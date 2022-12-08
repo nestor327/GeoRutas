@@ -1,5 +1,5 @@
 import React, { useEffect,useRef, useState  } from 'react'
-import { View,Text, Platform, StatusBar, ActivityIndicator, Image, TextInput} from 'react-native';
+import { View,Text, Platform, StatusBar, ActivityIndicator, Image, TextInput, TouchableOpacity, Keyboard} from 'react-native';
 import {enableLatestRenderer, Marker, PROVIDER_GOOGLE,Polyline} from 'react-native-maps';
 import MapView from 'react-native-maps';
 import IconosDeNavegacion from './IconosDeNavegacion.jsx';
@@ -15,6 +15,7 @@ import urlDeLasImagenesEstaticas from '../data/urlDeLasImagenesDeLasRutas.js';
 import urlDeLasImagenesParadaBajar from '../data/urlDeLasImagenesParadaBajar.js';
 import urlDeLasImagenesParadaSubir from '../data/urlDeLasImagenesParadaSubir.js';
 import useLocation from '../src/hooks/useLocation.jsx';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoordenadasOrigen,tipoDeUsuario
     ,setVerTrayectoria,setOcultarMenu,coordenadasOrigen,coordenadasDestino,setCoordenadasDestino,verTrayectoria,iconosTransportes,tiemposRutasTrayectorias
@@ -27,7 +28,9 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     ,setPermitirEnviarUbicacion,permitirEnviarUbicacion
 
     ,menUno,setmenUno,menDos, setmenDos,menTres, setmenTres,menCuatro, setmenCuatro,menCinco, setmenCinco
-    ,userLocation, setUserLocatio,setSecionIniciada, setTipoDeUsuario})=>{
+    ,userLocation, setUserLocatio,setSecionIniciada, setTipoDeUsuario
+    ,mostrarBarraSecundariaDeUbicacion,setMostrarBarraSecundariaDeUbicacion,setMostrarItemMenuUno,setIdRutaAMostrar
+    ,refCambiarLupa})=>{
     
 
 
@@ -44,7 +47,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             followUseLocation,            
             actualizarUbicacionEnElBackEnd,
             siguiendoAlUsuario,
-            askLocationPermission
+            askLocationPermission,
+            askLocationPermissionSetting
         }=useLocation(permitirEnviarUbicacion,tipoDeUsuario,idUsuarioIniciado,direccionesPorUsuario,userLocation,setUserLocatio);
 
     const [mostrarVentana,serMostrarVentana]=useState('none');    
@@ -55,10 +59,21 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     const [rutasParadas,setRutasParadas]=useState([]);
     const [pausarEnvioDeUbicaciones,serPausarEnvioDeUbicaciones]=useState(false);
 
+    const [actualizarDestino, setActualizarDestino]=useState({latitude:0,longitude:0});
+    const [actualizarOrigen,setActualizarOrigen]=useState({latitude:0,longitude:0});
+
+    const [tipoDeModificacionDeLugar, setTipoDeModificacionDeLugar]=useState('Destino');
+    const [verRecomendacionesDeUbicaciones, setVerRecomendacionesDeUbicacion]=useState(false);
+
+
+
     const refMapView=useRef();
     const refFollowing=useRef(true);
     const [refChangeLocation,setrefChangeLocation]=useState({latitude:0, longitude:0});
     const refEnvioDeUbicacionesPasajero=useRef(true);
+    const refInputAutoComplete=useRef();
+    const refNombreDelDestino=useRef("Desconocido");
+    const refNombreDelOrigen=useRef("Desconocido");
         
     const capturarUsuarioTransportistaYDemas=async()=>{
         console.log("El puto numero es: "+idUsuarioIniciado);
@@ -94,8 +109,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         if(pausarEnvioDeUbicaciones==false && tipoDeUsuario=='Transportista'){
             actualizarUbicacionEnElBackEnd(usuarioTransportista,paradasCompletas,rutasParadas,userLocation);            
             serPausarEnvioDeUbicaciones(true);
-        }else if(tipoDeUsuario=='Pasajero' && refEnvioDeUbicacionesPasajero.current==false){
-            let fecha= new Date();
+        }else if(tipoDeUsuario=='Pasajero' && refEnvioDeUbicacionesPasajero.current==false){            
             refEnvioDeUbicacionesPasajero.current=true;
             setrefChangeLocation(userLocation);
         }
@@ -127,6 +141,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         if(idUsuarioIniciado>0){
             capturarUsuarioTransportistaYDemas();
             askLocationPermission();
+            askLocationPermissionSetting();
         }
         
     },[idUsuarioIniciado,permitirEnviarUbicacion])
@@ -192,6 +207,22 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
     const [permitirSeguirPasajero, setPermitirSeguirPasajero]=useState(false);
 
+    useEffect(()=>{
+        if(actualizarDestino.latitude==0){
+            return;
+        }
+        setCoordenadasDestino(actualizarDestino);
+        refCambiarLupa.current=true;
+    },[actualizarDestino])
+
+    useEffect(()=>{
+        if(actualizarOrigen.latitude==0){
+            return;
+        }
+        setCoordenadasOrigen(actualizarOrigen);
+        refCambiarLupa.current=true;
+    },[actualizarOrigen])
+
 
 
     // useEffect(()=>{
@@ -214,8 +245,49 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     //     }
     // },[identificadorKey,actualizarTrayecto])
 
+    //
+
+    useEffect(() => {
+        const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+            
+            if(refInputAutoComplete.current.isFocused()==true){
+                setMostrarBarraSecundariaDeUbicacion(true);
+                refInputAutoComplete.current.clear();
+                if (menUno[0].display == 'flex' ) {
+                    setmenUno([{display:'none',color:'#102769'}]);
+                } else if(menDos[0].display == 'flex'){
+                    setmenDos([{display:'none',color:'#102769'}]);
+                }else if(menTres[0].display == 'flex'){
+                    setmenTres([{display:'none',color:'#102769'}]);
+                }else if(menCuatro[0].display=='flex'){
+                    setmenCuatro([{display:'none',color:'#102769'}])
+                }else if(menCinco[0].display=='flex'){
+                    setmenCinco([{display:'none',color:'#102769'}])                    
+                }
+                //setmenUno([{ display: 'flex',color:'#101043' }]);
+                setMostrarItemMenuUno(true);
+                setIdRutaAMostrar(-1);
+                setOcultarMenu(true);       
+                setVerParadasCercanas([{observar:false,latitude:coordenadasOrigenSecundario.latitude,longitude:coordenadasOrigenSecundario.longitude,direccion:'K',id_Ruta:1}]);
+                // setMostrarUsuarios(false);
+                // setVerTransportistasPorLaDerecha(false);
+                // setVerTransportistasPorLaIzquierda(false);
+            }
+        });
+
+        const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+            //Esto es cuando el teclado desaparece            
+        });
+    
+        return () => {
+          showSubscription.remove();
+          hideSubscription.remove();
+        };
+      }, [tipoDeModificacionDeLugar]);
+
+
   return(
-    <View style={{width:'100%',height:(height>width)?(height-width*0.2):height*0.8, backgroundColor:'#2060A5'}}>
+    <View style={{height:(height>width)?(height-width*0.2-StatusBar.currentHeight):height*0.8-StatusBar.currentHeight,width:'100%', backgroundColor:'#2060A5'}}>
         
         <IconosDeNavegacion
         setPermitirEnviarUbicacion={setPermitirEnviarUbicacion} idUsuarioIniciado={idUsuarioIniciado} setMostrarUsuarios={setMostrarUsuarios}
@@ -228,33 +300,530 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         centrePosition={centrePosition} siguiendoAlUsuario={siguiendoAlUsuario} askLocationPermission={askLocationPermission} followUseLocation={followUseLocation}
         stopFollowUserLocation={stopFollowUserLocation} permitirSeguirPasajero={permitirSeguirPasajero} setPermitirSeguirPasajero={setPermitirSeguirPasajero}
         setVerTrayectoria={setVerTrayectoria} ocultarTrayecto={ocultarTrayecto} permisos={permisos} usuarioTransportista={usuarioTransportista}
+        askLocationPermissionSetting={askLocationPermissionSetting}
         ></IconosDeNavegacion>
 
 
 
-        <View style={{height:40,width:'90%',zIndex:100,top:'8%',position:'absolute', 
-        backgroundColor:'#2060A5',flexDirection:'row',marginLeft:'5%',marginRight:'5%',
-        borderRadius:20,alignContent:'center',alignItems:'center'}}>
-            <Image 
-                source={require('../assets/Citycons_bus_icon-icons.com_67914.png')}
-                style={{width:32, height:32,marginLeft:4}}>
-            </Image>
 
-            <TextInput placeholder="¿Adónde quieres ir?"style={{flex:1,marginLeft:4}}>
-            </TextInput>
+        <View style={[{width:'90%',zIndex:100,top:height*0.08-StatusBar.currentHeight,position:'absolute', 
+        backgroundColor:'#2060A5',flexDirection:'row',marginLeft:'5%',borderTopRightRadius:20, 
+        borderTopLeftRadius:20},mostrarBarraSecundariaDeUbicacion==false && {borderBottomRightRadius:20,borderBottomLeftRadius:20}]}>
+
+            <TouchableOpacity 
+                onPress={()=>{
+
+                    if(mostrarBarraSecundariaDeUbicacion==false){
+                        setMostrarBarraSecundariaDeUbicacion(true);
+                        if(tipoDeModificacionDeLugar=='Destino'){
+                            refMapView.current?.animateCamera({
+                                center:{...coordenadasDestino}
+                            })  
+                        }else{
+                            refMapView.current?.animateCamera({
+                                center:{...coordenadasOrigen}
+                            })                            
+                        }
+
+
+                        if (menUno[0].display == 'none') {                            
+                            if (menUno[0].display == 'flex' ) {
+                                setmenUno([{display:'none',color:'#102769'}]);
+                            } else if(menDos[0].display == 'flex'){
+                                setmenDos([{display:'none',color:'#102769'}]);
+                            }else if(menTres[0].display == 'flex'){
+                                setmenTres([{display:'none',color:'#102769'}]);
+                            }else if(menCuatro[0].display=='flex'){
+                                setmenCuatro([{display:'none',color:'#102769'}])
+                            }else if(menCinco[0].display=='flex'){
+                                setmenCinco([{display:'none',color:'#102769'}])                    
+                            }                            
+                            setMostrarItemMenuUno(true);
+                            setIdRutaAMostrar(-1);
+                            setMostrarUsuarios(false);
+                            setVerTransportistasPorLaDerecha(false);
+                            setVerTransportistasPorLaIzquierda(false);
+                        } else {
+                            setmenUno([{ display: 'none',color:'#102769' }]);
+                            setmenCuatro([{ display: 'flex',color:'#101043'}]);                           
+                            //setMostrarItemMenuUno(false);
+                        }
+                            
+                        
+                        //RutasTrayectorias(setRutasEnElMapa);    
+                        setOcultarMenu(true);       
+                        setVerParadasCercanas([{observar:false,latitude:coordenadasOrigenSecundario.latitude,longitude:coordenadasOrigenSecundario.longitude,direccion:'K',id_Ruta:1}]);
+                        
+                    }else{                        
+                        if(tipoDeModificacionDeLugar=='Destino'){
+                            refMapView.current?.animateCamera({
+                                center:{...coordenadasOrigen}
+                            })
+                            setTipoDeModificacionDeLugar('Origen');
+                            refInputAutoComplete.current.blur();
+                            if(refNombreDelOrigen.current=='Desconocido'){
+                                refInputAutoComplete.current.setAddressText('');
+                            }else{
+                                refInputAutoComplete.current.setAddressText(refNombreDelOrigen.current);
+                            }
+                        }else{
+                            refMapView.current?.animateCamera({
+                                center:{...coordenadasDestino}
+                            })
+                            setTipoDeModificacionDeLugar('Destino');
+                            refInputAutoComplete.current.blur();
+                            if(refNombreDelDestino.current=='Desconocido'){
+                                refInputAutoComplete.current.setAddressText('');
+                            }else{
+                                refInputAutoComplete.current.setAddressText(refNombreDelDestino.current);
+                            }
+                        }
+                    }
+
+                }}
+            >
+                <Image 
+                //require('../assets/Citycons_bus_icon-icons.com_67914.png')
+                    source={(tipoDeModificacionDeLugar=='Destino')?require("../assets/paradaFinal.png"):require("../assets/UsuarioPersona.png")}
+                    style={{width:37, height:37,marginLeft:7,marginTop:7,marginBottom:7,backgroundColor:'#f1f1f1',borderRadius:20,marginRight:7}}>
+                </Image>
+            </TouchableOpacity>
+
+            <View style={{flex:1, flexDirection:'row',alignContent:'center',alignItems:'center'}}>
+
+           
+
+            {/* <TextInput placeholder="¿Adónde quieres ir?"style={{flex:1,marginLeft:4}}>
+            </TextInput> */}
+
+            <GooglePlacesAutocomplete
+                ref={refInputAutoComplete}
+                
+                placeholder={(tipoDeModificacionDeLugar=='Destino')?"¿Adónde quieres ir?":"¿Cual es tu punto de partida?"}
+                minLength={2}
+                styles={{
+
+                    textInputContainer:{
+                        //Este es el color de subrayado sin detalles del buscador
+                        backgroundColor:'#2060A5',
+                        marginTop:8,
+                        marginBottom:3,
+                        color:'black',
+                        placeholderTextColor:'gray'
+                    },
+                    textInput: {                        
+                        placeholderTextColor:'gray',
+                        backgroundColor: '#dcdcdc',
+                        height: 35,
+                        borderRadius: 14,
+                        paddingVertical: 0,
+                        paddingHorizontal: 10,
+                        fontSize: 15,
+                        flex: 1,
+                        textAlign:'left',
+                        color:'black'
+                      },
+                      poweredContainer: {
+                        justifyContent: 'flex-end',
+                        alignItems: 'center',
+                        borderBottomRightRadius: 12,
+                        borderBottomLeftRadius: 12,
+                        borderColor: '#c8c7cc',
+                        borderTopWidth: 0.5,                        
+                        alignContent:'flex-start',
+                        color:'black'
+                      },
+                    powered: {},
+                    listView: {},
+                    row: {
+                        backgroundColor: '4682B4',
+                        padding: 0,
+                        alignContent:'center',
+                        alignItems:'center',
+                        height: 40,
+                        flexDirection: 'row',
+                        color:'black'
+                    },
+                    separator: {
+                        height: 0.5,
+                        backgroundColor: '#c8c7cc'
+                    },
+                    description: {},
+                    loader: {
+                        flexDirection: 'row',
+                        justifyContent: 'flex-end',
+                        height: 20,
+                        color:'black'
+                    }
+                    
+                }}
+                enablePoweredByContainer={false}
+                           
+                onPress={(data, details)=>{
+                    console.log(data);
+                    console.log(details);
+                    // console.log("Mierda");
+
+                    if(details!=null){
+                        
+                        console.log(details.geometry.location.lat +" n "+details.geometry.location.lng);
+
+                        let latitude=details.geometry.location.lat;
+                        let longitude=details.geometry.location.lng;
+
+                        refMapView.current?.animateCamera({
+                            center:{ latitude,longitude}//{latitude:,latitude:}
+                        })
+                        console.log("Se debio de actualizar");
+                        if(tipoDeModificacionDeLugar=='Destino'){
+                            setActualizarDestino({latitude:latitude,longitude:longitude});
+                            if(data.structured_formatting.main_text.length>30){
+                                refNombreDelDestino.current=(data.structured_formatting.main_text.substring(0,24));
+                                refInputAutoComplete.current.setAddressText(data.structured_formatting.main_text.substring(0,24));
+                            }else{
+                                refNombreDelDestino.current=(data.structured_formatting.main_text);
+                                refInputAutoComplete.current.setAddressText(data.structured_formatting.main_text);
+                            }
+                                
+                        }else{
+                            setActualizarOrigen({latitude:latitude,longitude:longitude});
+                            if(data.structured_formatting.main_text.length>30){
+                                refNombreDelOrigen.current=(data.structured_formatting.main_text.substring(0,24));
+                                refInputAutoComplete.current.setAddressText(data.structured_formatting.main_text.substring(0,24));
+                            }else{
+                                refNombreDelOrigen.current=(data.structured_formatting.main_text);
+                                refInputAutoComplete.current.setAddressText(data.structured_formatting.main_text);
+                            }
+                                
+                        }
+
+                        if (menUno[0].display == 'flex' ) {
+                            setmenUno([{display:'none',color:'#102769'}]);
+                        } else if(menDos[0].display == 'flex'){
+                            setmenDos([{display:'none',color:'#102769'}]);
+                        }else if(menTres[0].display == 'flex'){
+                            setmenTres([{display:'none',color:'#102769'}]);
+                        }else if(menCuatro[0].display=='flex'){
+                            setmenCuatro([{display:'none',color:'#102769'}])
+                        }else if(menCinco[0].display=='flex'){
+                            setmenCinco([{display:'none',color:'#102769'}])                    
+                        }
+
+                        setOcultarTrayecto(false);
+                        setIdRutaAMostrar(-1);
+                        setmenCuatro([{ display: 'flex',color:'#101043' }]);                        
+                        //setMostrarItemMenuUno(false);  
+                    }
+                }}
+
+                query={{
+                    key:'AIzaSyCNl411y84GibkNJrHX4cKJeRbldOe5hsc',
+                    language:'es',
+                    components:'country:ni'
+                }}
+                fetchDetails={true}
+            />
+
+
+        </View>
 
             <View onTouchEnd={()=>{
-                serMostrarVentana('flex');                                 
-            }}>
+                if(mostrarBarraSecundariaDeUbicacion==false){
+                    serMostrarVentana('flex'); 
+                    if (menUno[0].display == 'flex' ) {
+                        setmenUno([{display:'none',color:'#102769'}]);
+                    } else if(menDos[0].display == 'flex'){
+                        setmenDos([{display:'none',color:'#102769'}]);
+                    }else if(menTres[0].display == 'flex'){
+                        setmenTres([{display:'none',color:'#102769'}]);
+                    }else if(menCuatro[0].display=='flex'){
+                        setmenCuatro([{display:'none',color:'#102769'}])
+                    }else if(menCinco[0].display=='flex'){
+                        setmenCinco([{display:'none',color:'#102769'}])                    
+                    }
+                    //setmenUno([{ display: 'flex',color:'#101043' }]);
+                    //setMostrarItemMenuUno(true);
+                    //setIdRutaAMostrar(-1);
+                    //setOcultarMenu(true);       
+                    //setVerParadasCercanas([{observar:false,latitude:coordenadasOrigenSecundario.latitude,longitude:coordenadasOrigenSecundario.longitude,direccion:'K',id_Ruta:1}]);
+                                    
+                }else{
+                    setMostrarBarraSecundariaDeUbicacion(false);
+                    refInputAutoComplete.current.blur();
+                    refInputAutoComplete.current.clear(); 
+                }                
+                }}>
                 
                 <Image 
-                    source={require('../assets/Sukuna.jpg')} 
-                    style={{width:32, height:32,marginRight:4, borderRadius:16}}>
+                    //source={require('../assets/Sukuna.jpg')} 
+                    source={(mostrarBarraSecundariaDeUbicacion==true)?require('../assets/x_icon_imagen.png'):require('../assets/Sukuna.jpg')}
+                    style={[{width:37, height:37,marginLeft:7,marginRight:7, borderRadius:20,marginTop:7,marginBottom:7,
+                    },(mostrarBarraSecundariaDeUbicacion==true) && {tintColor:'#f1f1f1',marginRight:10,marginLeft:4}]}>
                 </Image>
             </View>
-        </View>
+    </View>
+    
+    {mostrarBarraSecundariaDeUbicacion==true && <View style={{width:(mostrarBarraSecundariaDeUbicacion==true)?'90%':12,zIndex:90,top:height*0.08+47-StatusBar.currentHeight
+    ,position:'absolute', backgroundColor:'#2060A5',flexDirection:'row',marginLeft:'5%',
+        borderBottomLeftRadius:20,borderBottomRightRadius:20,alignItems:'flex-start',paddingBottom:0,paddingTop:5}}>
+            
+            <TouchableOpacity 
+                onPress={()=>{
+                    if(tipoDeModificacionDeLugar=='Destino'){
+                        refMapView.current?.animateCamera({
+                            center:{...coordenadasOrigen}
+                        })
+                        setTipoDeModificacionDeLugar('Origen');
+                        refInputAutoComplete.current.blur();
+                        if(refNombreDelOrigen.current=='Desconocido'){
+                            refInputAutoComplete.current.setAddressText('');
+                        }else{
+                            refInputAutoComplete.current.setAddressText(refNombreDelOrigen.current);
+                        }
+                    }else{
+                        refMapView.current?.animateCamera({
+                            center:{...coordenadasDestino}
+                        })
+                        setTipoDeModificacionDeLugar('Destino');
+                        refInputAutoComplete.current.blur();
+                        if(refNombreDelDestino.current=='Desconocido'){
+                            refInputAutoComplete.current.setAddressText('');
+                        }else{
+                            refInputAutoComplete.current.setAddressText(refNombreDelDestino.current);
+                        }
+                    }                  
+                }}
+            >
+                <Image 
+                //require('../assets/Citycons_bus_icon-icons.com_67914.png')
+                    source={(tipoDeModificacionDeLugar=='Destino')?require("../assets/UsuarioPersona.png"):require("../assets/paradaFinal.png")}
+                    style={{marginBottom:8,marginLeft:6.5,backgroundColor:'#f1f1f1',borderRadius:20,marginRight:6.5
+                    ,marginTop:1,width:36,height:36}}>
+                </Image>
+            </TouchableOpacity>
         
-        {mostrarVentana=="flex" && <Perfil permitirEnviarUbicacion={permitirEnviarUbicacion} secionIniciada={secionIniciada} setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setRegistrarse={setRegistrarse} setLoguearse={setLoguearse} tipoDePerfil={[{principal:{width:'100%',height:height+StatusBar.currentHeight-width*0.2,position:'absolute',top:0,left:0,zIndex:200,backgroundColor:'#00000045'}}]} actualizar={serMostrarVentana}></Perfil>}
+            {<View
+                style={{                      
+                    width:'100%',
+                    borderRadius: 10,
+                    fontSize: 15,
+                    flex: 1,
+                    textAlignVertical:'center',                    
+                    color:'white',
+                    fontWeight:'500',                  
+                    textAlign:'left',
+                    paddingBottom:0,
+                    paddingTop:0,
+                    marginBottom:4,
+                    marginLeft:3
+                }}
+            >
+                <TouchableOpacity
+                    style={{
+                        flexDirection:'row',
+                        alignItems:'center',
+                        backgroundColor: '#4682B4',
+                        height: 35,
+                        width:'100%',
+                        borderRadius: 10,
+                        paddingHorizontal: 10,
+                        fontSize: 15,
+                        flex: 1,
+                        textAlignVertical:'center',                        
+                        color:'white',
+                        fontWeight:'500',                  
+                        textAlign:'left',
+                        paddingBottom:0,
+                        paddingTop:0,
+                        marginBottom:4
+                    }}
+                    editable={false}
+                    onPressOut={()=>{
+                        setVerRecomendacionesDeUbicacion(!verRecomendacionesDeUbicaciones);
+
+                    }}
+                        >
+                    <Text
+                        style={{fontWeight:'700',fontSize:16,color:'#3e4144',margin:0}}
+                    >
+                        {(tipoDeModificacionDeLugar=='Destino')?"Origen: ":"Destino: "}
+                    </Text>
+
+                    <Text
+                        style={{fontSize:15,color:'#f1f1f1',margin:0,flex:1,height:22}}
+                    >
+                        {(tipoDeModificacionDeLugar=='Destino')?refNombreDelOrigen.current:refNombreDelDestino.current}
+                    </Text>
+                     
+                </TouchableOpacity>
+                {verRecomendacionesDeUbicaciones==true && <View>
+                    <TouchableOpacity
+                        style={{                        
+                            justifyContent: 'center',
+                            alignItems: 'flex-start',
+                            //borderBottomRightRadius: 12,
+                            //borderBottomLeftRadius: 12,
+                            borderRadius:12,
+                            borderColor: '#c8c7cc',
+                            borderBottomWidth: 0.5,
+                            borderTopWidth:0.5,                            
+                            alignContent:'flex-start',                            
+                            backgroundColor:'#f1f1f1',
+                            height:40,
+                            paddingLeft:15,
+                            marginBottom:0,
+                        }}  
+                        onPress={()=>{
+                            setVerRecomendacionesDeUbicacion(false);
+
+                            if(tipoDeModificacionDeLugar=='Destino'){
+                                refMapView.current?.animateCamera({
+                                    center:{...coordenadasOrigen}
+                                })
+                                setTipoDeModificacionDeLugar('Origen');
+                                refInputAutoComplete.current.blur();
+                                //refInputAutoComplete.current.setAddressText(refNombreDelOrigen.current);                        
+                                refInputAutoComplete.current.focus();
+                            }else{
+                                refMapView.current?.animateCamera({
+                                    center:{...coordenadasDestino}
+                                })
+                                setTipoDeModificacionDeLugar('Destino');
+                                refInputAutoComplete.current.blur();
+                                refInputAutoComplete.current.focus();
+                                //refInputAutoComplete.current.setAddressText(refNombreDelDestino.current);
+                            }
+                        }}                      
+                    >
+                        <Text style={{color:'gray',fontSize:15}}>Buscar</Text>
+                    </TouchableOpacity>
+
+                    {tipoDeModificacionDeLugar=='Destino' && refNombreDelOrigen.current!='Desconocido' &&
+                    refNombreDelOrigen.current!='Tu ubicación' && <TouchableOpacity
+                    style={{                        
+                        justifyContent: 'center',
+                        alignItems: 'flex-start',
+                        borderBottomRightRadius: 12,
+                        borderBottomLeftRadius: 12,
+                        borderColor: '#c8c7cc',
+                        borderBottomWidth: 0.5,
+                        color:'black',
+                        alignContent:'center',
+                        color:'black',
+                        paddingLeft:15,
+                        marginBottom:0,
+                        height:40
+                        }}
+
+                        onPress={()=>{
+                            setVerRecomendacionesDeUbicacion(false);
+                            refMapView.current?.animateCamera({
+                                center:{...coordenadasOrigen}
+                            })
+                            //setTipoDeModificacionDeLugar('Origen');
+                            //refInputAutoComplete.current.blur();
+                            //refInputAutoComplete.current.setAddressText(refNombreDelOrigen.current);                        
+                            //refInputAutoComplete.current.focus();
+                        }}
+
+                        >
+                        <Text style={{color:'black',fontSize:15}}>{refNombreDelOrigen.current}</Text>
+                    </TouchableOpacity>}
+
+                    {tipoDeModificacionDeLugar!='Destino' && refNombreDelDestino.current!='Desconocido'
+                    && <TouchableOpacity
+                    style={{                        
+                        justifyContent: 'center',
+                        alignItems: 'flex-start',
+                        borderBottomRightRadius: 12,
+                        borderBottomLeftRadius: 12,
+                        borderColor: '#c8c7cc',
+                        borderBottomWidth: 0.5,
+                        color:'black',
+                        alignContent:'center',
+                        color:'black',
+                        paddingLeft:15,
+                        marginBottom:0,
+                        height:40}}
+                        
+                        onPress={()=>{
+                            setVerRecomendacionesDeUbicacion(false);
+                            refMapView.current?.animateCamera({
+                                center:{...coordenadasDestino}
+                            })
+                        }}
+                        >
+                        <Text style={{color:'black',fontSize:15}}>{refNombreDelDestino.current}</Text>
+                    </TouchableOpacity>}
+
+                    {tipoDeModificacionDeLugar=='Destino'  && <TouchableOpacity
+                    style={{                        
+                        justifyContent: 'center',
+                        alignItems: 'flex-start',
+                        borderBottomRightRadius: 12,
+                        borderBottomLeftRadius: 12,
+                        borderColor: '#c8c7cc',
+                        borderBottomWidth: 0.5,
+                        color:'black',
+                        alignContent:'center',
+                        color:'black',
+                        paddingLeft:15,
+                        marginBottom:0,
+                        height:40}}
+
+                        onPress={()=>{
+                            if(permisos!='granted'){
+                                askLocationPermission();
+                                askLocationPermissionSetting();
+                                return;
+                            }
+                            refNombreDelOrigen.current='Tu ubicación';
+                            setVerRecomendacionesDeUbicacion(false);
+                            const {latitude,longitude}=getCurrentLocation();
+                            
+                            setCoordenadasOrigen(userLocation);
+
+                            refMapView.current?.animateCamera({
+                                center:{...userLocation}
+                            })
+                        }}
+                    >
+                        <Text style={{color:'black',fontSize:15}}>Tu ubicación</Text>
+                    </TouchableOpacity>}
+                </View>}
+
+            </View>}
+
+        {mostrarBarraSecundariaDeUbicacion==true && <TouchableOpacity
+            onPress={()=>{
+                if(menUno[0].display=='none'){
+                    setmenUno([{ display: 'flex',color:'#101043' }]);
+                    setMostrarItemMenuUno(true);
+                    setIdRutaAMostrar(-1);
+                    setOcultarMenu(true);       
+                    setVerParadasCercanas([{observar:false,latitude:coordenadasOrigenSecundario.latitude,longitude:coordenadasOrigenSecundario.longitude,direccion:'K',id_Ruta:1}]);                        
+                }else{                    
+                    setmenUno([{ display: 'none',color:'#102769' }]);
+                    setmenCuatro([{ display: 'flex',color:'#101043'}]);                          
+                }
+                
+
+            }}
+        >
+                <Image 
+                //require('../assets/Citycons_bus_icon-icons.com_67914.png')
+                    source={(refCambiarLupa.current==true)?require("../assets/lupaRota.png"):require("../assets/lupa.png")}
+                    style={{marginBottom:0,width:40, height:40,marginRight:7,backgroundColor:'#2060A5',borderRadius:20,
+                        borderWidth:2,borderColor:'#2060A5',marginLeft:7}}>                    
+                </Image>
+        </TouchableOpacity>}
+    </View>}
+        
+
+
+
+
+        {mostrarVentana=="flex" && <Perfil permitirEnviarUbicacion={permitirEnviarUbicacion} secionIniciada={secionIniciada} setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setRegistrarse={setRegistrarse} setLoguearse={setLoguearse} tipoDePerfil={[{principal:{width:'100%',height:height-width*0.2,position:'absolute',top:0,left:0,zIndex:200,backgroundColor:'#00000045'}}]} actualizar={serMostrarVentana}></Perfil>}
         
         {<MapView
 
@@ -262,7 +831,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             refMapView.current=el;
         }}
 
-        initialRegion={{latitude:inicialPosition.latitude,longitude:inicialPosition.longitude
+        initialRegion={{latitude:inicialPosition.latitude,
+                        longitude:inicialPosition.longitude
                         ,latitudeDelta:0.04,longitudeDelta:0.04}}
 
         style={{width:'100%',height:'100%'}}
@@ -286,6 +856,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     setmenCinco([{display:'none',color:'#102769'}])                    
                 }
                 setmenCuatro([{ display: 'flex',color:'#101043' }]);
+                refInputAutoComplete.current.blur();
+                setMostrarBarraSecundariaDeUbicacion(false);
             }
         }
         >
@@ -303,7 +875,12 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             <View>
                 <Marker onDragEnd={
                     async(coords)=>{
-                        setCoordenadasOrigen(coords.nativeEvent.coordinate);   
+                        refNombreDelOrigen.current='Desconocido';
+                        if(tipoDeModificacionDeLugar!='Destino'){
+                            refInputAutoComplete.current.setAddressText('');
+                        }                        
+                        setMostrarBarraSecundariaDeUbicacion(false);
+                        setCoordenadasOrigen(coords.nativeEvent.coordinate);                           
                         //RutasTrayectorias(setRutasEnElMapa);              
                         obtenerRutas(identificadorKey.current);
                         setVerTrayectoria(false);
@@ -325,6 +902,11 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                 
                 <Marker onDragEnd={
                         async (coords)=>{
+                        refNombreDelDestino.current='Desconocido';
+                        if(tipoDeModificacionDeLugar=='Destino'){
+                            refInputAutoComplete.current.setAddressText('');    
+                        }                        
+                        setMostrarBarraSecundariaDeUbicacion(false);
                         setCoordenadasDestino(coords.nativeEvent.coordinate);
                         //RutasTrayectorias(setRutasEnElMapa);              
                         obtenerRutas(identificadorKey.current);
@@ -357,8 +939,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                             latitudeDelta:0.02,
                             longitudeDelta:0.05
                         }} style={{alignItems:'center'}}>
-                            {(item.direccionParadaInicial=='D') && <Text>{"⇛"+item.nombre}</Text>}
-                            {(item.direccionParadaInicial=='I') && <Text>{"⇚"+item.nombre}</Text>}
+                            {(item.direccionParadaInicial=='D') && <Text style={{color:'black'}}>{"⇛"+item.nombre}</Text>}
+                            {(item.direccionParadaInicial=='I') && <Text style={{color:'black'}}>{"⇚"+item.nombre}</Text>}
                             {/* {(item.id_Ruta==2) && (item.direccionParadaInicial=='D') && <Text>{"⇛"+item.nombre}</Text>}
                             {(item.id_Ruta==2) && (item.direccionParadaInicial=='I') && <Text>{"⇚"+item.nombre}</Text>}
                             {(item.id_Ruta==3) && (item.direccionParadaInicial=='D') && <Text>{"⇛"+item.nombre}</Text>}                                                        
@@ -368,7 +950,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                             {/* {(item.id_Ruta==2) && <Image style={{width:27,height:27}} source={require("../assets/114c.png")} ></Image>}
                             {(item.id_Ruta==3) && <Image style={{width:27,height:27}} source={require("../assets/102c.png")} ></Image>}                             */}
                         
-                            {<Text>{Math.floor(tiemposRutasTrayectorias[i]/3600)+":"+Math.floor(((tiemposRutasTrayectorias[i]-3600*(Math.floor(tiemposRutasTrayectorias[i]/3600)))/60))+":"+tiemposRutasTrayectorias[i]%60}</Text>}
+                            {<Text style={{color:'black'}}>{Math.floor(tiemposRutasTrayectorias[i]/3600)+":"+Math.floor(((tiemposRutasTrayectorias[i]-3600*(Math.floor(tiemposRutasTrayectorias[i]/3600)))/60))+":"+tiemposRutasTrayectorias[i]%60}</Text>}
                             
                         </Marker>
 

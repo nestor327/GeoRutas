@@ -9,7 +9,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
     verTransportistasPorLaDerecha,verTransportistasPorLaIzquierda,idRutaAMostrar,mostrarUsuarios,permitirEnviarUbicacion,
     tipoDeUsuario,mostrarParadas,mostrarItemMenuUno,verTrayectoria,verCompetencia,verRutasCercanas,centrePosition,siguiendoAlUsuario,
     askLocationPermission,followUseLocation, stopFollowUserLocation,permitirSeguirPasajero, setPermitirSeguirPasajero,setVerTrayectoria,
-    ocultarTrayecto,permisos,usuarioTransportista
+    ocultarTrayecto,permisos,usuarioTransportista,askLocationPermissionSetting
     })=>{
 
         //const [urlActualizacion,setUrlActualizacion]=useState('../assets/cambioDetrayectoriaCero.jpg');
@@ -49,6 +49,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
 
                     if(permisos!='granted'){
                         askLocationPermission();
+                        askLocationPermissionSetting();
                         return;
                     }
 
@@ -140,6 +141,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                 onPres={async()=>{
                     if(permisos!='granted'){
                         askLocationPermission();
+                        askLocationPermissionSetting();
                         return;
                     }
                     followUseLocation();

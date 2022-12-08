@@ -5,7 +5,7 @@ import getAllRutas from '../data/rutasManagua.js'
 
 
 const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRutasTrayecto,obtenerRutas
-    ,setVerTrayectoria,setVerRutasCercanas,identificadorKey
+    ,setVerTrayectoria,setVerRutasCercanas,identificadorKey,refCambiarLupa
     ,setVerCompetencia,setOcultarTrayecto})=>{
 
     let cantidadDeTrayectos =[0];
@@ -72,6 +72,7 @@ return(
                             setVerRutasCercanas(false);  
                             setVerCompetencia(false);    
                             setOcultarTrayecto(true); 
+                            refCambiarLupa.current=false;
                         }
                         }>
                             <TouchableOpacity style={visualizarRutas==(i+1) && { backgroundColor:'#1e81ce', padding:5, borderRadius:10}}>
