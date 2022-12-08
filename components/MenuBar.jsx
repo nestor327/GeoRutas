@@ -1,7 +1,7 @@
 import * as react from 'react';
 import Perfil from './Perfil.jsx';
 import IntercambiosRutas from './IntercambiosRutas.jsx';
-import { ScrollView, View,Image,Text, TouchableHighlightBase, TouchableOpacity } from 'react-native';
+import { ScrollView, View,Image,Text, TouchableHighlightBase, TouchableOpacity, StatusBar } from 'react-native';
 import getAllRutas from '../data/rutasManagua.js';
 import RutasBarItem from './RutasBarItem.jsx';
 import ParadasCercaDelOrigen from './ParadasCercaDeUbicacion.jsx';
@@ -17,7 +17,7 @@ const  MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTray
 
                 ,menUno,setmenUno,menDos, setmenDos,menTres, setmenTres,menCuatro, setmenCuatro,menCinco, setmenCinco
                 ,verParadasCercanas,userLocation,setCoordenadasOrigenSecundario,setSecionIniciada, setTipoDeUsuario
-                ,permitirEnviarUbicacion
+                ,permitirEnviarUbicacion, setMostrarBarraSecundariaDeUbicacion,refCambiarLupa
             })=>{
     
     // const {data,obtenerRutas} = useTrayectoria(coordenadasOrigen,coordenadasDestino,setRutasEnElMapa,rutasEnElMapa,setRutasTrayectoria,setVisualizarRutas,
@@ -53,7 +53,7 @@ const  MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTray
   return (
     <View style={{height:(height>width)?width*0.2:height*0.2}}>
         {verPerfil=='flex' && <Perfil permitirEnviarUbicacion={permitirEnviarUbicacion} secionIniciada={secionIniciada} setSecionIniciada={setSecionIniciada} 
-        setTipoDeUsuario={setTipoDeUsuario} tipoDePerfil={[{principal:{width:'100%',height:'900%',position:'absolute',top:'-900%',left:0,zIndex:200,backgroundColor:'#00000045'}
+        setTipoDeUsuario={setTipoDeUsuario} tipoDePerfil={[{principal:{width:'100%',height:height+StatusBar.currentHeight-width*0.2,position:'absolute',top:-1*(height-width*0.2),left:0,zIndex:200,backgroundColor:'#00000045'}
         }]} actualizar={setVerPerfil} setLoguearse={setLoguearse} setRegistrarse={setRegistrarse}></Perfil>}
 
              {ocultarMenu==true && <View style={[menUno, {left:(height<width)?(width*0.2-height*0.2)/2:0, width: (height>width)?width*0.2:height*0.2, height: '300%', position: 'absolute', top: '-300%', backgroundColor: '#102769' }]}>
@@ -63,14 +63,15 @@ const  MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTray
                     verRutasTrayecto={verRutasTrayecto} obtenerRutas={obtenerRutas}
                     setVerTrayectoria={setVerTrayectoria}
                     setVerRutasCercanas={setVerRutasCercanas} setVerCompetencia={setVerCompetencia} setOcultarTrayecto={setOcultarTrayecto}
-                    identificadorKey={identificadorKey}></IntercambiosRutas>
+                    identificadorKey={identificadorKey} refCambiarLupa={refCambiarLupa}
+                    ></IntercambiosRutas>
 
                 </ScrollView>
             </View>}
 
             <View style={[menDos, { left:(height<width)?width*0.2+(width*0.2-height*0.2)/2:width*0.2, width: (height>width)?width*0.2:height*0.2, height: '300%', position: 'absolute', top: '-300%', backgroundColor: '#102769' }]}>
                 <ScrollView>
-                { todasLasRutasData.length>0 &&
+                { todasLasRutasData.length>0 && todasLasRutasData!=undefined &&
                 
                     todasLasRutasData.map((item,i)=>{
                         return(                            
@@ -115,7 +116,7 @@ const  MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTray
                                 setOcultarMenu(true);       
                                 setVerParadasCercanas([{observar:false,latitude:coordenadasOrigenSecundario.latitude,longitude:coordenadasOrigenSecundario.longitude,direccion:'K',id_Ruta:1}]);
                                 //console.log(userLocation);
-                                
+                                setMostrarBarraSecundariaDeUbicacion(true);
                             }else{
                                 setLoguearse(true);
                             }
@@ -143,6 +144,7 @@ const  MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTray
                                 }
                                 setOcultarTrayecto(false);
                                 setVerParadasCercanas([{observar:false,latitude:coordenadasOrigenSecundario.latitude,longitude:coordenadasOrigenSecundario.longitude,direccion:'K',id_Ruta:1}]);                                
+                                setMostrarBarraSecundariaDeUbicacion(false);
                             }else{
                                 setLoguearse(true);
                             }
@@ -166,7 +168,7 @@ const  MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTray
                                     setMostrarItemMenuUno(false);  
                                     setIdRutaAMostrar(-1);
                                 }   
-                                setOcultarTrayecto(false);                         
+                                setOcultarTrayecto(false);                                
                             }else{
                                 setLoguearse(true);
                             }                 
@@ -202,7 +204,8 @@ const  MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTray
                             setOcultarTrayecto(false);
                             //setVerParadasCercanas(...{...{observar:false}})
                             setVerParadasCercanas([{observar:true,latitude:verParadasCercanas[0].latitude,longitude:verParadasCercanas[0].longitude,direccion:verParadasCercanas[0].direccion,id_Ruta:verParadasCercanas[0].id_Ruta}]);
-                            setOcultarTercerMenu(true);                            
+                            setOcultarTercerMenu(true);    
+                            setMostrarBarraSecundariaDeUbicacion(false);                        
                         }else{
                             setLoguearse(true);
                         }

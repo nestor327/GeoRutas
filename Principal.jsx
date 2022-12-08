@@ -32,7 +32,7 @@ export default function App() {
  LOG  {"latitude": , "longitude": } */
 
     const [coordenadasOrigen, setCoordenadasOrigen]=React.useState({latitude:12.153800313208755,longitude:-86.30149193108082});
-    const [coordenadasDestino, setCoordenadasDestino]=React.useState({latitude:12.143833235026133,longitude:-86.2169248983264});
+    const [coordenadasDestino, setCoordenadasDestino]=React.useState({latitude:12.134261,longitude:-86.269897});
     //const [coordenadasOrigen, setCoordenadasOrigen]=React.useState({latitude:12.147148643476557,longitude:-86.21404554694891});
     //const [coordenadasDestino, setCoordenadasDestino]=React.useState({latitude:12.155924,longitude:-86.302363});
 
@@ -70,7 +70,7 @@ export default function App() {
     const [iconosTransportes,setIconosTransportes]=React.useState([]);
     
     const identificadorKey=React.useRef(0);
-    
+    const refCambiarLupa=React.useRef(false);
     
     //const todasLasRutas=getAllRutas();
 
@@ -159,12 +159,15 @@ export default function App() {
 
       const [userLocation,setUserLocatio]=React.useState({latitude:0,longitude:0});    
 
+      const [mostrarBarraSecundariaDeUbicacion, setMostrarBarraSecundariaDeUbicacion]=React.useState(false);
+
   return (
     // <View style={{height:alturaTotal, width:width}}>
     <View style={{flex:1}}>
       
-        <StatusBar barStyle={'dark-content'} backgroundColor={"#00000045"} translucent={true}></StatusBar>      
+        {/* <StatusBar barStyle={'dark-content'} backgroundColor={"#00000045"} translucent={true}></StatusBar>       */}
 
+        
         <Inicio setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} setCoordenadasOrigen={setCoordenadasOrigen} tipoDeUsuario={tipoDeUsuario}
         setVerTrayectoria={setVerTrayectoria} setOcultarMenu={setOcultarMenu} coordenadasOrigen={coordenadasOrigen} coordenadasDestino={coordenadasDestino}
         setCoordenadasDestino={setCoordenadasDestino} mostrarItemMenuUno={mostrarItemMenuUno} verTrayectoria={verTrayectoria} iconosTransportes={iconosTransportes}
@@ -174,13 +177,16 @@ export default function App() {
         verTransportistasPorLaDerecha={verTransportistasPorLaDerecha} setVerTransportistasPorLaDerecha={setVerTransportistasPorLaDerecha} verTransportistasPorLaIzquierda={verTransportistasPorLaIzquierda} 
         setVerTransportistasPorLaIzquierda={setVerTransportistasPorLaIzquierda} mostrarSniperCargando={mostrarSniperCargando} idUsuariosDeTrayectoria={idUsuariosDeTrayectoria}
         rutasEnElMapa={data} identificadorKey={identificadorKey} secionIniciada={secionIniciada} verCompetencia={verCompetencia} setVerCompetencia={setVerCompetencia}
-        verRutasCercanas={verRutasCercanas} setVerRutasCercanas={setVerRutasCercanas} ocultarTrayecto={ocultarTrayecto} setOcultarTrayecto={setOcultarTrayecto} height={height} width={width}
+        verRutasCercanas={verRutasCercanas} setVerRutasCercanas={setVerRutasCercanas} ocultarTrayecto={ocultarTrayecto} setOcultarTrayecto={setOcultarTrayecto} height={alturaTotal} width={width}
         permitirEnviarUbicacion={permitirEnviarUbicacion} setPermitirEnviarUbicacion={setPermitirEnviarUbicacion}
         obtenerRutas={obtenerRutas} menUno={menUno} setmenUno={setmenUno} menDos={menDos} setmenDos={setmenDos} menTres={menTres} setmenTres={setmenTres} menCuatro={menCuatro} 
         setmenCuatro={setmenCuatro} menCinco={menCinco} setmenCinco={setmenCinco} userLocation={userLocation} setUserLocatio={setUserLocatio}
-        setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario}
+        setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} mostrarBarraSecundariaDeUbicacion={mostrarBarraSecundariaDeUbicacion} setMostrarBarraSecundariaDeUbicacion={setMostrarBarraSecundariaDeUbicacion}
+        setMostrarItemMenuUno={setMostrarItemMenuUno} setIdRutaAMostrar={setIdRutaAMostrar} refCambiarLupa={refCambiarLupa}
         ></Inicio>
+        
 
+        
         <MenuBar setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} ocultarMenu={ocultarMenu} rutasEnElMapa={data} rutasTrayectoria={rutasTrayectoria}
         visualizarRutas={visualizarRutas} verRutasTrayecto={verRutasTrayecto} setVerTrayectoria={setVerTrayectoria}
         setIdRutaAMostrar={setIdRutaAMostrar} ocultarTercerMenu={ocultarTercerMenu} coordenadasOrigenSecundario={coordenadasOrigenSecundario} setVerParadasCercanas={setVerParadasCercanas} secionIniciada={secionIniciada}
@@ -190,9 +196,9 @@ export default function App() {
         menUno={menUno} setmenUno={setmenUno} menDos={menDos} setmenDos={setmenDos} menTres={menTres} setmenTres={setmenTres} menCuatro={menCuatro} setmenCuatro={setmenCuatro} menCinco={menCinco} setmenCinco={setmenCinco}
         verParadasCercanas={verParadasCercanas} userLocation={userLocation}
         setCoordenadasOrigenSecundario={setCoordenadasOrigenSecundario} setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario}
-        permitirEnviarUbicacion={permitirEnviarUbicacion}
+        permitirEnviarUbicacion={permitirEnviarUbicacion} setMostrarBarraSecundariaDeUbicacion={setMostrarBarraSecundariaDeUbicacion} refCambiarLupa={refCambiarLupa}
         ></MenuBar>
-
+        
 
         
         {loguearse==true && <Login setTipoDeUsuario={setTipoDeUsuario} setSecionIniciada={setSecionIniciada} setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} setLosguearTransportista={setLosguearTransportista} height={height} width={width} 

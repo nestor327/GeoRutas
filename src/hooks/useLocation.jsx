@@ -21,12 +21,22 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
     const isMounted=useRef(true);
 
     const checkLocationPermission=async()=>{        
+        
         if(Platform.OS === "ios"){
 
         }else if(Platform.OS === "android"){            
             setPermisos(await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION));
         }
+     
+    }
 
+    const askLocationPermissionSetting=()=>{
+        
+        if(Platform.OS === "android"){
+            if(permisos=='blocked' || permisos=='denied'){
+                openSettings();
+            }
+        }
     }
 
     const askLocationPermission=async()=>{
@@ -34,9 +44,6 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
 
         }else if(Platform.OS === "android"){
             setPermisos(await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION));
-            if(permisos=='blocked'){
-                openSettings();
-            }
         }
     }
 
@@ -90,6 +97,7 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
                     Geolocation.getCurrentPosition(
                         ({coords})=>{
                             resolve({latitude:coords.latitude,longitude:coords.longitude});
+                            setUserLocation({latitude:coords.latitude,longitude:coords.longitude});
                         },
                         ()=>{
                             (err)=>{reject({err})};
@@ -436,7 +444,8 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
         stopFollowUserLocation,
         actualizarUbicacionEnElBackEnd,
         siguiendoAlUsuario,
-        askLocationPermission
+        askLocationPermission,
+        askLocationPermissionSetting
     };
 }
 

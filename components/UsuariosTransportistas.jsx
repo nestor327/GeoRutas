@@ -191,8 +191,8 @@ import urlDeLasImagenesEstaticas from "../data/urlDeLasImagenesDeLasRutas.js";
                             latitudeDelta:0.02,
                             longitudeDelta:0.05}}>
                                 
-                                {direccionesPorUsuario[i]=='D' && <Text>{"⇛"+nombresEnElArregloFinal[i]}</Text>}
-                                {direccionesPorUsuario[i]=='I' && <Text>{"⇚"+nombresEnElArregloFinal[i]}</Text>}
+                                {direccionesPorUsuario[i]=='D' && <Text style={{color:'black'}}>{"⇛"+nombresEnElArregloFinal[i]}</Text>}
+                                {direccionesPorUsuario[i]=='I' && <Text style={{color:'black'}}>{"⇚"+nombresEnElArregloFinal[i]}</Text>}
 
                                 {<Image style={{width:25,height:25}} source={urlDeLasImagenes[idRuta-1]} ></Image>}
             

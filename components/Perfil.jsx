@@ -17,7 +17,7 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
     return(
         <View style={[tipoDePerfil[0].principal]}>
 
-        <View style={{backgroundColor:'#101038',height:'90%',width:'90%',position:'absolute',top:'5%',left:'5%',zIndex:190}}>
+        <View style={{backgroundColor:'#101038',height:'87%',width:'90%',position:'absolute',top:'5%',left:'5%',zIndex:190}}>
             <View style={{position:'absolute',zIndex:250,height:50,width:50,left:'85%',top:'3%'}} onTouchEnd={()=>{
                 actualizar('none');                         
                 

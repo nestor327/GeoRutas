@@ -38,8 +38,6 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
     const verificandoContrasenia=async ()=>{
 
         let data=await fetch('https://georutas.somee.com/api/UsuariosComunes').then(res=>datos=res.json());
-        
-        let usuariosTransportistas=await fetch('https://georutas.somee.com/api/UsuariosTransporte').then(res=>datos=res.json());
 
         for(let k=0;k<data.length;k++){
             if(data[k].contrasenia==MD5(contrasenia) && data[k].usuario==usuarioState){                
@@ -52,6 +50,8 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                 return;
             }
         }    
+        
+        let usuariosTransportistas=await fetch('https://georutas.somee.com/api/UsuariosTransporte').then(res=>datos=res.json());
         
         for(let k=0;k<usuariosTransportistas.length;k++){
             if(usuariosTransportistas[k].contrasenia==(contrasenia) && usuariosTransportistas[k].usuario==usuarioState){
