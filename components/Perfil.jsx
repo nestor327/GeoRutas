@@ -4,7 +4,8 @@ import { View,Text,Image, TouchableOpacity } from 'react-native'
 import imagen from '../assets/x_icon_imagen.png';
 import { getNombre,getCorreo } from '../data/asyncStorageData.js';
 
-const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,setLoguearse,setRegistrarse,setSecionIniciada,setTipoDeUsuario})=>{
+const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,setLoguearse,setRegistrarse,
+    setSecionIniciada,setTipoDeUsuario,activarPrecision,setActivarPrecision})=>{
 
 
     const [nombre,setnombre]=useState();
@@ -25,9 +26,9 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
              <Image source={imagen} style={{width:35,height:35, tintColor:'#f1f1f1'}}></Image>
             </View>
             <View style={{alignItems:'center'}}>
-                <Text style={{color:'white',marginTop:'10%',fontSize:25}}>GeoRutas</Text>
+                <Text style={{color:'white',marginTop:'10%',fontSize:25}}>Ajustes</Text>
                 <View style={{flexDirection:'row',height:100,alignItems:'center'}}>
-                    <Image source={require('../assets/Sukuna.jpg')} style={{width:76,height:76,borderRadius:38, marginRight:20}}/>
+                    <Image source={require('../assets/Sukuna.jpg')} style={{width:76,height:76,borderRadius:38}}/>
 
                 <View>
                     <Text style={{color:'white',marginTop:'10%',fontSize:20,marginTop:0}}>{nombre}</Text>
@@ -38,7 +39,13 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
             </View>
             <View style={{alignItems:'center'}}>
             <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0,marginBottom:10}}>______________________________________</Text>
-            
+
+            <TouchableOpacity style={{flexDirection:'row',alignContent:'center',justifyContent:'center',height:36}}
+                onPress={()=>{setActivarPrecision(!activarPrecision)}}>
+                <Text style={[{color:'white',marginTop:'10%',fontSize:15,marginTop:7,marginBottom:10,alignContent:'center',marginRight:10},activarPrecision==true && {color:'red'}]}>{(activarPrecision==false)?"Activar precisión":"Desactivar precisión"}</Text>
+                <Image source={(activarPrecision==true)?require('../assets/precisionGPS.jpg'):require('../assets/precisionGPSDesactivada.jpg')} style={{width:36,height:36,borderRadius:18, marginRight:20}}></Image>
+            </TouchableOpacity>
+
             <TouchableOpacity>
                 <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0,marginBottom:10}}>Ver Ubicacion</Text>
             </TouchableOpacity>
@@ -79,12 +86,7 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
                 }}>Registrarse</Text>
             </TouchableOpacity>
 
-            <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0,marginBottom:20}}>______________________________________</Text>
-            
-            <View style={{alignItems:'center'}}>
-                <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0}}>CEO: Nestor Gonzalez</Text>
-                <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0}}>Contacto: nestorgt37@gmail.com</Text>
-            </View>
+            <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0,marginBottom:20}}>______________________________________</Text>            
 
             </View>
             

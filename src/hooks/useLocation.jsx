@@ -5,7 +5,7 @@ import usePermissionsContext from "./usePermissionsContext.jsx";
 import { AppState } from "react-native";
 import { PermissionStatus,PERMISSIONS, request, check,openSettings } from "react-native-permissions";
 
-const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, direccionesPorUsuario,userLocation,setUserLocation)=>{
+const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, direccionesPorUsuario,userLocation,setUserLocation,activarPrecision)=>{
     
     const [permisos,setPermisos]=useState('unavailable');
 
@@ -192,15 +192,118 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
     }
 
 
-    const actualizarUbicacionEnElBackEnd=async(usuarioTransportista,paradasCompletas,rutasParadas,userLocation)=>{
+    const actualizarUbicacionEnElBackEnd=async(paradasCompletas,rutasParadas,userLocationReal,coordenadasDeLaRuta)=>{
         
-        if(idUsuarioIniciado>0 && hasLocation==true){ 
+        if(idUsuarioIniciado>0 && hasLocation==true && userLocationReal!=undefined){ 
 
         setHasLocation(false);
         console.log("INICIASTE el rrecorrido de la actualizacion");
 
+        
+        let userLocation={latitude:0,longitude:0}
+        //console.log(coordenadasDeLaRuta);
+
+        if(coordenadasDeLaRuta.length==0 || coordenadasDeLaRuta==undefined && activarPrecision==true){            
+            userLocation=userLocationReal;            
+        }else{
+            console.log("Entraste al segundo lugar");
+            let pendiente=0;
+            console.log(coordenadasDeLaRuta[0]);
+
+            pendiente=(coordenadasDeLaRuta[0].latitude-coordenadasDeLaRuta[1].latitude)/(coordenadasDeLaRuta[0].longitude-coordenadasDeLaRuta[1].longitude);
+
+            
+            let xValue=(userLocationReal.longitude+((1/pendiente)*(userLocationReal.latitude))
+                -coordenadasDeLaRuta[0].latitude+pendiente*coordenadasDeLaRuta[0].longitude)/(pendiente+1/pendiente);
+            
+            let yValue=(-1/pendiente)*xValue+userLocationReal.longitude+(1/pendiente)*userLocationReal.latitude;
+
+            let menorDistanciaHaciaLaLineaRuta=Math.sqrt(Math.pow(xValue-userLocationReal.latitude,2)+Math.pow(yValue-userLocationReal.longitude,2));
+
+            let distanciaDeFiltroDeDistanciaHaciaLaLinea=2*menorDistanciaHaciaLaLineaRuta+10;
+
+            let xValueFinal=xValue;
+            let yValueFinal=yValue;
+            
+            for(let k=1;k<coordenadasDeLaRuta.length;k++){
+
+                    pendiente=(coordenadasDeLaRuta[k-1].latitude-coordenadasDeLaRuta[k].latitude)/(coordenadasDeLaRuta[k-1].longitude-coordenadasDeLaRuta[k].longitude);
+
+                    xValue=(userLocationReal.longitude+((1/pendiente)*(userLocationReal.latitude))
+                    -coordenadasDeLaRuta[k-1].latitude+pendiente*coordenadasDeLaRuta[k-1].longitude)/(pendiente+1/pendiente);
+    
+                    yValue=(-1/pendiente)*xValue+userLocationReal.longitude+(1/pendiente)*userLocationReal.latitude;
+    
+                    distanciaDeFiltroDeDistanciaHaciaLaLinea=Math.sqrt(Math.pow(xValue-userLocationReal.latitude,2)+Math.pow(yValue-userLocationReal.longitude,2))
+    
+                    let latRectaUno=0;
+                    let latRectaDos=0;
+                    let longRectaUno=0;
+                    let longRectaDos=0;
+
+                    if(coordenadasDeLaRuta[k-1].latitude<coordenadasDeLaRuta[k].latitude){
+                        latRectaUno=coordenadasDeLaRuta[k].latitude;
+                        latRectaDos=coordenadasDeLaRuta[k-1].latitude;
+                    }else{
+                        latRectaUno=coordenadasDeLaRuta[k-1].latitude;
+                        latRectaDos=coordenadasDeLaRuta[k].latitude;
+                    }
+
+                    if(coordenadasDeLaRuta[k-1].longitude<coordenadasDeLaRuta[k].longitude){
+                        longRectaUno=coordenadasDeLaRuta[k].longitude;
+                        longRectaDos=coordenadasDeLaRuta[k-1].longitude;
+                    }else{
+                        longRectaUno=coordenadasDeLaRuta[k-1].longitude;
+                        longRectaDosRectaDos=coordenadasDeLaRuta[k].longitude;
+                    }
+
+                    if(distanciaDeFiltroDeDistanciaHaciaLaLinea < menorDistanciaHaciaLaLineaRuta 
+                        && (yValue>=latRectaDos && yValue<=latRectaUno) && (xValue>=longRectaDos && xValue<=longRectaUno)){
+                        menorDistanciaHaciaLaLineaRuta=distanciaDeFiltroDeDistanciaHaciaLaLinea;
+                        xValueFinal=xValue;
+                        yValueFinal=yValue;
+                    }
+
+                    xValue=(userLocationReal.longitude-coordenadasDeLaRuta[k-1].latitude+pendiente*coordenadasDeLaRuta[k-1].longitude)/pendiente;
+                    yValue=userLocationReal.longitude;
+
+                    distanciaDeFiltroDeDistanciaHaciaLaLinea=Math.abs(xValue-userLocation.latitude);
+
+                    if(distanciaDeFiltroDeDistanciaHaciaLaLinea < menorDistanciaHaciaLaLineaRuta 
+                        && (yValue>=latRectaDos && yValue<=latRectaUno) && (xValue>=longRectaDos && xValue<=longRectaUno)){
+                        menorDistanciaHaciaLaLineaRuta=distanciaDeFiltroDeDistanciaHaciaLaLinea;
+                        xValueFinal=xValue;
+                        yValueFinal=yValue;
+                    }
+
+                    xValue=userLocationReal.latitude;
+                    yValue=pendiente*xValue+coordenadasDeLaRuta[k-1].latitude-pendiente*coordenadasDeLaRuta[k-1].longitude;
+
+                    distanciaDeFiltroDeDistanciaHaciaLaLinea=Math.abs(yValue-userLocation.longitude);
+
+                    if(distanciaDeFiltroDeDistanciaHaciaLaLinea < menorDistanciaHaciaLaLineaRuta 
+                        && (yValue>=latRectaDos && yValue<=latRectaUno) && (xValue>=longRectaDos && xValue<=longRectaUno)){
+                        menorDistanciaHaciaLaLineaRuta=distanciaDeFiltroDeDistanciaHaciaLaLinea;
+                        xValueFinal=xValue;
+                        yValueFinal=yValue;
+                    }
+
+            }
+
+            userLocation={latitude:xValueFinal,longitude:yValueFinal};
+            console.log("El valor antes de posiblemente cambiarlo es: ");
+            console.log(userLocation);
+            
+            if(xValueFinal==0 || xValueFinal==undefined){
+                userLocation=userLocationReal;
+            }
+
+        }
+
         console.log(userLocation);
 
+        let usuarioTransportista= await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json());
+        
         //let paradasCompletas=await fetch('https://georutas.somee.com/api/Paradas').then(res=>datos=res.json());
         //let rutasParadas=await fetch('https://georutas.somee.com/api/RutasParada').then(res=>datos=res.json());        
 
@@ -224,7 +327,7 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
         let paradaMasCercanaSinDireccion=-1;
         let distanciaEntreUsuarioYRutaMenorSinDireccion=1000;
     
-        //Revisa porque no hace los cambios y porque no calcula la distancia
+        //De aqui toma la distancia, por tanto aqui debes de modificar la ubicacion putito
         let latitudActual=userLocation.latitude;
         let longitudeActual=userLocation.longitude;
 
@@ -272,10 +375,10 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
 
             let fechaActual=new Date();
             let minutosActuales=fechaActual.getHours()*60+fechaActual.getMinutes();
-                        
+            
             if(Math.abs(minutosActuales-minutosDesdeElPasado)>30){
             try{
-                
+
                     let datos=await fetch('https://georutas.somee.com/api/UsuarioTransporteParada',{
                         method:"PUT",
                         headers:{
@@ -287,11 +390,11 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
                                     id_Usuario_Transporte: segundoDato,
                                     id_Parada: tercerDato,
                                     tiempoDeLlegadaAnterior: tiempoAnterior.tiempoDeLlegadaAnterior,
-                                    ultimaActualizacion: fecha.toISOString()
+                                    ultimaActualizacion: fechaActual.toISOString()
                                 }
                             )
                         }
-                    ) 
+                    )
                 }catch(e){
                 
             }

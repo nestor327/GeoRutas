@@ -83,10 +83,6 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
 
         let menorDistancia=1000000;
         let direccionesPorUsuario=[];
-
-        console.log("DATOS");
-        console.log(arregloFinal);
-        console.log("DATOS");
         
         for(let y=0;y<arregloFinal.length;y++){
             

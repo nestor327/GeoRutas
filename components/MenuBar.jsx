@@ -30,7 +30,7 @@ const  MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTray
     // const [menCuatro, setmenCuatro] = react.useState([{ display: 'flex',color:'#101043' }]);
     // const [menCinco, setmenCinco] = react.useState([{ display: 'none',color:'#102769' }]);
 
-    todasLasRutasData=getAllRutas();
+    let todasLasRutasData=getAllRutas();
     
     const resultado = () => {
         if (menUno[0].display == 'flex' ) {
@@ -52,7 +52,7 @@ const  MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTray
 
   return (
     <View style={{height:(height>width)?width*0.2:height*0.2}}>
-        {verPerfil=='flex' && <Perfil permitirEnviarUbicacion={permitirEnviarUbicacion} secionIniciada={secionIniciada} setSecionIniciada={setSecionIniciada} 
+        {verPerfil=='flex' && <Perfil activarPrecision={activarPrecision} setActivarPrecision={setActivarPrecision} permitirEnviarUbicacion={permitirEnviarUbicacion} secionIniciada={secionIniciada} setSecionIniciada={setSecionIniciada} 
         setTipoDeUsuario={setTipoDeUsuario} tipoDePerfil={[{principal:{width:'100%',height:height+StatusBar.currentHeight-width*0.2,position:'absolute',top:-1*(height-width*0.2),left:0,zIndex:200,backgroundColor:'#00000045'}
         }]} actualizar={setVerPerfil} setLoguearse={setLoguearse} setRegistrarse={setRegistrarse}></Perfil>}
 
@@ -71,7 +71,7 @@ const  MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTray
 
             <View style={[menDos, { left:(height<width)?width*0.2+(width*0.2-height*0.2)/2:width*0.2, width: (height>width)?width*0.2:height*0.2, height: '300%', position: 'absolute', top: '-300%', backgroundColor: '#102769' }]}>
                 <ScrollView>
-                { todasLasRutasData.length>0 && todasLasRutasData!=undefined &&
+                { todasLasRutasData!=undefined && todasLasRutasData.length>0 &&
                 
                     todasLasRutasData.map((item,i)=>{
                         return(                            
