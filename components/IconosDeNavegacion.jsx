@@ -9,7 +9,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
     verTransportistasPorLaDerecha,verTransportistasPorLaIzquierda,idRutaAMostrar,mostrarUsuarios,permitirEnviarUbicacion,
     tipoDeUsuario,mostrarParadas,mostrarItemMenuUno,verTrayectoria,verCompetencia,verRutasCercanas,centrePosition,siguiendoAlUsuario,
     askLocationPermission,followUseLocation, stopFollowUserLocation,permitirSeguirPasajero, setPermitirSeguirPasajero,setVerTrayectoria,
-    ocultarTrayecto,permisos,usuarioTransportista,askLocationPermissionSetting
+    ocultarTrayecto,permisos,askLocationPermissionSetting, setUsuarioTransportista
     })=>{
 
         //const [urlActualizacion,setUrlActualizacion]=useState('../assets/cambioDetrayectoriaCero.jpg');
@@ -52,7 +52,13 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         askLocationPermissionSetting();
                         return;
                     }
-
+                    
+                    if(idUsuarioIniciado<0){
+                        alert("Vualva a iniciar secion");
+                        return;
+                    }
+                    let usuarioTransportista= await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json());
+                    
                     if(usuarioTransportista=={} || usuarioTransportista.nombre==null){                        
                         alert("Has perdido tu usuario, vuelve a iniciar secion");
                         return;
@@ -63,7 +69,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                     //     askLocationPermission();
                     //     return;
                     // }
-                //let usuarioTransportista= await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json())
+                
 
 
                 let datos=await fetch('https://georutas.somee.com/api/UsuariosTransporte',{
@@ -90,6 +96,21 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                     })    
                         
                     setPermitirEnviarUbicacion(true);
+                    setUsuarioTransportista({
+                        id_UsuarioTransporte: idUsuarioIniciado,
+                        id_Tipo_Transporte: 1,
+                        id_Ruta: usuarioTransportista.id_Ruta,
+                        nombre: usuarioTransportista.nombre,
+                        usuario: usuarioTransportista.usuario,
+                        contrasenia: usuarioTransportista.contrasenia,
+                        correo: usuarioTransportista.correo,
+                        telefono: usuarioTransportista.telefono,
+                        longitude: usuarioTransportista.longitude,
+                        latitude: usuarioTransportista.latitude,
+                        longitudeAnterior: usuarioTransportista.longitudeAnterior,
+                        latitudeAnterior: usuarioTransportista.latitudeAnterior,
+                        estado: 'A'
+                    });
                 }
             }
                 imagen={require('../assets/ocultarUbicacionTransportista.png')}
@@ -99,14 +120,17 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
             
             {permitirEnviarUbicacion==true && tipoDeUsuario=="Transportista" && <Fab 
                 onPres={async()=>{
+                    if(idUsuarioIniciado<0){
+                        alert("Vualva a iniciar secion");
+                        return;
+                    }
+                    let usuarioTransportista= await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json())
+                    
                     if(usuarioTransportista=={} || usuarioTransportista.nombre==null){
                         return;
                     }
                     stopFollowUserLocation();
-                    
-                    //let usuarioTransportista= await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json())
-                    
-        
+
                     let datos=await fetch('https://georutas.somee.com/api/UsuariosTransporte',{
                         method:"PUT",
                         headers:{
@@ -131,6 +155,21 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         })
 
                         setPermitirEnviarUbicacion(false);
+                        setUsuarioTransportista({
+                            id_UsuarioTransporte: idUsuarioIniciado,
+                            id_Tipo_Transporte: 1,
+                            id_Ruta: usuarioTransportista.id_Ruta,
+                            nombre: usuarioTransportista.nombre,
+                            usuario: usuarioTransportista.usuario,
+                            contrasenia: usuarioTransportista.contrasenia,
+                            correo: usuarioTransportista.correo,
+                            telefono: usuarioTransportista.telefono,
+                            longitude: usuarioTransportista.longitude,
+                            latitude: usuarioTransportista.latitude,
+                            longitudeAnterior: usuarioTransportista.longitudeAnterior,
+                            latitudeAnterior: usuarioTransportista.latitudeAnterior,
+                            estado: 'I'
+                        });
                 }}
                 imagen={require('../assets/ubicacionTransportista.png')}
             />}

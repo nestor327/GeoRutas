@@ -30,7 +30,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     ,menUno,setmenUno,menDos, setmenDos,menTres, setmenTres,menCuatro, setmenCuatro,menCinco, setmenCinco
     ,userLocation, setUserLocatio,setSecionIniciada, setTipoDeUsuario
     ,mostrarBarraSecundariaDeUbicacion,setMostrarBarraSecundariaDeUbicacion,setMostrarItemMenuUno,setIdRutaAMostrar
-    ,refCambiarLupa})=>{
+    ,refCambiarLupa,activarPrecision,setActivarPrecision})=>{
     
 
 
@@ -49,7 +49,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             siguiendoAlUsuario,
             askLocationPermission,
             askLocationPermissionSetting
-        }=useLocation(permitirEnviarUbicacion,tipoDeUsuario,idUsuarioIniciado,direccionesPorUsuario,userLocation,setUserLocatio);
+        }=useLocation(permitirEnviarUbicacion,tipoDeUsuario,idUsuarioIniciado,direccionesPorUsuario,userLocation,setUserLocatio,activarPrecision);
 
     const [mostrarVentana,serMostrarVentana]=useState('none');    
     const [mostrarUsuarios, setMostrarUsuarios]=useState(false);
@@ -64,6 +64,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
     const [tipoDeModificacionDeLugar, setTipoDeModificacionDeLugar]=useState('Destino');
     const [verRecomendacionesDeUbicaciones, setVerRecomendacionesDeUbicacion]=useState(false);
+    const [coordenadasDeLaRuta, setCoordenadasDeLaRuta]=useState([]);
 
 
 
@@ -75,11 +76,13 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     const refNombreDelDestino=useRef("Desconocido");
     const refNombreDelOrigen=useRef("Desconocido");
         
-    const capturarUsuarioTransportistaYDemas=async()=>{
-        console.log("El puto numero es: "+idUsuarioIniciado);
-        setUsuarioTransportista(await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>datos=res.json()));
+    const capturarUsuarioTransportistaYDemas=async()=>{  
+        let usuario=await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json());
+        setUsuarioTransportista(usuario);
         setParadasCompletas(await fetch('https://georutas.somee.com/api/Paradas').then(res=>datos=res.json()));
-        setRutasParadas(await fetch('https://georutas.somee.com/api/RutasParada').then(res=>datos=res.json()));        
+        setRutasParadas(await fetch('https://georutas.somee.com/api/RutasParada').then(res=>datos=res.json()));
+        setCoordenadasDeLaRuta(await fetch('https://georutas.somee.com/api/Coordenadas/'+usuario.id_Ruta).then(res=>datos=res.json()));
+        
     }
 
 
@@ -106,48 +109,49 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     // }
 
     useEffect(()=>{
-        if(pausarEnvioDeUbicaciones==false && tipoDeUsuario=='Transportista'){
-            actualizarUbicacionEnElBackEnd(usuarioTransportista,paradasCompletas,rutasParadas,userLocation);            
+        if(pausarEnvioDeUbicaciones==false && tipoDeUsuario=='Transportista' ){
+            actualizarUbicacionEnElBackEnd(paradasCompletas,rutasParadas,userLocation,coordenadasDeLaRuta);            
             serPausarEnvioDeUbicaciones(true);
         }else if(tipoDeUsuario=='Pasajero' && refEnvioDeUbicacionesPasajero.current==false){            
             refEnvioDeUbicacionesPasajero.current=true;
             setrefChangeLocation(userLocation);
         }
-
         
-    },[userLocation,usuarioTransportista])
+    },[userLocation,tipoDeUsuario,coordenadasDeLaRuta])
+
+    useEffect(()=>{
+        if(idUsuarioIniciado>0){
+            askLocationPermission();
+            //askLocationPermissionSetting();
+            capturarUsuarioTransportistaYDemas();
+        }
+
+    },[idUsuarioIniciado,idRutaAMostrar])
 
     useEffect(()=>{
         
         let k=0;
-        if(idUsuarioIniciado>0 && usuarioTransportista.estado=='A' && tipoDeUsuario=='Transportista' && pausarEnvioDeUbicaciones==true){
+        if(idUsuarioIniciado>0 && usuarioTransportista.estado=='A' 
+            && tipoDeUsuario=='Transportista' && pausarEnvioDeUbicaciones==true){
             k=setInterval(()=>{
                 serPausarEnvioDeUbicaciones(false);
-            },2500)
+            },3000)
         }else if(tipoDeUsuario=='Pasajero'){
             k=setInterval(()=>{
-                refEnvioDeUbicacionesPasajero.current=false;                
+                refEnvioDeUbicacionesPasajero.current=false; 
             },2500)
         }
-        
         
         return ()=>{
             clearInterval(k);            
         }        
 
-    },[usuarioTransportista,tipoDeUsuario])
+    },[usuarioTransportista,tipoDeUsuario,idUsuarioIniciado])
+
+
 
     useEffect(()=>{
-        if(idUsuarioIniciado>0){
-            capturarUsuarioTransportistaYDemas();
-            askLocationPermission();
-            askLocationPermissionSetting();
-        }
-        
-    },[idUsuarioIniciado,permitirEnviarUbicacion])
-
-    useEffect(()=>{
-        
+        //Ojo con esto, este puede ser el problema de el movimiento no deseado del mapa
         if(userLocation.latitude!=0 
             && userLocation.longitude>-86.430191 && userLocation.longitude<-86.109765
             && userLocation.latitude<12.195666 && userLocation.latitude>12.066094){
@@ -289,6 +293,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
   return(
     <View style={{height:(height>width)?(height-width*0.2-StatusBar.currentHeight):height*0.8-StatusBar.currentHeight,width:'100%', backgroundColor:'#2060A5'}}>
         
+
+
         <IconosDeNavegacion
         setPermitirEnviarUbicacion={setPermitirEnviarUbicacion} idUsuarioIniciado={idUsuarioIniciado} setMostrarUsuarios={setMostrarUsuarios}
         setVerTransportistasPorLaDerecha={setVerTransportistasPorLaDerecha} setVerTransportistasPorLaIzquierda={setVerTransportistasPorLaIzquierda}
@@ -299,8 +305,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         verCompetencia={verCompetencia} verRutasCercanas={verRutasCercanas} verTransportistasPorLaIzquierda={verTransportistasPorLaIzquierda}
         centrePosition={centrePosition} siguiendoAlUsuario={siguiendoAlUsuario} askLocationPermission={askLocationPermission} followUseLocation={followUseLocation}
         stopFollowUserLocation={stopFollowUserLocation} permitirSeguirPasajero={permitirSeguirPasajero} setPermitirSeguirPasajero={setPermitirSeguirPasajero}
-        setVerTrayectoria={setVerTrayectoria} ocultarTrayecto={ocultarTrayecto} permisos={permisos} usuarioTransportista={usuarioTransportista}
-        askLocationPermissionSetting={askLocationPermissionSetting}
+        setVerTrayectoria={setVerTrayectoria} ocultarTrayecto={ocultarTrayecto} permisos={permisos}
+        askLocationPermissionSetting={askLocationPermissionSetting} setUsuarioTransportista={setUsuarioTransportista}
         ></IconosDeNavegacion>
 
 
@@ -309,7 +315,16 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         <View style={[{width:'90%',zIndex:100,top:height*0.08-StatusBar.currentHeight,position:'absolute', 
         backgroundColor:'#2060A5',flexDirection:'row',marginLeft:'5%',borderTopRightRadius:20, 
         borderTopLeftRadius:20},mostrarBarraSecundariaDeUbicacion==false && {borderBottomRightRadius:20,borderBottomLeftRadius:20}]}>
-
+        {activarPrecision==false && 
+        <TouchableOpacity style={{position:'absolute', zIndex:101, top:-28,alignItems:'center',borderColor:'red',borderWidth:1,borderRadius:10}}
+            onPress={()=>{
+                serMostrarVentana('flex');
+            }}
+            >
+            <Text style={{color:'red',fontSize:18,fontWeight:'600'}} >La Precision de la ubicacion esta desactivada!!!
+            </Text>
+        </TouchableOpacity>
+        }
             <TouchableOpacity 
                 onPress={()=>{
 
@@ -460,13 +475,9 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                 enablePoweredByContainer={false}
                            
                 onPress={(data, details)=>{
-                    console.log(data);
-                    console.log(details);
-                    // console.log("Mierda");
 
                     if(details!=null){
                         
-                        console.log(details.geometry.location.lat +" n "+details.geometry.location.lng);
 
                         let latitude=details.geometry.location.lat;
                         let longitude=details.geometry.location.lng;
@@ -474,7 +485,6 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         refMapView.current?.animateCamera({
                             center:{ latitude,longitude}//{latitude:,latitude:}
                         })
-                        console.log("Se debio de actualizar");
                         if(tipoDeModificacionDeLugar=='Destino'){
                             setActualizarDestino({latitude:latitude,longitude:longitude});
                             if(data.structured_formatting.main_text.length>30){
@@ -551,6 +561,17 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     setMostrarBarraSecundariaDeUbicacion(false);
                     refInputAutoComplete.current.blur();
                     refInputAutoComplete.current.clear(); 
+                    if (menUno[0].display == 'flex' ) {
+                        setmenUno([{display:'none',color:'#102769'}]);
+                    } else if(menDos[0].display == 'flex'){
+                        setmenDos([{display:'none',color:'#102769'}]);
+                    }else if(menTres[0].display == 'flex'){
+                        setmenTres([{display:'none',color:'#102769'}]);
+                    }else if(menCuatro[0].display=='flex'){
+                        setmenCuatro([{display:'none',color:'#102769'}])
+                    }else if(menCinco[0].display=='flex'){
+                        setmenCinco([{display:'none',color:'#102769'}])                    
+                    }
                 }                
                 }}>
                 
@@ -823,7 +844,10 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
 
 
-        {mostrarVentana=="flex" && <Perfil permitirEnviarUbicacion={permitirEnviarUbicacion} secionIniciada={secionIniciada} setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setRegistrarse={setRegistrarse} setLoguearse={setLoguearse} tipoDePerfil={[{principal:{width:'100%',height:height-width*0.2,position:'absolute',top:0,left:0,zIndex:200,backgroundColor:'#00000045'}}]} actualizar={serMostrarVentana}></Perfil>}
+        {mostrarVentana=="flex" && <Perfil permitirEnviarUbicacion={permitirEnviarUbicacion} secionIniciada={secionIniciada} 
+            setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setRegistrarse={setRegistrarse} 
+            setLoguearse={setLoguearse} tipoDePerfil={[{principal:{width:'100%',height:height-width*0.2,position:'absolute',top:0,left:0,zIndex:200,backgroundColor:'#00000045'}}]} 
+            actualizar={serMostrarVentana} activarPrecision={activarPrecision} setActivarPrecision={setActivarPrecision}></Perfil>}
         
         {<MapView
 
@@ -911,7 +935,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         //RutasTrayectorias(setRutasEnElMapa);              
                         obtenerRutas(identificadorKey.current);
                         setVerTrayectoria(false);   
-                        setOcultarMenu(false);  
+                        setOcultarMenu(false);
                         //console.log(nombresIconosTransportes);                      
                         }
                 

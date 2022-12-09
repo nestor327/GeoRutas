@@ -6,6 +6,7 @@ import obtenerParadasPorParadas from '../data/obtencionDeLasParadasPorRuta.js';
 import { View,Text,Image } from "react-native";
 import { getUsuario } from "../data/asyncStorageData.js";
 import getAllRutas from '../data/rutasManagua.js'
+import Polyline from 'react-native-maps'
 
 
 //Este componente posee errores, revisalo luego
@@ -192,23 +193,15 @@ import getAllRutas from '../data/rutasManagua.js'
 
                 {/* //<Marker coordinate={{latitude:12.153800313208755,longitude:-86.30149193108082}}>        */}
 
-                { UsuarioEncontrado.current.estado=='A' &&
-                    <Marker coordinate={{latitude:(userLocation.latitude), longitude:(userLocation.longitude)}}>
+                { UsuarioEncontrado.current.estado=='A' &&                    
+                        <Marker coordinate={{latitude:(userLocation.latitude), longitude:(userLocation.longitude)}}>
                     
                         {direccionesPorUsuarioDos=='D' && <Text>{"⇛"+nombresEnElArregloFinal[0]}</Text>}
                         {direccionesPorUsuarioDos=='I' && <Text>{"⇚"+nombresEnElArregloFinal[0]}</Text>}
 
                         <Image style={{width:30,height:30}} source={require("../assets/transportistaAzul.png")}></Image>
-                    </Marker>
+                        </Marker>
                 }
-
-            
-                {/* {UsuarioEncontrado.longitude && 
-                    <Marker coordinate={{latitude:UsuarioEncontrado.longitudeAnterior, longitude:UsuarioEncontrado.latitudeAnterior}}>
-
-                        <Image style={{width:30,height:30}} source={require("../assets/transportistaAzul.png")}></Image>
-                    </Marker>
-                } */}
                 
             </View>
         )}
