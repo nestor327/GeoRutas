@@ -7,9 +7,8 @@ import RutasBarItem from './RutasBarItem.jsx';
 import ParadasCercaDelOrigen from './ParadasCercaDeUbicacion.jsx';
 import styles from '../componentStyles/menuBarStyles.js';
 import { useEffect } from 'react';
-import useTrayectoria from '../src/hooks/useTrayectoria.jsx';
 
-const  MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRutasTrayecto
+const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRutasTrayecto
                 ,setVerTrayectoria,setIdRutaAMostrar,ocultarTercerMenu,coordenadasOrigenSecundario
                 ,setVerParadasCercanas,secionIniciada,setMostrarItemMenuUno,setOcultarMenu,setOcultarTercerMenu
                 ,obtenerRutas
@@ -17,12 +16,17 @@ const  MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTray
 
                 ,menUno,setmenUno,menDos, setmenDos,menTres, setmenTres,menCuatro, setmenCuatro,menCinco, setmenCinco
                 ,verParadasCercanas,userLocation,setCoordenadasOrigenSecundario,setSecionIniciada, setTipoDeUsuario
-                ,permitirEnviarUbicacion, setMostrarBarraSecundariaDeUbicacion,refCambiarLupa
+                ,permitirEnviarUbicacion, setMostrarBarraSecundariaDeUbicacion,refCambiarLupa,activarPrecision,setActivarPrecision
+                ,tipoDeUsuario,serMostrarVentana
             })=>{
     
     // const {data,obtenerRutas} = useTrayectoria(coordenadasOrigen,coordenadasDestino,setRutasEnElMapa,rutasEnElMapa,setRutasTrayectoria,setVisualizarRutas,
     //                     setVerRutasTrayecto,setTiemposRutasTrayectorias,setIconosTransportes,setIdUsuariosDeTrayectoria,verRutasTrayecto);
-    const [verPerfil,setVerPerfil]=react.useState('none');    
+    const [verPerfil,setVerPerfil]=react.useState('none'); 
+    
+    useEffect(()=>{
+        serMostrarVentana(verPerfil);
+    },[verPerfil])
 
     // const [menUno, setmenUno] = react.useState([{ display: 'none',color:'#102769' }]);
     // const [menDos, setmenDos] = react.useState([{ display: 'none',color:'#102769' }]);
@@ -52,9 +56,9 @@ const  MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTray
 
   return (
     <View style={{height:(height>width)?width*0.2:height*0.2}}>
-        {verPerfil=='flex' && <Perfil activarPrecision={activarPrecision} setActivarPrecision={setActivarPrecision} permitirEnviarUbicacion={permitirEnviarUbicacion} secionIniciada={secionIniciada} setSecionIniciada={setSecionIniciada} 
+        {/* {verPerfil=='flex' && <Perfil tipoDeUsuario={tipoDeUsuario} activarPrecision={activarPrecision} setActivarPrecision={setActivarPrecision} permitirEnviarUbicacion={permitirEnviarUbicacion} secionIniciada={secionIniciada} setSecionIniciada={setSecionIniciada} 
         setTipoDeUsuario={setTipoDeUsuario} tipoDePerfil={[{principal:{width:'100%',height:height+StatusBar.currentHeight-width*0.2,position:'absolute',top:-1*(height-width*0.2),left:0,zIndex:200,backgroundColor:'#00000045'}
-        }]} actualizar={setVerPerfil} setLoguearse={setLoguearse} setRegistrarse={setRegistrarse}></Perfil>}
+        }]} actualizar={setVerPerfil} setLoguearse={setLoguearse} setRegistrarse={setRegistrarse}></Perfil>} */}
 
              {ocultarMenu==true && <View style={[menUno, {left:(height<width)?(width*0.2-height*0.2)/2:0, width: (height>width)?width*0.2:height*0.2, height: '300%', position: 'absolute', top: '-300%', backgroundColor: '#102769' }]}>
                 <ScrollView>
