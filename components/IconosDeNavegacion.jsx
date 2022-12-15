@@ -1,5 +1,6 @@
 import { useState,useEffect } from "react";
 import { Alert, View } from "react-native"
+import { getPermitirEnvio, setPermitirEnvio } from "../data/asyncStorageData.js";
 import Fab from "./Fab.jsx";
 
 
@@ -12,32 +13,12 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
     ocultarTrayecto,permisos,askLocationPermissionSetting, setUsuarioTransportista
     })=>{
 
-        //const [urlActualizacion,setUrlActualizacion]=useState('../assets/cambioDetrayectoriaCero.jpg');
-    
         // useEffect(()=>{
-        
-        //     if(urlActualizacion!=='../assets/cambioDetrayectoriaCero.jpg'){   
-    
-        //     let r=setInterval(() => {     
-        //         if(urlActualizacion=='../assets/cambioDetrayectoriaUno.jpg'){
-        //             setUrlActualizacion('../assets/cambioDetrayectoriaDos.jpg');
-        //         }else if(urlActualizacion=='../assets/cambioDetrayectoriaDos.jpg'){
-        //             setUrlActualizacion('../assets/cambioDetrayectoriaTres.jpg');
-        //         }
-        //     }, 2500);
-        //     return ()=>{
-        //         clearInterval(r);
+        //     if(tipoDeUsuario=='Transportista'){
+        //         getPermitirEnvio(setPermitirEnviarUbicacion);
         //     }
-    
-        //     }
-            
-        // },[urlActualizacion])
+        // },[tipoDeUsuario])
 
-        // useEffect(()=>{
-        //     if(permitirEnviarUbicacion==true){
-        //         alert("Al final si se actualiza si, "+permitirEnviarUbicacion);
-        //     }
-        // },[permitirEnviarUbicacion])
     
     return(    
         <View style={{position:'absolute',zIndex:200,bottom:0,right:10}}>
@@ -63,12 +44,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         alert("Has perdido tu usuario, vuelve a iniciar secion");
                         return;
                     }
-                    followUseLocation();
-                    // if(siguiendoAlUsuario==false){
-                    //     console.log("Tu madre puto");
-                    //     askLocationPermission();
-                    //     return;
-                    // }
+                    followUseLocation(50);
                 
 
 
@@ -111,6 +87,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         latitudeAnterior: usuarioTransportista.latitudeAnterior,
                         estado: 'A'
                     });
+                    setPermitirEnvio("true");
                 }
             }
                 imagen={require('../assets/ocultarUbicacionTransportista.png')}
@@ -170,6 +147,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                             latitudeAnterior: usuarioTransportista.latitudeAnterior,
                             estado: 'I'
                         });
+                        setPermitirEnvio("false");
                 }}
                 imagen={require('../assets/ubicacionTransportista.png')}
             />}
@@ -183,7 +161,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         askLocationPermissionSetting();
                         return;
                     }
-                    followUseLocation();
+                    followUseLocation(25);
                     setPermitirSeguirPasajero(true);
         
                 }}
@@ -197,7 +175,6 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
 
                     stopFollowUserLocation();
                     setPermitirSeguirPasajero(false);
-                //alert("Al final se modifoca a falso");        
 
                 }}
                 imagen={require('../assets/ubicacionTransportista.png')}
@@ -269,19 +246,8 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
 
                 {ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && tipoDeUsuario=="Transportista" && <Fab
                     onPres={()=>{                
-                        // if(urlActualizacion=='../assets/cambioDetrayectoriaCero.jpg'){
-                        //     setUrlActualizacion('../assets/cambioDetrayectoriaUno.jpg');
-                        // }else{
-                        //     setUrlActualizacion('../assets/cambioDetrayectoriaCero.jpg');                
-                        // }
-                        //RutasTrayectorias(setRutasEnElMapa);              
+          
                         obtenerRutas(identificadorKey.current);   
-                        //RutasTrayectorias(setRutasEnElMapa);              
-                        //obtenerRutas(identificadorKey.current);
-
-                        // console.log("Esta entre estos dos valores");
-                        // console.log(identificadorKey.current);
-                        // console.log("Esta entre estos dos valores");
 
                         setVerTrayectoria(true);
                         setVerRutasCercanas(false);  
@@ -289,24 +255,13 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         setOcultarTrayecto(true);   
 
                     }}
-                    // imagen={(urlActualizacion=='../assets/cambioDetrayectoriaCero.jpg')?require('../assets/cambioDetrayectoriaCero.jpg'):
-                    // ((urlActualizacion=='../assets/cambioDetrayectoriaUno.jpg')?require('../assets/cambioDetrayectoriaUno.jpg'):
-                    // ((urlActualizacion=='../assets/cambioDetrayectoriaDos.jpg')?require('../assets/cambioDetrayectoriaDos.jpg'):
-                    // (require('../assets/cambioDetrayectoriaTres.jpg'))))}
                         imagen={require('../assets/cambioDetrayectoriaCero.jpg')}
                 />}
 
                 {ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && tipoDeUsuario=="Pasajero" && <Fab
                     onPres={()=>{                
-                        // if(urlActualizacion=='../assets/cambioDetrayectoriaCero.jpg'){
-                        //     setUrlActualizacion('../assets/cambioDetrayectoriaUno.jpg');
-                        // }else{
-                        //     setUrlActualizacion('../assets/cambioDetrayectoriaCero.jpg');                
-                        // }
-                        //RutasTrayectorias(setRutasEnElMapa);              
+
                         obtenerRutas(identificadorKey.current);   
-                        //RutasTrayectorias(setRutasEnElMapa);              
-                        //obtenerRutas(identificadorKey.current);  
                         
                         setVerTrayectoria(true);                           
                         setVerRutasCercanas(false);  
@@ -314,10 +269,6 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         setOcultarTrayecto(true);  
                     }}
 
-                    // imagen={(urlActualizacion=='../assets/cambioDetrayectoriaCero.jpg')?require('../assets/cambioDetrayectoriaCero.jpg'):
-                    // ((urlActualizacion=='../assets/cambioDetrayectoriaUno.jpg')?require('../assets/cambioDetrayectoriaUno.jpg'):
-                    // ((urlActualizacion=='../assets/cambioDetrayectoriaDos.jpg')?require('../assets/cambioDetrayectoriaDos.jpg'):
-                    // (require('../assets/cambioDetrayectoriaTres.jpg'))))}
                         imagen={require('../assets/cambioDetrayectoriaCero.jpg')}
                 />}
 
@@ -325,7 +276,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                 { (tipoDeUsuario=="Pasajero" || tipoDeUsuario=="Transportista") && (permitirSeguirPasajero==true || permitirEnviarUbicacion==true) &&
                     <Fab
                     onPres={centrePosition}
-                    imagen={require('../assets/paradaFinal.png')}
+                    imagen={require('../assets/tuUbicacioncopia.png')}
                 >
                 </Fab>}
 

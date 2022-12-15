@@ -8,6 +8,7 @@ import { PermissionStatus,PERMISSIONS, request, check,openSettings } from "react
 const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, direccionesPorUsuario,userLocation,setUserLocation,activarPrecision)=>{
     
     const [permisos,setPermisos]=useState('unavailable');
+    const [bacgroundPermisos,setBacgroundPermisos]=useState('unavailable');
 
     const [hasLocation, setHasLocation]=useState(true);
 
@@ -47,14 +48,36 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
         }
     }
 
+    const askLocationBacgroundPermission=async()=>{
+        if(Platform.OS === "android"){
+            setBacgroundPermisos(await request(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION));            
+        }
+    }
+
+    const checkBacgroundLocationPermission=async()=>{        
+        
+        if(Platform.OS === "ios"){
+
+        }else if(Platform.OS === "android"){            
+            //let {estatus}=await check(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION);
+            // if(estatus!='granted' && estatus!=undefined){
+            //     alert("Permita que a la aplicacion usar la ubicacion todo el tiempo "+estatus);
+            // }
+            setBacgroundPermisos(await check(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION));
+        }
+     
+    }
+
     useEffect(()=>{
         
         isMounted.current=true;
         checkLocationPermission();
+        checkBacgroundLocationPermission();
 
         const permisosState=AppState.addEventListener('change',async(state)=>{
         
             setPermisos(await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION));
+            setBacgroundPermisos(await check(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION));
 
             if(state!=='active') return;
                 checkLocationPermission();
@@ -97,7 +120,6 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
                     Geolocation.getCurrentPosition(
                         ({coords})=>{
                             resolve({latitude:coords.latitude,longitude:coords.longitude});
-                            setUserLocation({latitude:coords.latitude,longitude:coords.longitude});
                         },
                         ()=>{
                             (err)=>{reject({err})};
@@ -113,21 +135,22 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
         })
     }
     
-    const followUseLocation=()=>{
+    const followUseLocation=(filtroDeDistancia)=>{
         if(isMounted.current==true){
             if(permisos=='granted'){         
                 setSiguiendoAlUsuario(true);                
                 watchID.current= Geolocation.watchPosition(
                     ({coords})=>{
-                        setUserLocation({latitude:coords.latitude,longitude:coords.longitude});                           
-                        
+                        setUserLocation({latitude:coords.latitude,longitude:coords.longitude});
+                        let fecha= new Date();
+                        console.log("Los segundos mientras sigues al usuario es: "+fecha.getSeconds());
                     },
                     ()=>{
                         (err)=>{console.log("Entraste al watch del usuario")};
                     },
                     {
                         enableHighAccuracy:true,
-                        distanceFilter:10 //OJO CON ESTO, ES UN FILTRO PARA VER LA NOTIFICAR LA POSICION CON UNA DISTANCIA DE 10 METROS   
+                        distanceFilter:filtroDeDistancia //OJO CON ESTO, ES UN FILTRO PARA VER LA NOTIFICAR LA POSICION CON UNA DISTANCIA DE 50 METROS   
                     }
                     )  
                     console.log("Otorgaste permisos en: ");
@@ -142,7 +165,7 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
             if(permisos=='granted'){
                 setSiguiendoAlUsuario(false);
                 Geolocation.clearWatch(watchID.current);
-                console.log("La mierda se cancelo, con "+watchID.current);
+                console.log("La mierda se cancelo, con "+watchID.current);                
             }
         }
     }
@@ -191,15 +214,29 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
         //console.log(datos);        
     }
 
-
-    const actualizarUbicacionEnElBackEnd=async(paradasCompletas,rutasParadas,userLocationReal,coordenadasDeLaRuta)=>{
+    const actualizarUbicacionEnElBackEnd=async(paradasCompletas,rutasParadas,coordenadasDeLaRuta)=>{
         
-        if(idUsuarioIniciado>0 && hasLocation==true && userLocationReal!=undefined){ 
+        if(idUsuarioIniciado>0){ 
 
-        setHasLocation(false);
         console.log("INICIASTE el rrecorrido de la actualizacion");
 
-        
+        let userLocationReal=(await new Promise(async (resolve) => {
+            Geolocation.getCurrentPosition(
+                ({coords})=>{
+                    resolve({latitude:coords.latitude,longitude:coords.longitude});
+                }
+            )
+        }))
+
+        //getCurrentLocation().then((coords) => userLocationReal=coords.json());
+        console.log(userLocationReal);
+
+        if(userLocationReal=={} || userLocationReal==undefined || userLocationReal.latitude==undefined){
+            setHasLocation(true);
+            console.log("No se actualizo el backend");            
+            return;
+        }
+
         let userLocation={latitude:0,longitude:0}
         //console.log(coordenadasDeLaRuta);
 
@@ -531,8 +568,7 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
                 usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,userLocation.latitude,
                 userLocation.longitude,usuarioTransportista.longitudeAnterior,usuarioTransportista.latitudeAnterior,
                 usuarioTransportista.estado);
-           }
-           setHasLocation(true);
+           }           
            console.log("FINALIZASTE el rrecorrido de la actualizacion");
         }
     }
@@ -548,7 +584,11 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
         actualizarUbicacionEnElBackEnd,
         siguiendoAlUsuario,
         askLocationPermission,
-        askLocationPermissionSetting
+        askLocationPermissionSetting,
+        askLocationBacgroundPermission,
+        checkLocationPermission,
+        checkBacgroundLocationPermission,
+        bacgroundPermisos
     };
 }
 

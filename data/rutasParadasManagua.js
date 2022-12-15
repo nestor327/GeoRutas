@@ -12,8 +12,9 @@ if(isLoading){
     //console.log("Se estan cargando las paradas");        
 }
 
-if(isLoading==false){    
-    return(data.filter(elemento => elemento.id_Ruta==idRuta))
+if(isLoading==false){  
+    let dato=data.filter(elemento => elemento.id_Ruta==idRuta);
+    return(dato);
 }
 }
 

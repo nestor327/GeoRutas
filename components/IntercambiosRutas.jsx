@@ -39,7 +39,7 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
         return(
             rutasTrayectoria.map((ruta, i)=>{
                 return(
-                    <View style={{alignItems:'center'}} key={(i)}>
+                    <View style={{alignItems:'center',marginHorizontal:2.5}} key={(i)}>
                         {/* <Image source={require("../assets/Citycons_bus_icon-icons.com_67914.png")} style={{height:50,width:50, borderRadius:25}}/> */}
                         
                         <RutasBarItem color={coloresEnLasRutas[i]} numeroDeRuta={nombreDeLasRutas[i]}
@@ -64,7 +64,10 @@ return(
                 cantidadDeTrayectos.map((item, i)=>{
                     return(
                         <View key={i} style={{alignItems:'center', marginTop:'17%'}} 
-                        onTouchEnd={()=>{                                                        
+                        onTouchEnd={()=>{         
+                            if(identificadorKey.current==i+1){
+                                verRutasTrayecto.current==!verRutasTrayecto.current;
+                            }
                             obtenerRutas(i+1);
                             //RutasTrayectorias(setRutasEnElMapa);
                             setVerTrayectoria(true);   
@@ -81,7 +84,7 @@ return(
                              
                              <Text style={{color:'white'}} >Ruta: {i+1}</Text>
 
-                             {visualizarRutas==(i+1) && verRutasTrayecto==true && <RutasDelTrayecto rutasTrayectoria={rutasTrayectoria}></RutasDelTrayecto>}
+                             {visualizarRutas==(i+1) && verRutasTrayecto.current==true && <RutasDelTrayecto rutasTrayectoria={rutasTrayectoria}></RutasDelTrayecto>}
                         </View>
                         
                     )

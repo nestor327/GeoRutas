@@ -27,7 +27,7 @@
     // const rutasParadasManagua=async()=>{
     //     return(await fetch('https://georutas.somee.com/api/RutasParada').then(res=>datos=res.json()));
     // }
-    let paradasEnComun=rutasParadasManagua(idRuta)._3;
+    let paradasEnComun=rutasParadasManagua(idRuta)._j;    
     let paradasNecesarias=[];
     
  

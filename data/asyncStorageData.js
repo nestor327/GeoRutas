@@ -114,3 +114,52 @@ export const getCorreo = async (setCorreo) => {
     }
   return true;
 }
+
+export const setPermitirEnvio= async (correo) => {
+    try{
+        await AsyncStorage.setItem('permitirEnvio',correo);
+    }catch (e){
+        console.log("No se encontro el permitir envio");
+    }
+  return true;
+}
+
+export const getPermitirEnvio = async (setPermitirEnvio) => {   
+    try{
+        const value=await AsyncStorage.getItem('permitirEnvio');
+
+        if(value!=null){
+            setPermitirEnvio(value);
+        }else if(value==="false"){
+            setPermitirEnvio(false);
+        }else if(value==="true"){
+            setPermitirEnvio(true);
+        }
+    }catch (e){
+        console.log("No se encontro el permitir envio");
+        setPermitirEnvio(false);      
+    }
+  return true;
+}
+
+export const setRutasParadasValue= async (rutasParadas) => {
+    try{
+        await AsyncStorage.setItem('rutasParadas',rutasParadas);
+    }catch (e){
+        console.log("No se encontro el usuario");
+    }
+  return true;
+}
+
+export const getRutasParadasValue = async (setRutasParadas) => {   
+    try{
+        const value=await AsyncStorage.getItem('rutasParadas');
+
+        setRutasParadas(value);      
+          
+    }catch (e){
+        console.log("No se encontro el usuario");
+        setRutasParadas("");      
+    }
+  return true;
+}

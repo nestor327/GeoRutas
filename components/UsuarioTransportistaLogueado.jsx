@@ -196,10 +196,10 @@ import Polyline from 'react-native-maps'
                 { UsuarioEncontrado.current.estado=='A' &&                    
                         <Marker coordinate={{latitude:(userLocation.latitude), longitude:(userLocation.longitude)}}>
                     
-                        {direccionesPorUsuarioDos=='D' && <Text>{"⇛"+nombresEnElArregloFinal[0]}</Text>}
-                        {direccionesPorUsuarioDos=='I' && <Text>{"⇚"+nombresEnElArregloFinal[0]}</Text>}
+                            {direccionesPorUsuarioDos=='D' && <Text style={{color:'black'}}>{"⇛"+nombresEnElArregloFinal[0]}</Text>}
+                            {direccionesPorUsuarioDos=='I' && <Text style={{color:'black'}}>{"⇚"+nombresEnElArregloFinal[0]}</Text>}
 
-                        <Image style={{width:30,height:30}} source={require("../assets/transportistaAzul.png")}></Image>
+                            <Image style={{width:30,height:30}} source={require("../assets/transportistaAzul.png")}></Image>
                         </Marker>
                 }
                 

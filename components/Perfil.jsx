@@ -3,17 +3,24 @@ import { useEffect, useState } from 'react';
 import { View,Text,Image, TouchableOpacity } from 'react-native'
 import imagen from '../assets/x_icon_imagen.png';
 import { getNombre,getCorreo } from '../data/asyncStorageData.js';
+import { check, openSettings, PERMISSIONS, request } from 'react-native-permissions';
 
 const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,setLoguearse,setRegistrarse,
-    setSecionIniciada,setTipoDeUsuario,activarPrecision,setActivarPrecision})=>{
+    setSecionIniciada,setTipoDeUsuario,activarPrecision,setActivarPrecision,tipoDeUsuario})=>{
 
 
     const [nombre,setnombre]=useState();
     const [correo,setcorreo]=useState();
+    const [permisosEnSegundoPlano,setPermisosEnSegundoPlano]=useState('unavailable');
+
+    const obteniendoElPermiso=async()=>{
+        setPermisosEnSegundoPlano(await check(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION));
+    }
 
     useEffect(()=>{
         getNombre(setnombre);
         getCorreo(setcorreo);
+        obteniendoElPermiso();
     },[])
     return(
         <View style={[tipoDePerfil[0].principal]}>
@@ -40,32 +47,62 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
             <View style={{alignItems:'center'}}>
             <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0,marginBottom:10}}>______________________________________</Text>
 
-            <TouchableOpacity style={{flexDirection:'row',alignContent:'center',justifyContent:'center',height:36}}
+            {tipoDeUsuario=='Transportista' && <TouchableOpacity style={{flexDirection:'row',borderWidth:1.5,borderColor:'#f1f1f1',width:'70%'
+            ,height:40,paddingBottom:0,borderRadius:10,marginBottom:8}}
                 onPress={()=>{setActivarPrecision(!activarPrecision)}}>
-                <Text style={[{color:'white',marginTop:'10%',fontSize:15,marginTop:7,marginBottom:10,alignContent:'center',marginRight:10},activarPrecision==true && {color:'red'}]}>{(activarPrecision==false)?"Activar precisión":"Desactivar precisión"}</Text>
-                <Image source={(activarPrecision==true)?require('../assets/precisionGPS.jpg'):require('../assets/precisionGPSDesactivada.jpg')} style={{width:36,height:36,borderRadius:18, marginRight:20}}></Image>
+                <Image source={(activarPrecision==true)?require('../assets/precisionGPS.jpg'):require('../assets/precisionGPSDesactivada.jpg')} 
+                style={{width:35,height:35,borderRadius:18,marginTop:0, marginRight:20,marginLeft:10}}></Image>
+                <Text style={[{marginTop:7,color:'white',fontSize:15}]}>{(activarPrecision==false)?"Activar precisión":"Desactivar precisión"}</Text>
+            </TouchableOpacity>}
+
+            <TouchableOpacity style={{borderWidth:1.5,borderColor:'#f1f1f1',width:'70%'
+            ,height:40,paddingTop:8,paddingBottom:0,borderRadius:10,marginBottom:8,alignItems:'center'}}>
+                <Text style={{color:'white',fontSize:15,height:20}}>Ver Ubicacion</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity>
-                <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0,marginBottom:10}}>Ver Ubicacion</Text>
+            {tipoDeUsuario=='Transportista' && <TouchableOpacity
+                style={{alignContent:'center',flexDirection:'column',alignItems:'center',alignSelf:'center'
+                ,borderWidth:2.2,borderColor:'green',width:'70%',borderRadius:10,marginBottom:8,alignItems:'center'}}
+                onPress={
+                    async()=>{
+                        if(permisosEnSegundoPlano=='granted'){
+                            openSettings();
+                            return;
+                        }
+                        setPermisosEnSegundoPlano(await request(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION));
+                        
+                        if(permisosEnSegundoPlano=='blocked' || permisosEnSegundoPlano=='denied'){
+                            openSettings();
+                        }
+                    }
+                }
+                >
+                <Text style={[{color:'white',marginTop:'10%',fontSize:15,marginTop:0,textAlign:'center'}]}>{"Permisos para enviar ubicacion siempre: "}</Text>
+                
+                <Text style={[{color:'green',fontSize:15,marginTop:1,marginBottom:8},permisosEnSegundoPlano!='granted' && {color:'red'}]}>{permisosEnSegundoPlano!='granted'?"Desativado":"Activado"}</Text>
+
+            </TouchableOpacity>}
+
+            <TouchableOpacity style={{borderWidth:2.2,width:'70%',borderRadius:10
+                ,marginBottom:8,height:40,paddingTop:8,borderColor:'white',alignItems:'center'}}>
+                <Text style={{color:'white',fontSize:15}}>Cambiar Contraseña</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity>
-                <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0, marginBottom:10}}>Cambiar Contraseña</Text>
+            <TouchableOpacity style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10
+                ,height:40,paddingTop:8,alignItems:'center'}}>
+                <Text style={{color:'white',fontSize:15}}>Ajustes</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity>
-                <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0,marginBottom:10}}>Ajustes</Text>
-            </TouchableOpacity>
-
-            <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0,marginBottom:20}}>______________________________________</Text>
+            <Text style={{color:'white',fontSize:15,marginTop:0,marginBottom:8}}>______________________________________</Text>
             
-            <TouchableOpacity>
-                <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0,marginBottom:10}}>Contactanos</Text>
+            <TouchableOpacity style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10
+                ,marginBottom:8,height:40,paddingTop:8,alignItems:'center'}}>
+                <Text style={{color:'white',fontSize:15}}>Contactanos</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity>
-                <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0,marginBottom:10}} onPress={()=>{
+            <TouchableOpacity style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10
+                ,marginBottom:8,height:40,paddingTop:8,alignItems:'center'}}>
+                <Text style={{color:'white',fontSize:15}} onPress={()=>{
                 if(secionIniciada==true){
                     if(permitirEnviarUbicacion==true){
                         alert("Antes debes dejar de compartir tu ubicacion")
@@ -80,11 +117,14 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
                 }}>{(secionIniciada==true)?"Cerrar secion":"Iniciar secion"}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity>
+            {secionIniciada==false && <TouchableOpacity
+                style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10
+                ,marginBottom:8,height:40,paddingTop:8,alignItems:'center'}}
+                >
                 <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0,marginBottom:10}} onPress={()=>{
                 setRegistrarse(true);
                 }}>Registrarse</Text>
-            </TouchableOpacity>
+            </TouchableOpacity>}
 
             <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0,marginBottom:20}}>______________________________________</Text>            
 
