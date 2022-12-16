@@ -1,12 +1,13 @@
 import * as react from 'react'
-import { Keyboard,View,Text, TextInput,Image,StatusBar, TouchableOpacity} from 'react-native'
+import { Keyboard,View,Text, TextInput,Image,StatusBar, TouchableOpacity,ActivityIndicator} from 'react-native'
 import imagen from '../assets/x_icon_imagen.png';
 import {setUsuario,getUsuario,setContraseña,getContraseña} from '../data/asyncStorageData.js'
 import MD5 from 'md5'
 import { useQuery } from 'react-query';
 
 
-const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransportista,setTipoDeUsuario,height,width,setIdUsuarioIniciado,setUsuarioLogueado})=>{
+const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransportista
+        ,setTipoDeUsuario,height,width,setIdUsuarioIniciado,setUsuarioLogueado})=>{
  
     const [usuarioState,setUsuarioState]=react.useState([]);
     const [contrasenia, setContrasenia]=react.useState("");
@@ -64,7 +65,7 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                 setLoguearse(false);
                 setSecionIniciada(true);
                 setTipoDeUsuario("Transportista");
-                setContraseña(contrasenia);                
+                setContraseña(contrasenia);      
                 return;
             }
         }
@@ -73,8 +74,8 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
             alert("Reintente ingresar"); 
             return;
         }       
-
         alert("Usuario o contrseña no validos");
+        
 
     }
 
@@ -97,7 +98,6 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
 
         <View style={{backgroundColor:'#103070',position:'absolute',zIndex:220, height:height+StatusBar.currentHeight, width:width, paddingTop:(height>width)?height*0.2:StatusBar.currentHeight}}>
             <View style={[{backgroundColor:'#101038',width:(height>width)?width*0.8:height*0.8, paddingTop:(height>width)?height*0.07:StatusBar.currentHeight,marginLeft:'auto', marginRight:'auto'},estylosStates]}>
-                
             <View style={{width:'80%', height:40, marginLeft:'10%', marginRight:'10%', flexDirection:'row', alignItems:'center'}}>
                  {/* <TouchableOpacity style={{width:'50%',alignItems:'center',backgroundColor:'#2060A5', height:40, borderRadius:10, paddingTop:8}}>
                     <Text style={{color:'white'}}>Pasajero</Text>
@@ -136,9 +136,7 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                 <TouchableOpacity style={{backgroundColor:'#2060A5', height:55,width:'60%',marginTop:30,marginLeft:'auto', marginRight:'auto',alignItems:'center', justifyContent:'center', borderRadius:10}}>
                     <Text style={{ color:'white',fontSize:27,marginLeft:'auto', marginRight:'auto',marginBottom:'5%',textAlign:'center',paddingTop:5}} 
                     onTouchEnd={()=>{
-                        
                         verificandoContrasenia();
-                        
                     }}>Ingresar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity>

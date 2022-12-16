@@ -65,7 +65,7 @@ import usePermissionsContext from '../src/hooks/usePermissionsContext.jsx';
         refetchInterval:1000
     })
 
-    const verificandoExistencia=()=>{
+    const verificandoExistencia=async()=>{
         if(isLoading){
             //console.log("Se estan buscando los usuarios");
         }
@@ -77,6 +77,16 @@ import usePermissionsContext from '../src/hooks/usePermissionsContext.jsx';
                     return false;
                 }
             }    
+
+            let usuariosTransportistas=await fetch('https://georutas.somee.com/api/UsuariosTransporte').then(res=>datos=res.json());
+            
+            if(usuariosTransportistas.length>0){
+                for(let i=0;i<usuariosTransportistas.length;i++){
+                    if(usuariosTransportistas[i].usuario==usuario){
+                        return false;
+                    }
+                }
+            }
             
             return true;
         }
@@ -157,7 +167,7 @@ import usePermissionsContext from '../src/hooks/usePermissionsContext.jsx';
                     <Text style={{ color:'white',fontSize:27,marginLeft:'auto', marginRight:'auto',marginBottom:'5%',textAlign:'center',marginTop:5}} 
                     onTouchEnd={
                         ()=>{   
-                            if(!isLoading){       
+                            if(!isLoading){                                  
                                 console.log(validante);                         
                                 if(verificandoExistencia()==true){
                                     if(validarElementos()){
@@ -172,7 +182,7 @@ import usePermissionsContext from '../src/hooks/usePermissionsContext.jsx';
                                     }
                                 }else{
                                     alert("El nombre de usuario ya existe");
-                                }
+                                }                                
                             }else{
                                 alert("Reintente registrarse");
                             }

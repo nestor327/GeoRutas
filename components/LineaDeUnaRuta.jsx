@@ -6,7 +6,7 @@
     import getAllRutas from '../data/rutasManagua.js';
 import { View } from "react-native";
 
-    const LineaDeUnaRuta=({idRuta,setMostrarSniperCargando})=>{
+    const LineaDeUnaRuta=({idRuta,setMostrarSniperCargando,setCargando})=>{
 
          let color="red";
         // if(idRuta==1)
@@ -29,10 +29,14 @@ import { View } from "react-native";
         cacheTime:20000,
         onSuccess:()=>{
             setMostrarSniperCargando(true);            
+            setCargando(false);
         }
         
     })
 
+    if(error){
+        setCargando(false);
+    }
 
     if(isLoading){
         //console.log("Se esta cargando la linea de la ruta");            
@@ -43,6 +47,12 @@ import { View } from "react-native";
         
         let coordenadas=[]
 
+        if(data.length==0 || data==undefined){
+            return(
+                <View></View>
+            )
+        }
+        
         for(let y=0;y<data.length;y++){
             
                 coordenadas.push({latitude: data[y].longitude, longitude: data[y].latitude})                        

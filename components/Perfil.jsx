@@ -6,12 +6,11 @@ import { getNombre,getCorreo } from '../data/asyncStorageData.js';
 import { check, openSettings, PERMISSIONS, request } from 'react-native-permissions';
 
 const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,setLoguearse,setRegistrarse,
-    setSecionIniciada,setTipoDeUsuario,activarPrecision,setActivarPrecision,tipoDeUsuario})=>{
+    setSecionIniciada,setTipoDeUsuario,activarPrecision,setActivarPrecision,tipoDeUsuario,permisosEnSegundoPlano,setPermisosEnSegundoPlano})=>{
 
 
     const [nombre,setnombre]=useState();
     const [correo,setcorreo]=useState();
-    const [permisosEnSegundoPlano,setPermisosEnSegundoPlano]=useState('unavailable');
 
     const obteniendoElPermiso=async()=>{
         setPermisosEnSegundoPlano(await check(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION));
@@ -35,8 +34,8 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
             <View style={{alignItems:'center'}}>
                 <Text style={{color:'white',marginTop:'10%',fontSize:25}}>Ajustes</Text>
                 <View style={{flexDirection:'row',height:100,alignItems:'center'}}>
-                    <Image source={require('../assets/Sukuna.jpg')} style={{width:76,height:76,borderRadius:38}}/>
-
+                    {/* <Image source={require('../assets/Sukuna.jpg')} style={{width:76,height:76,borderRadius:38}}/> */}
+                    <Image source={require('../assets/ajustes.png')} style={{width:76,height:76,borderRadius:38}}/>
                 <View>
                     <Text style={{color:'white',marginTop:'10%',fontSize:20,marginTop:0}}>{nombre}</Text>
                     <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0}}>{correo}</Text>

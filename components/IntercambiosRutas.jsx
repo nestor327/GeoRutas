@@ -1,12 +1,12 @@
 import React, { useEffect,useState } from "react";
-import { View,Image,TextInput,Text, ScrollView, TouchableOpacity } from "react-native";
+import { View,Image,TextInput,Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
 import RutasBarItem from "./RutasBarItem.jsx";
 import getAllRutas from '../data/rutasManagua.js'
 
 
 const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRutasTrayecto,obtenerRutas
     ,setVerTrayectoria,setVerRutasCercanas,identificadorKey,refCambiarLupa
-    ,setVerCompetencia,setOcultarTrayecto})=>{
+    ,setVerCompetencia,setOcultarTrayecto,setCargando})=>{
 
     let cantidadDeTrayectos =[0];
     let datosDeLasRutas=[];
@@ -60,11 +60,12 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
 return(
     <View >
         <ScrollView>
-            {
+            {     
                 cantidadDeTrayectos.map((item, i)=>{
                     return(
                         <View key={i} style={{alignItems:'center', marginTop:'17%'}} 
-                        onTouchEnd={()=>{         
+                        onTouchEnd={()=>{  
+                            setCargando(true);
                             if(identificadorKey.current==i+1){
                                 verRutasTrayecto.current==!verRutasTrayecto.current;
                             }
@@ -76,6 +77,7 @@ return(
                             setVerCompetencia(false);    
                             setOcultarTrayecto(true); 
                             refCambiarLupa.current=false;
+                            setCargando(false);
                         }
                         }>
                             <TouchableOpacity style={visualizarRutas==(i+1) && { backgroundColor:'#1e81ce', padding:5, borderRadius:10}}>

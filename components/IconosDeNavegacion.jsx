@@ -10,7 +10,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
     verTransportistasPorLaDerecha,verTransportistasPorLaIzquierda,idRutaAMostrar,mostrarUsuarios,permitirEnviarUbicacion,
     tipoDeUsuario,mostrarParadas,mostrarItemMenuUno,verTrayectoria,verCompetencia,verRutasCercanas,centrePosition,siguiendoAlUsuario,
     askLocationPermission,followUseLocation, stopFollowUserLocation,permitirSeguirPasajero, setPermitirSeguirPasajero,setVerTrayectoria,
-    ocultarTrayecto,permisos,askLocationPermissionSetting, setUsuarioTransportista
+    ocultarTrayecto,permisos,askLocationPermissionSetting, setUsuarioTransportista,setCargando
     })=>{
 
         // useEffect(()=>{
@@ -27,8 +27,9 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
 
             {permitirEnviarUbicacion==false && tipoDeUsuario=="Transportista" && <Fab 
                 onPres={async()=>{
-
+                    setCargando(true);
                     if(permisos!='granted'){
+                        setCargando(false);
                         askLocationPermission();
                         askLocationPermissionSetting();
                         return;
@@ -36,12 +37,14 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                     
                     if(idUsuarioIniciado<0){
                         alert("Vualva a iniciar secion");
+                        setCargando(false);
                         return;
                     }
                     let usuarioTransportista= await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json());
                     
                     if(usuarioTransportista=={} || usuarioTransportista.nombre==null){                        
                         alert("Has perdido tu usuario, vuelve a iniciar secion");
+                        setCargando(false);
                         return;
                     }
                     followUseLocation(50);
@@ -70,8 +73,6 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                                     estado: 'A'
                             })
                     })    
-                        
-                    setPermitirEnviarUbicacion(true);
                     setUsuarioTransportista({
                         id_UsuarioTransporte: idUsuarioIniciado,
                         id_Tipo_Transporte: 1,
@@ -88,6 +89,8 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         estado: 'A'
                     });
                     setPermitirEnvio("true");
+                    setPermitirEnviarUbicacion(true);
+                    setCargando(false);
                 }
             }
                 imagen={require('../assets/ocultarUbicacionTransportista.png')}
@@ -97,13 +100,18 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
             
             {permitirEnviarUbicacion==true && tipoDeUsuario=="Transportista" && <Fab 
                 onPres={async()=>{
+                    setCargando(true);
+                    setPermitirEnviarUbicacion(false);
+                    setPermitirEnvio("false");
                     if(idUsuarioIniciado<0){
                         alert("Vualva a iniciar secion");
+                        setCargando(false);
                         return;
                     }
                     let usuarioTransportista= await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json())
                     
                     if(usuarioTransportista=={} || usuarioTransportista.nombre==null){
+                        setCargando(false);
                         return;
                     }
                     stopFollowUserLocation();
@@ -131,7 +139,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                                 })
                         })
 
-                        setPermitirEnviarUbicacion(false);
+                        
                         setUsuarioTransportista({
                             id_UsuarioTransporte: idUsuarioIniciado,
                             id_Tipo_Transporte: 1,
@@ -147,7 +155,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                             latitudeAnterior: usuarioTransportista.latitudeAnterior,
                             estado: 'I'
                         });
-                        setPermitirEnvio("false");
+                        setCargando(false);
                 }}
                 imagen={require('../assets/ubicacionTransportista.png')}
             />}
@@ -156,14 +164,16 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
             
              {permitirSeguirPasajero==false && tipoDeUsuario=="Pasajero" && <Fab 
                 onPres={async()=>{
+                    setCargando(true);
                     if(permisos!='granted'){
+                        setCargando(false);
                         askLocationPermission();
                         askLocationPermissionSetting();
                         return;
                     }
                     followUseLocation(25);
                     setPermitirSeguirPasajero(true);
-        
+                    setCargando(false);
                 }}
                 imagen={require('../assets/ocultarUbicacionTransportista.png')}
             />} 
@@ -172,10 +182,10 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
             
             {permitirSeguirPasajero==true && tipoDeUsuario=="Pasajero" && <Fab 
                 onPres={async()=>{
-
+                    setCargando(true);
                     stopFollowUserLocation();
                     setPermitirSeguirPasajero(false);
-
+                    setCargando(false);
                 }}
                 imagen={require('../assets/ubicacionTransportista.png')}
             />} 
@@ -184,9 +194,11 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
             
             {idRutaAMostrar>0 && mostrarUsuarios==false && <Fab 
                 onPres={()=>{
+                    setCargando(true);
                     setMostrarUsuarios(true);
                     setVerTransportistasPorLaDerecha(true);
                     setVerTransportistasPorLaIzquierda(true);
+                    setCargando(false);
                 }}
                 imagen={require('../assets/noVerUsuarios.png')}                
             />}
@@ -194,7 +206,9 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
             
             {idRutaAMostrar>0 && mostrarUsuarios==true && <Fab 
                 onPres={()=>{
+                    setCargando(true);
                     setMostrarUsuarios(false);
+                    setCargando(false);
                 }}
                 imagen={require('../assets/verUsuarios.png')}                
             />}
@@ -203,7 +217,9 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
             
             {idRutaAMostrar>0 && mostrarParadas==false && <Fab 
                 onPres={()=>{
+                    setCargando(true);
                     serMostrarParadas(true);
+                    setCargando(false);
                 }}
                 imagen={require('../assets/noVerParadas.jpg')}
             />}
@@ -212,61 +228,77 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
             
             {idRutaAMostrar>0 && mostrarParadas==true && <Fab 
                 onPres={()=>{
+                    setCargando(true);
                     serMostrarParadas(false);
+                    setCargando(false);
                 }}
                 imagen={require('../assets/verParadas.jpg')}
             />}
 
                 {tipoDeUsuario=='Transportista' && mostrarItemMenuUno==true && verCompetencia==false && <Fab
-                    onPres={()=>{                
+                    onPres={()=>{   
+                        setCargando(true);             
                         setVerCompetencia(true);
                         setOcultarTrayecto(false);
+                        setCargando(false);
                     }}
                     imagen={require('../assets/noVerUsuarios.png')}
                 />}
 
                 
                 {tipoDeUsuario=='Transportista' && mostrarItemMenuUno==true && verCompetencia==true && <Fab
-                    onPres={()=>{setVerCompetencia(false)}}
+                    onPres={()=>{
+                        setCargando(true);
+                        setVerCompetencia(false);
+                        setCargando(false);
+                    }}
                     imagen={require('../assets/verUsuarios.png')}
                 />}
                 
                 {tipoDeUsuario=='Pasajero' && mostrarItemMenuUno==true && verRutasCercanas==false && <Fab 
                     onPres={()=>{
+                        setCargando(true);
                         setVerRutasCercanas(true); 
-                        setOcultarTrayecto(false);}}
+                        setOcultarTrayecto(false);
+                        setCargando(false);
+                    }}
                         imagen={require('../assets/noVerUsuarios.png')}
                 />}
 
                 
                 {tipoDeUsuario=='Pasajero' && mostrarItemMenuUno==true && verRutasCercanas==true && <Fab
-                    onPres={()=>{setVerRutasCercanas(false)}}                
+                    onPres={()=>{
+                        setCargando(true);
+                        setVerRutasCercanas(false);
+                        setCargando(false);
+                    }}                
                     imagen={require('../assets/verUsuarios.png')}
                 />}
 
                 {ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && tipoDeUsuario=="Transportista" && <Fab
                     onPres={()=>{                
-          
+                        setCargando(true);
                         obtenerRutas(identificadorKey.current);   
 
                         setVerTrayectoria(true);
                         setVerRutasCercanas(false);  
                         setVerCompetencia(false);    
                         setOcultarTrayecto(true);   
-
+                        setCargando(false);
                     }}
                         imagen={require('../assets/cambioDetrayectoriaCero.jpg')}
                 />}
 
                 {ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && tipoDeUsuario=="Pasajero" && <Fab
                     onPres={()=>{                
-
+                        setCargando(true);
                         obtenerRutas(identificadorKey.current);   
                         
                         setVerTrayectoria(true);                           
                         setVerRutasCercanas(false);  
                         setVerCompetencia(false);    
                         setOcultarTrayecto(true);  
+                        setCargando(false);
                     }}
 
                         imagen={require('../assets/cambioDetrayectoriaCero.jpg')}
@@ -275,7 +307,11 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                 
                 { (tipoDeUsuario=="Pasajero" || tipoDeUsuario=="Transportista") && (permitirSeguirPasajero==true || permitirEnviarUbicacion==true) &&
                     <Fab
-                    onPres={centrePosition}
+                    onPres={()=>{
+                        setCargando(true);
+                        centrePosition();
+                        setCargando(false);
+                    }}
                     imagen={require('../assets/tuUbicacioncopia.png')}
                 >
                 </Fab>}
@@ -288,7 +324,9 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
             
             {idRutaAMostrar>0 && mostrarUsuarios==true && verTransportistasPorLaIzquierda==false && <Fab 
                 onPres={()=>{
+                    setCargando(true);
                     setVerTransportistasPorLaIzquierda(true);
+                    setCargando(false);
                 }}
                 imagen={require('../assets/DireccionDeTransportistasIzquierdaNegada.png')}
             />}
@@ -296,10 +334,12 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
             
             {idRutaAMostrar>0 && mostrarUsuarios==true && verTransportistasPorLaIzquierda==true && <Fab 
                 onPres={()=>{
+                    setCargando(true);
                     setVerTransportistasPorLaIzquierda(false);
                     if(verTransportistasPorLaDerecha==false){
                         setMostrarUsuarios(false);
                     }
+                    setCargando(false);
                 }}
                 imagen={require('../assets/DireccionDeTransportistasIzquierda.png')}
             />}
@@ -307,7 +347,9 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
             
             {idRutaAMostrar>0 && mostrarUsuarios==true && verTransportistasPorLaDerecha==false && <Fab 
                 onPres={()=>{
+                    setCargando(true);
                     setVerTransportistasPorLaDerecha(true);
+                    setCargando(false);
                 }}
                 imagen={require('../assets/DireccionDeTransportistasDerechaNegada.png')}
             />}
@@ -315,10 +357,12 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
             
             {idRutaAMostrar>0 && mostrarUsuarios==true && verTransportistasPorLaDerecha==true && <Fab 
                 onPres={()=>{
+                    setCargando(true);
                     setVerTransportistasPorLaDerecha(false);
                     if(verTransportistasPorLaIzquierda==false){
                         setMostrarUsuarios(false);
                     }
+                    setCargando(false);
                 }}
                 imagen={require('../assets/DireccionDeTransportistasDerecha.png')}
             />}
