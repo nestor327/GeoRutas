@@ -208,7 +208,7 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
                     latitude: longitude,
                     longitudeAnterior: longitudeAnterior,
                     latitudeAnterior: latitudeAnterior,
-                    estado: estado
+                    estado: 'A'
                 })
         })
         //console.log(datos);        
@@ -228,8 +228,6 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
             )
         }))
 
-        //getCurrentLocation().then((coords) => userLocationReal=coords.json());
-        console.log(userLocationReal);
 
         if(userLocationReal=={} || userLocationReal==undefined || userLocationReal.latitude==undefined){
             setHasLocation(true);
@@ -245,7 +243,6 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
         }else{
             console.log("Entraste al segundo lugar");
             let pendiente=0;
-            console.log(coordenadasDeLaRuta[0]);
 
             pendiente=(coordenadasDeLaRuta[0].latitude-coordenadasDeLaRuta[1].latitude)/(coordenadasDeLaRuta[0].longitude-coordenadasDeLaRuta[1].longitude);
 
@@ -327,9 +324,7 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
 
             }
 
-            userLocation={latitude:xValueFinal,longitude:yValueFinal};
-            console.log("El valor antes de posiblemente cambiarlo es: ");
-            console.log(userLocation);
+            userLocation={latitude:xValueFinal,longitude:yValueFinal};            
             
             if(xValueFinal==0 || xValueFinal==undefined){
                 userLocation=userLocationReal;
@@ -337,7 +332,6 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
 
         }
 
-        console.log(userLocation);
 
         let usuarioTransportista= await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json());
         
@@ -351,13 +345,11 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
             paradasDelUsuario.push(paradasCompletas.filter(elemento => elemento.id_Parada==paradasEnComunRuta[k].id_Parada)[0]);
         }
 
-        console.log("Englobaste esta parte");
         
         actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
                                     usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,userLocation.latitude,
                                     userLocation.longitude,usuarioTransportista.longitudeAnterior,usuarioTransportista.latitudeAnterior,usuarioTransportista.estado);
         
-        console.log("Englobaste esta parte");
 
         let distanciaEntreUsuarioYRutaMenor=1000;
         let paradaMasCercana=-1;
@@ -588,7 +580,8 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
         askLocationBacgroundPermission,
         checkLocationPermission,
         checkBacgroundLocationPermission,
-        bacgroundPermisos
+        bacgroundPermisos,
+        setBacgroundPermisos
     };
 }
 

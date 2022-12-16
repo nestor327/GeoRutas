@@ -10,7 +10,7 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
     
 
 
-    const CompetenciaTransportistas=({tipoDeUsuario,idUsuarioIniciado})=>{
+    const CompetenciaTransportistas=({tipoDeUsuario,idUsuarioIniciado,setCargando})=>{
 
         
 

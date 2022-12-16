@@ -20,6 +20,7 @@ import BackgroundService from 'react-native-background-actions';
 import Geolocation from '@react-native-community/geolocation';
 import { PermissionStatus,PERMISSIONS, request, check,openSettings } from "react-native-permissions";
 import { getPermitirEnvio, getRutasParadasValue, setRutasParadasValue } from '../data/asyncStorageData.js';
+import Cargando from './Cargando.jsx';
 
 export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoordenadasOrigen,tipoDeUsuario
     ,setVerTrayectoria,setOcultarMenu,coordenadasOrigen,coordenadasDestino,setCoordenadasDestino,verTrayectoria,iconosTransportes,tiemposRutasTrayectorias
@@ -34,7 +35,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     ,menUno,setmenUno,menDos, setmenDos,menTres, setmenTres,menCuatro, setmenCuatro,menCinco, setmenCinco
     ,userLocation, setUserLocatio,setSecionIniciada, setTipoDeUsuario
     ,mostrarBarraSecundariaDeUbicacion,setMostrarBarraSecundariaDeUbicacion,setMostrarItemMenuUno,setIdRutaAMostrar
-    ,refCambiarLupa,activarPrecision,setActivarPrecision,mostrarVentana,serMostrarVentana})=>{
+    ,refCambiarLupa,activarPrecision,setActivarPrecision,mostrarVentana,serMostrarVentana
+    ,setCargando,cargando})=>{
     
 
 
@@ -56,7 +58,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             askLocationBacgroundPermission,
             checkLocationPermission,
             checkBacgroundLocationPermission,
-            bacgroundPermisos
+            bacgroundPermisos,
+            setBacgroundPermisos
         }=useLocation(permitirEnviarUbicacion,tipoDeUsuario,idUsuarioIniciado,direccionesPorUsuario,userLocation,setUserLocatio,activarPrecision);
 
     
@@ -74,6 +77,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     const [coordenadasDeLaRuta, setCoordenadasDeLaRuta]=useState([]);
     const [tiempoEntreActualizaciones,setTiempoEntreActualizaciones]=useState(4);
     const [actualizarIntervalo, setActualizarIntervalo]=useState(false);
+    const [estadoAplicacion, setEstadoAplicacion]=useState(true);
 
 
 
@@ -96,31 +100,33 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         let paradasRutas=paradas.filter(elemento => elemento.id_Ruta==usuario.id_Ruta);
         setRutasParadas(paradasRutas);
         let paradasComple=await fetch('https://georutas.somee.com/api/Paradas').then(res=>datos=res.json());
+        
         let paradasFilter=[];
         for(let i=0;i<paradas.length;i++){
             paradasFilter.push(paradasComple.filter(elemento => elemento.id_Parada==paradas[i].id_Parada)[0]);
         }
+
         setParadasCompletas(paradasFilter);
         
         setCoordenadasDeLaRuta(await fetch('https://georutas.somee.com/api/Coordenadas/'+usuario.id_Ruta).then(res=>datos=res.json()));
         
         setRutasParadasValue(JSON.stringify(paradasRutas));
-        getRutasParadasValue(setPruebaState);
-        console.log("La prueba da como resultado");
-        console.log(pruebaState);
+        //getRutasParadasValue(setPruebaState);
+        //console.log("La prueba da como resultado");
+        //console.log(pruebaState);
     }
     }
 
-    useEffect(()=>{
-        if(pruebaState.length==0)
-        {
-            return;
-        }
-        console.log("Prueba");
-        let datos=JSON.parse(pruebaState);
-        console.log((datos[0]).id_Ruta);
-        console.log("Prueba");
-    },[pruebaState])
+    // useEffect(()=>{
+    //     if(pruebaState.length==0)
+    //     {
+    //         return;
+    //     }
+    //     console.log("Prueba");
+    //     let datos=JSON.parse(pruebaState);
+    //     console.log((datos[0]).id_Ruta);
+    //     console.log("Prueba");
+    // },[pruebaState])
 
 
 
@@ -136,6 +142,31 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         refFollowing.current=true;
         console.log("A la gran puta");
 
+    }
+
+    const ocultarUsuarioTransportistaEnElBackend=async()=>{
+        let datos=await fetch('https://georutas.somee.com/api/UsuariosTransporte',{
+            method:"PUT",
+            headers:{
+                "Content-Type":"application/json",
+                },
+                body:JSON.stringify(
+                    {
+                            id_UsuarioTransporte: idUsuarioIniciado,
+                            id_Tipo_Transporte: 1,
+                            id_Ruta: usuarioTransportista.id_Ruta,
+                            nombre: usuarioTransportista.nombre,
+                            usuario: usuarioTransportista.usuario,
+                            contrasenia: usuarioTransportista.contrasenia,
+                            correo: usuarioTransportista.correo,
+                            telefono: usuarioTransportista.telefono,
+                            longitude: usuarioTransportista.longitude,
+                            latitude: usuarioTransportista.latitude,
+                            longitudeAnterior: usuarioTransportista.longitudeAnterior,
+                            latitudeAnterior: usuarioTransportista.latitudeAnterior,
+                            estado: 'I'
+                    })
+            })
     }
 
 
@@ -200,19 +231,23 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         
         let k=setInterval(()=>{
 
-            if(tipoDeUsuario=='Transportista' && permitirEnviarUbicacion==true){
-                //Este espacio, esta totalmente vacio
-                console.log("Pedo");
+            if(tipoDeUsuario=='Transportista' && permitirEnviarUbicacion==true && estadoAplicacion==true){
+                // //Este espacio, esta totalmente vacio
+                // console.log("Pedo");
                 actualizarUbicacionEnElBackEnd(paradasCompletas,rutasParadas,coordenadasDeLaRuta);
                 
-                //console.log(userLocation);
+                // //console.log(userLocation);
                 let fecha= new Date();
+                console.log("Segundos");
                 console.log(fecha.getSeconds());
                 if(Math.abs(tiempoEntreActualizaciones-fecha.getSeconds())<=2){
                     setActualizarIntervalo(!actualizarIntervalo);
                 }
                 setTiempoEntreActualizaciones(fecha.getSeconds())
-                console.log("Fin del Pedo");
+                // console.log("Fin del Pedo");
+            }else if(tipoDeUsuario=='Transportista' && permitirEnviarUbicacion==false && usuarioTransportista.estado!=undefined
+                && usuarioTransportista!={}){
+                ocultarUsuarioTransportistaEnElBackend();
             }
 
         },4000)
@@ -222,7 +257,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             console.log("Eliminando y actualizando");
         }
 
-    },[tipoDeUsuario,coordenadasDeLaRuta,permitirEnviarUbicacion,actualizarIntervalo])
+    },[tipoDeUsuario,coordenadasDeLaRuta,permitirEnviarUbicacion,actualizarIntervalo,estadoAplicacion,activarPrecision])
 
 
 
@@ -360,8 +395,10 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         // Example of an infinite loop task
         const { delay } = taskDataArguments;
         await new Promise( async (resolve) => {
+
             for (let i = 0; BackgroundService.isRunning(); i++) {
 
+                //let rutasParadasSegundoPlano=getRutasParadasValue();
                 let permisosSegundoPlano=await check(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION);
 
                 if(permisosSegundoPlano!='granted' || permisosSegundoPlano==undefined){
@@ -369,17 +406,14 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     console.log("Los permisos no estan activos: "+permisosSegundoPlano);
                 }else{
                     console.log(3*i);
-            
-                    Geolocation.getCurrentPosition(
-                        ({coords})=>{
-                            console.log(coords);
-                        }
-                    )
-
                     
-
+                    if(tipoDeUsuario=='Transportista' && permitirEnviarUbicacion==true){
+                        actualizarUbicacionEnElBackEnd(paradasCompletas,rutasParadas,coordenadasDeLaRuta);
+                    }else{
+                        console.log("No yes");
+                        let detener=await BackgroundService.stop();
+                    }        
                 }
-                
                 await sleep(delay);
             }
         });
@@ -396,7 +430,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         color: '#ff00ff',
         linkingURI: 'yourSchemeHere://chat/jane', // See Deep Linking for more info
         parameters: {
-            delay: 4000,
+            delay: 5000,
         },
     };
     
@@ -417,19 +451,16 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     
         const permisosState=AppState.addEventListener('change',async(state)=>{
     
-            
-
             if(state!=='active'){
                 activarTarea();
+                setEstadoAplicacion(false);
                 console.log("La tarea se activo");
                 return;
-
-                
-
             } 
             
             if(state=='active'){
                 desactivarTarea();
+                setEstadoAplicacion(true);
                 console.log("La tarea se desactivo");
             }
 
@@ -439,10 +470,12 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         return ()=>{
             permisosState.remove();
         }
-    },[])
+    },[permitirEnviarUbicacion])
 
   return(
     <View style={{height:(height>width)?(height-width*0.2-StatusBar.currentHeight):height*0.8-StatusBar.currentHeight,width:'100%', backgroundColor:'#2060A5'}}>
+        
+        {cargando==true && <Cargando height={height}></Cargando>}
         
         <IconosDeNavegacion
         setPermitirEnviarUbicacion={setPermitirEnviarUbicacion} idUsuarioIniciado={idUsuarioIniciado} setMostrarUsuarios={setMostrarUsuarios}
@@ -455,7 +488,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         centrePosition={centrePosition} siguiendoAlUsuario={siguiendoAlUsuario} askLocationPermission={askLocationPermission} followUseLocation={followUseLocation}
         stopFollowUserLocation={stopFollowUserLocation} permitirSeguirPasajero={permitirSeguirPasajero} setPermitirSeguirPasajero={setPermitirSeguirPasajero}
         setVerTrayectoria={setVerTrayectoria} ocultarTrayecto={ocultarTrayecto} permisos={permisos}
-        askLocationPermissionSetting={askLocationPermissionSetting} setUsuarioTransportista={setUsuarioTransportista}
+        askLocationPermissionSetting={askLocationPermissionSetting} setUsuarioTransportista={setUsuarioTransportista} setCargando={setCargando}
         ></IconosDeNavegacion>
 
 
@@ -740,8 +773,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                 
                 <Image 
                     //source={require('../assets/Sukuna.jpg')} 
-                    source={(mostrarBarraSecundariaDeUbicacion==true)?require('../assets/x_icon_imagen.png'):require('../assets/Sukuna.jpg')}
-                    style={[{width:37, height:37,marginLeft:7,marginRight:7, borderRadius:20,marginTop:7,marginBottom:7,
+                    source={(mostrarBarraSecundariaDeUbicacion==true)?require('../assets/x_icon_imagen.png'):require('../assets/ajustes.png')}
+                    style={[{width:39, height:39,marginLeft:6,marginRight:6, borderRadius:20,marginTop:6,marginBottom:6,
                     },(mostrarBarraSecundariaDeUbicacion==true) && {tintColor:'#f1f1f1',marginRight:10,marginLeft:4}]}>
                 </Image>
             </View>
@@ -1013,7 +1046,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setRegistrarse={setRegistrarse} 
             setLoguearse={setLoguearse} tipoDePerfil={[{principal:{width:'100%',height:height-width*0.2,position:'absolute',top:0,left:0,zIndex:200,backgroundColor:'#00000045'}}]} 
             actualizar={serMostrarVentana} activarPrecision={activarPrecision} setActivarPrecision={setActivarPrecision}
-            tipoDeUsuario={tipoDeUsuario}></Perfil>}
+            tipoDeUsuario={tipoDeUsuario} permisosEnSegundoPlano={bacgroundPermisos} setPermisosEnSegundoPlano={setBacgroundPermisos}></Perfil>}
         
         {<MapView
 
@@ -1181,7 +1214,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             {idRutaAMostrar>0 &&
                      <View>
                          {mostrarParadas==true && <DireccionesSegunUbicacion idRuta={idRutaAMostrar}></DireccionesSegunUbicacion>}
-                         <LineaDeUnaRuta setMostrarSniperCargando={setMostrarSniperCargando} idRuta={idRutaAMostrar} ></LineaDeUnaRuta>
+                         <LineaDeUnaRuta setCargando={setCargando} setMostrarSniperCargando={setMostrarSniperCargando} idRuta={idRutaAMostrar} ></LineaDeUnaRuta>
                          {mostrarUsuarios==true && <UsuariosTransportistas tipoDeUsuario={tipoDeUsuario} idRuta={idRutaAMostrar} idUsuarioIniciado={idUsuarioIniciado}
                          verTransportistasPorLaDerecha={verTransportistasPorLaDerecha} verTransportistasPorLaIzquierda={verTransportistasPorLaIzquierda}></UsuariosTransportistas>}                        
                      </View>
@@ -1232,7 +1265,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     </View>
                 )
             })}  
-            {idUsuarioIniciado>0 && permitirEnviarUbicacion==true && tipoDeUsuario=="Transportista" && <UsuarioTransportistaLogueado direccionesPorUsuario={direccionesPorUsuario}
+            {idUsuarioIniciado>0 && permitirEnviarUbicacion==true && tipoDeUsuario=="Transportista" && <UsuarioTransportistaLogueado activarPrecision={activarPrecision} direccionesPorUsuario={direccionesPorUsuario}
             setDireccionPorUsuario={setDireccionPorUsuario} idUsuarioIniciado={idUsuarioIniciado} userLocation={userLocation}></UsuarioTransportistaLogueado>}
             
         </MapView>}        

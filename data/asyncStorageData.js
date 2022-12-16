@@ -151,15 +151,16 @@ export const setRutasParadasValue= async (rutasParadas) => {
   return true;
 }
 
-export const getRutasParadasValue = async (setRutasParadas) => {   
+export const getRutasParadasValue = async () => {   
     try{
         const value=await AsyncStorage.getItem('rutasParadas');
-
-        setRutasParadas(value);      
+        
+        return (JSON.parse(value));      
+        
           
     }catch (e){
-        console.log("No se encontro el usuario");
-        setRutasParadas("");      
+        console.log("No se encontraron las paradas");
+        return "[]";
     }
-  return true;
+  
 }

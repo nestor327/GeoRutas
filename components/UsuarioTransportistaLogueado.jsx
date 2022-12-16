@@ -1,67 +1,57 @@
   
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { useQuery } from "react-query";
 import { Marker } from "react-native-maps";
 import obtenerParadasPorParadas from '../data/obtencionDeLasParadasPorRuta.js';
 import { View,Text,Image } from "react-native";
-import { getUsuario } from "../data/asyncStorageData.js";
 import getAllRutas from '../data/rutasManagua.js'
-import Polyline from 'react-native-maps'
 
 
 //Este componente posee errores, revisalo luego
-//Recibido, el problema que tiene es que no llama a los datos del backend se queda con el primero para siempre,
-//ademas de que no muestra a el elemento por ninguna parte, despues de la primera vez.
 
-    const UsuarioTransportistaLogueado=({usuario,direccionesPorUsuario,setDireccionPorUsuario,idUsuarioIniciado,userLocation})=>{
+    const UsuarioTransportistaLogueado=({usuario,direccionesPorUsuario,setDireccionPorUsuario,idUsuarioIniciado,userLocation,activarPrecision})=>{
 
         let direccionesPorUsuarioDos='K';
-        const UsuarioEncontrado=useRef({});
 
-
-        const {data,error,isLoading}=useQuery(['obtenerTodosLosUsuarioComunesUnico123'],async({queryKey})=>{
-            return await fetch('https://georutas.somee.com/api/UsuariosTransporte/').then(res=>datos=res.json())
+        const {data,error,isLoading}=useQuery(['obtenerTodosLosUsuarioComunes'],async({queryKey})=>{
+            return await fetch('https://georutas.somee.com/api/UsuariosTransporte').then(res=>datos=res.json())
             
         },{
-            refetchInterval:4000,
+            refetchInterval:2000,
             onSuccess:()=>{                
                 setDireccionPorUsuario(direccionesPorUsuarioDos);
-            },
-            cacheTime:1500
+            }   
         }
         
         )
 
-        const [usuarioState, setUsuarioState]=useState("nnnn");
         
+        let UsuarioEncontrado={};
         
         
 
     if(isLoading){
         //console.log("Se esta cargando la linea de la ruta");            
     }
-    let paradas=obtenerParadasPorParadas(UsuarioEncontrado.current.id_Ruta);
+    let paradas=obtenerParadasPorParadas(UsuarioEncontrado.id_Ruta);
     let rutasDeManagua=getAllRutas();
     
-    getUsuario(setUsuarioState);
 
-    if(isLoading==false && paradas.length>0 && rutasDeManagua.length>0 && usuarioState!='nnnn' && rutasDeManagua!=undefined){
+    if(isLoading==false && paradas.length>0 && rutasDeManagua.length>0){
 
+        
         let nombresEnElArregloFinal=[];
         
 
         for(let k=0;k<data.length;k++){
-            if(data[k].nombre==null){
-                continue;
-            }
-
             if(data[k].id_UsuarioTransporte==idUsuarioIniciado){
-            
-                UsuarioEncontrado.current=(data[k]);                
+                UsuarioEncontrado=data[k];
                 
-                nombresEnElArregloFinal.push(rutasDeManagua.filter(elemento => elemento.id_Ruta==data[k].id_Ruta)[0].nombre);
+                nombresEnElArregloFinal.push(rutasDeManagua.filter(elemento => elemento.id_Ruta==UsuarioEncontrado.id_Ruta)[0].nombre);
+                //console.log(nombresEnElArregloFinal);
             }
         }    
+            //console.log(UsuarioEncontrado);
             //console.log(UsuarioEncontrado);
             //El problema es que aveces no encuentra el usuario, arregla eso...
             //console.log(UsuarioEncontrado);
@@ -74,11 +64,11 @@ import Polyline from 'react-native-maps'
             let ultimaParadaPorLaIzquierda=-1;
             let ultimaParadaPorLaDerecha=-1;
 
-            //console.log("Quedaste fuera");
-            if( UsuarioEncontrado.current!={}){
+            if( UsuarioEncontrado.estado=='A'){
+                //console.log("Entraste");
                 for(let g=0;g<paradas.length;g++){
-                let distanciaALaActualParada=Math.sqrt(Math.pow((paradas[g].latitude-UsuarioEncontrado.current.latitudeAnterior),2)
-                +Math.pow((paradas[g].longitude-UsuarioEncontrado.current.longitudeAnterior),2));
+                let distanciaALaActualParada=Math.sqrt(Math.pow((paradas[g].latitude-UsuarioEncontrado.latitudeAnterior),2)
+                +Math.pow((paradas[g].longitude-UsuarioEncontrado.longitudeAnterior),2));
 
                 if(distanciaPasadaALaRuta>distanciaALaActualParada){
                     distanciaPasadaALaRuta=distanciaALaActualParada;
@@ -94,8 +84,8 @@ import Polyline from 'react-native-maps'
 
             
             for(let g=0;g<paradas.length;g++){
-                let distanciaALaActualParada=Math.sqrt(Math.pow((paradas[g].latitude-UsuarioEncontrado.current.latitude),2)
-                +Math.pow((paradas[g].longitude-UsuarioEncontrado.current.longitude),2));
+                let distanciaALaActualParada=Math.sqrt(Math.pow((paradas[g].latitude-UsuarioEncontrado.latitude),2)
+                +Math.pow((paradas[g].longitude-UsuarioEncontrado.longitude),2));
 
                 if(distanciaActualALaParada>distanciaALaActualParada 
                     && paradas[g].direccion==paradas[paradaAnteriorAdondeEstuvo].direccion){
@@ -127,80 +117,16 @@ import Polyline from 'react-native-maps'
                 }                
             }
 
-            //En esta parte de aqui se encuentra la direccion con la primera idea que se tenia al principio
-            //Se procedio a comentarla        
-            // let idParada=0;
-            // let menorDistancia=1000000;
-            // const mayorParada=paradas[paradas.length-1].id_Parada;
-            
-
-            // for(let k=0;k<paradas.length;k++){
-
-            //     let distanciaReal=Math.sqrt(Math.pow((UsuarioEncontrado.longitude-paradas[k].longitude),2)
-            //     +Math.pow((UsuarioEncontrado.latitude-paradas[k].latitude),2));
-
-            //     if(distanciaReal<menorDistancia){
-            //         menorDistancia=distanciaReal;
-            //         idParada=k;                    
-            //     }
-
-            // }
-
-
-            
-
-            // if(paradas[idParada].id_Parada<mayorParada){
-            //     let distanciaEntreActualYparadaSiguiente=Math.sqrt(Math.pow((UsuarioEncontrado.longitude-paradas[idParada+1].longitude),2)
-            //     +Math.pow((UsuarioEncontrado.latitude-paradas[idParada+1].latitude),2));
-
-            //     let distanciaEntreAnteriorYparadaSiguiente=Math.sqrt(Math.pow((UsuarioEncontrado.longitudeAnterior-paradas[idParada+1].longitude),2)
-            //     +Math.pow((UsuarioEncontrado.latitudeAnterior-paradas[idParada+1].latitude),2));
-
-            //     if(distanciaEntreActualYparadaSiguiente<=distanciaEntreAnteriorYparadaSiguiente){
-            //         direccionesPorUsuarioDos=(paradas[idParada+1].direccion);                    
-            //     }else{
-            //         if(paradas[idParada].direccion=='D'){
-            //             direccionesPorUsuarioDos=('I');
-            //         }else{
-            //             direccionesPorUsuarioDos=('D');
-            //         }
-            //     }
-
-
-            // }else if(paradas[idParada].id_Parada==mayorParada){
-            //     let distanciaEntreActualYparadaSiguiente=Math.sqrt(Math.pow((UsuarioEncontrado.longitude-paradas[0].longitude),2)
-            //     +Math.pow((UsuarioEncontrado.latitude-paradas[0].latitude),2));
-
-            //     let distanciaEntreAnteriorYparadaSiguiente=Math.sqrt(Math.pow((UsuarioEncontrado.longitudeAnterior-paradas[0].longitude),2)
-            //     +Math.pow((UsuarioEncontrado.latitudeAnterior-paradas[0].latitude),2));
-
-
-            //     if(distanciaEntreActualYparadaSiguiente<=distanciaEntreAnteriorYparadaSiguiente){
-            //         direccionesPorUsuarioDos=(paradas[0].direccion);
-            //     }else{
-            //         if(paradas[idParada].direccion=='D'){
-            //             direccionesPorUsuarioDos=('I');
-            //         }else{
-            //             direccionesPorUsuarioDos=('D');
-            //         }
-            //     }
-            // }                   
-            
-
 
         return(
             <View>
+                {data.length>0 && data!=undefined &&
+                    <Marker coordinate={{latitude:(activarPrecision==true)?data[idUsuarioIniciado-1].longitude:userLocation.latitude, longitude:(activarPrecision==true)?data[idUsuarioIniciado-1].latitude:userLocation.longitude}}>
+                        {direccionesPorUsuarioDos=='D' && <Text style={{color:'black'}}>{"⇛"+nombresEnElArregloFinal[0]}</Text>}
+                        {direccionesPorUsuarioDos=='I' && <Text style={{color:'black'}}>{"⇚"+nombresEnElArregloFinal[0]}</Text>}
 
-                {/* //<Marker coordinate={{latitude:12.153800313208755,longitude:-86.30149193108082}}>        */}
-
-                { UsuarioEncontrado.current.estado=='A' &&                    
-                        <Marker coordinate={{latitude:(userLocation.latitude), longitude:(userLocation.longitude)}}>
-                    
-                            {direccionesPorUsuarioDos=='D' && <Text style={{color:'black'}}>{"⇛"+nombresEnElArregloFinal[0]}</Text>}
-                            {direccionesPorUsuarioDos=='I' && <Text style={{color:'black'}}>{"⇚"+nombresEnElArregloFinal[0]}</Text>}
-
-                            <Image style={{width:30,height:30}} source={require("../assets/transportistaAzul.png")}></Image>
-                        </Marker>
+                        <Image style={{width:30,height:30}} source={require("../assets/transportistaAzul.png")}></Image>
+                    </Marker>
                 }
                 
             </View>

@@ -71,48 +71,7 @@ export default function App() {
     
     const identificadorKey=React.useRef(0);
     const refCambiarLupa=React.useRef(false);
-    
-    //const todasLasRutas=getAllRutas();
-
-    // const obtenerRutas=(key)=>{
-    //     const resultados=[];
-    //     const tiempos=[];
-    //     const transportes=[];
-    //     const idUsuarios=[];
-            
-    
-    //     //console.log(rutasEnElMapa);
-    //     for(let k=0;k<rutasEnElMapa.length;k++){
-    //         if(rutasEnElMapa[k].id_Idetificador==(key)){
-    //             resultados.push(rutasEnElMapa[k]);
-    //             tiempos.push(rutasEnElMapa[k].tiempoDeLlegada);
-    //             //transportes.push(rutasEnElMapa[k]);
-                
-    //             transportes.push({color:rutasEnElMapa[k].color, direccionParadaInicial:rutasEnElMapa[k].direccionParadaInicial, 
-    //                              id_Ruta:rutasEnElMapa[k].id_Ruta, nombre:todasLasRutas.filter(elemento => elemento.id_Ruta==rutasEnElMapa[k].id_Ruta)[0].nombre, 
-    //                              latitudParadaUsuarioComun:rutasEnElMapa[k].latitudParadaUsuarioComun,longitudParadaUsuarioComun:rutasEnElMapa[k].longitudParadaUsuarioComun,
-    //                              id_ParadaUsuarioComun:rutasEnElMapa[k].id_ParadaUsuarioComun,id_ParadaFinal:rutasEnElMapa[k].id_ParadaFinal,id_Usuario:rutasEnElMapa[k].id_Usuario,
-    //                              latitudParadaFinal:rutasEnElMapa[k].latitudParadaFinal,longitudParadaFinal:rutasEnElMapa[k].longitudParadaFinal,
-    //                              longitudUsuarioComun:rutasEnElMapa[k].longitudUsuarioComun,latitudUsuarioComun:rutasEnElMapa[k].latitudUsuarioComun});
-    //         //console.log(todasLasRutas.filter(elemento => elemento.id_Ruta==2));
-                
-    //             idUsuarios.push({id_Usuario:rutasEnElMapa[k].id_Usuario,id_Ruta:rutasEnElMapa[k].id_Ruta});
-    //         }
-    //     }
-    
-    //     setRutasTrayectoria(resultados);
-    //     setVisualizarRutas(key);      
-    //     setVerRutasTrayecto(!verRutasTrayecto);
-    
-    //     setTiemposRutasTrayectorias(tiempos);        
-    
-    //     setIconosTransportes(transportes);
-    //     setIdUsuariosDeTrayectoria(idUsuarios);
-    //     //console.log(nombresIconosTransportes);
-    //     //Esto llega vacio a inicio putp, luego se llena y aun asi no sirve
-
-    //   }
-
+  
       const [verTrayectoria,setVerTrayectoria]=React.useState(true);
       const [ocultarMenu, setOcultarMenu]=React.useState(true);
       const [mostrarItemMenuUno, setMostrarItemMenuUno]=React.useState(true);
@@ -133,22 +92,7 @@ export default function App() {
 
       let alturaTotal=height+StatusBar.currentHeight;
 
-    //   const { CustomModule }=NativeModules;
-
-    //   const hadleNativeFuntion=async()=>{
-        
-    //     console.log(CustomModule);
-        
-    //     let name="Nestor Daniel Gonzalez Trujillo";
-    //     const result=await CustomModule.customEvent(name);
-  
-    //     console.log(result);
-    //   }
-
-    //   useEffect(()=>{
-    //     hadleNativeFuntion();
-    //   },[])
-    const {data,obtenerRutas} = useTrayectoria(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,setVisualizarRutas,
+      const {data,obtenerRutas} = useTrayectoria(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,setVisualizarRutas,
       setTiemposRutasTrayectorias,setIconosTransportes,setIdUsuariosDeTrayectoria,verRutasTrayecto,identificadorKey);
 
       const [menUno, setmenUno] = React.useState([{ display: 'none',color:'#102769' }]);
@@ -161,7 +105,9 @@ export default function App() {
 
       const [mostrarBarraSecundariaDeUbicacion, setMostrarBarraSecundariaDeUbicacion]=React.useState(false);
       const [activarPrecision, setActivarPrecision]=React.useState(true);
-      const [mostrarVentana,serMostrarVentana]=React.useState('none');    
+      const [mostrarVentana,serMostrarVentana]=React.useState('none');
+
+      const [cargando, setCargando]=React.useState(false);
 
   return (
     // <View style={{height:alturaTotal, width:width}}>
@@ -185,7 +131,7 @@ export default function App() {
         setmenCuatro={setmenCuatro} menCinco={menCinco} setmenCinco={setmenCinco} userLocation={userLocation} setUserLocatio={setUserLocatio}
         setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} mostrarBarraSecundariaDeUbicacion={mostrarBarraSecundariaDeUbicacion} setMostrarBarraSecundariaDeUbicacion={setMostrarBarraSecundariaDeUbicacion}
         setMostrarItemMenuUno={setMostrarItemMenuUno} setIdRutaAMostrar={setIdRutaAMostrar} refCambiarLupa={refCambiarLupa} activarPrecision={activarPrecision} setActivarPrecision={setActivarPrecision}
-        mostrarVentana={mostrarVentana} serMostrarVentana={serMostrarVentana}
+        mostrarVentana={mostrarVentana} serMostrarVentana={serMostrarVentana} setCargando={setCargando} cargando={cargando}
         ></Inicio>
         
 
@@ -201,19 +147,19 @@ export default function App() {
         setCoordenadasOrigenSecundario={setCoordenadasOrigenSecundario} setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario}
         permitirEnviarUbicacion={permitirEnviarUbicacion} setMostrarBarraSecundariaDeUbicacion={setMostrarBarraSecundariaDeUbicacion} refCambiarLupa={refCambiarLupa}
         activarPrecision={activarPrecision} setActivarPrecision={setActivarPrecision} tipoDeUsuario={tipoDeUsuario} 
-        serMostrarVentana={serMostrarVentana}
+        serMostrarVentana={serMostrarVentana} cargando={cargando} setCargando={setCargando} idRutaAMostrar={idRutaAMostrar}
         ></MenuBar>
-        
-
+  
         
         {loguearse==true && <Login setTipoDeUsuario={setTipoDeUsuario} setSecionIniciada={setSecionIniciada} setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} setLosguearTransportista={setLosguearTransportista} height={height} width={width} 
-        setIdUsuarioIniciado={setIdUsuarioIniciado} setUsuarioLogueado={setUsuarioLogueado} ></Login>}
+        setIdUsuarioIniciado={setIdUsuarioIniciado} setUsuarioLogueado={setUsuarioLogueado}></Login>}
         {/* {loguearTransportista==true && <LoginTransportistas setLosguearTransportista={setLosguearTransportista} setRegistrarse={setRegistrarse} setSecionIniciada={setSecionIniciada} setLoguearse={setLoguearse} setTipoDeUsuario={setTipoDeUsuario}
         setIdUsuarioIniciado={setIdUsuarioIniciado} setUsuarioLogueado={setUsuarioLogueado} height={height} width={width}></LoginTransportistas>} */}
 
         {/* //DEBES ELIMINAR EL COMPONENTE QUE SE ENCIENTRA EN LA PARTE SUPERIOR */}
 
-        {registrarse==true && <Register setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} height={height} width={width}></Register>}
+        {registrarse==true && <Register setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} 
+        height={height} width={width}></Register>}
     </View>
   );
 }
