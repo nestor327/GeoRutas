@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StatusBar, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { ScrollView, StatusBar, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Inicio from './components/Inicio.jsx';
 import Login from './components/Login.jsx';
 //import LoginTransportistas from './components/LoginTransportistas.jsx';
@@ -9,6 +9,11 @@ import Register from './components/Register.jsx';
 import getAllRutas from './data/rutasManagua.js';
 import { NativeModules } from 'react-native';
 import useTrayectoria from './src/hooks/useTrayectoria.jsx';
+
+import RutasBarItem from './components/RutasBarItem.jsx';
+import IntercambiosRutas from './components/IntercambiosRutas.jsx';
+import ParadasCercaDelOrigen from './components/ParadasCercaDeUbicacion.jsx';
+import { getRutasFavoritas, setRutasFavoritas } from './data/asyncStorageData.js';
 
 
 export default function App() {
@@ -109,11 +114,30 @@ export default function App() {
 
       const [cargando, setCargando]=React.useState(false);
 
+      let todasLasRutasData=getAllRutas();
+      const [todasLasRutasCompetencia, setTodasLasRutasCompetencia]=React.useState(getAllRutas());
+      const [rutasSeleccionadasCompetencia, setRutasSeleccionadasCompetencia]=React.useState([]);
+
+      React.useEffect(()=>{
+        getRutasFavoritas(setRutasSeleccionadasCompetencia);        
+      },[])
+
+      React.useEffect(()=>{
+        if(rutasSeleccionadasCompetencia==undefined || rutasSeleccionadasCompetencia==null || rutasSeleccionadasCompetencia.length==0){
+            let arreglo=[];
+            for(let y=0;y<45;y++){
+                arreglo.push("✓")
+            }
+            setRutasSeleccionadasCompetencia(arreglo);
+        }
+      },[rutasSeleccionadasCompetencia])
+
   return (
-    // <View style={{height:alturaTotal, width:width}}>
-    <View style={{flex:1}}>
+     <View style={{height:alturaTotal, width:width}}>
+    {/* //<View style={{flex:1}}> */}
       
         {/* <StatusBar barStyle={'dark-content'} backgroundColor={"#00000045"} translucent={true}></StatusBar>       */}
+
 
         
         <Inicio setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} setCoordenadasOrigen={setCoordenadasOrigen} tipoDeUsuario={tipoDeUsuario}
@@ -132,10 +156,68 @@ export default function App() {
         setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} mostrarBarraSecundariaDeUbicacion={mostrarBarraSecundariaDeUbicacion} setMostrarBarraSecundariaDeUbicacion={setMostrarBarraSecundariaDeUbicacion}
         setMostrarItemMenuUno={setMostrarItemMenuUno} setIdRutaAMostrar={setIdRutaAMostrar} refCambiarLupa={refCambiarLupa} activarPrecision={activarPrecision} setActivarPrecision={setActivarPrecision}
         mostrarVentana={mostrarVentana} serMostrarVentana={serMostrarVentana} setCargando={setCargando} cargando={cargando}
+        todasLasRutasCompetencia={todasLasRutasCompetencia} rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}
+        setTodasLasRutasCompetencia={setTodasLasRutasCompetencia} setRutasSeleccionadasCompetencia={setRutasSeleccionadasCompetencia}
         ></Inicio>
+        
+        <View style={{height:0,width:width,padding:0}}>
+                <View style={[menDos, { left:(height<width)?width*0.2+(width*0.2-height*0.2)/2:width*0.2, 
+                width: (height>width)?width*0.2:height*0.2,zIndex:1000,  position: 'absolute', 
+                top:-width*0.6, backgroundColor: '#102769',height:width*0.6 }]}
+                >
+                <ScrollView
+                >
+                {
+                    todasLasRutasData.map((item,i)=>{
+                        return(                            
+                            <View key={i} onTouchEnd={()=>{                                
+                                setIdRutaAMostrar(i+1);
+                                //setMostrarSniperCargando(false);
+                            }}                            
+                            >
+                            { i>=0 && <RutasBarItem color={item.color} numeroDeRuta={item.nombre}
+                                tiempoDeLlegada={'1231'}>
+                                </RutasBarItem>            }           
+
+                            </View>
+                        )})}
+                </ScrollView>
+            </View>
+
+            {ocultarMenu==true && <View style={[menUno, {left:(height<width)?(width*0.2-height*0.2)/2:0, 
+          width: (height>width)?width*0.2:height*0.2, height: width*0.6, position: 'absolute', 
+          bottom: 0, backgroundColor: '#102769' }]}>
+                  <ScrollView>
+                      
+                      <IntercambiosRutas rutasEnElMapa={data} rutasTrayectoria={rutasTrayectoria} visualizarRutas={visualizarRutas} 
+                      verRutasTrayecto={verRutasTrayecto} obtenerRutas={obtenerRutas}
+                      setVerTrayectoria={setVerTrayectoria}
+                      setVerRutasCercanas={setVerRutasCercanas} setVerCompetencia={setVerCompetencia} setOcultarTrayecto={setOcultarTrayecto}
+                      identificadorKey={identificadorKey} refCambiarLupa={refCambiarLupa} setCargando={setCargando}
+                      ></IntercambiosRutas>
+
+                  </ScrollView>
+          </View>}
+
+
+          {ocultarTercerMenu==true && <View style={[menTres, { left:(height<width)?3*width*0.2+(width*0.2-height*0.2)/2:3*width*0.2, 
+          width: (height>width)?width*0.2:height*0.2, 
+          height: width*0.6, position: 'absolute', bottom:0, backgroundColor: '#102769' }]}>
+                <ScrollView>
+                {
+                    <ParadasCercaDelOrigen lalitude={coordenadasOrigenSecundario.latitude} longitude={coordenadasOrigenSecundario.longitude} setVerParadasCercanas={setVerParadasCercanas}></ParadasCercaDelOrigen>
+                }
+                </ScrollView>
+            </View>}
+
+
+
+        </View>
+
         
 
         
+
         <MenuBar setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} ocultarMenu={ocultarMenu} rutasEnElMapa={data} rutasTrayectoria={rutasTrayectoria}
         visualizarRutas={visualizarRutas} verRutasTrayecto={verRutasTrayecto} setVerTrayectoria={setVerTrayectoria}
         setIdRutaAMostrar={setIdRutaAMostrar} ocultarTercerMenu={ocultarTercerMenu} coordenadasOrigenSecundario={coordenadasOrigenSecundario} setVerParadasCercanas={setVerParadasCercanas} secionIniciada={secionIniciada}

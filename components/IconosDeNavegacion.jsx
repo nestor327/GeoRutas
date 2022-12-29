@@ -241,6 +241,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         setVerCompetencia(true);
                         setOcultarTrayecto(false);
                         setCargando(false);
+                        alert("Para mayor comodidad elija a su competencia")
                     }}
                     imagen={require('../assets/noVerUsuarios.png')}
                 />}
@@ -261,6 +262,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         setVerRutasCercanas(true); 
                         setOcultarTrayecto(false);
                         setCargando(false);
+                        alert("Para mejor comodidad elija sus rutas favoritas en ajustes y muestre su ubicacion")
                     }}
                         imagen={require('../assets/noVerUsuarios.png')}
                 />}

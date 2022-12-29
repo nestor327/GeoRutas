@@ -14,7 +14,9 @@ if(isLoading){
 
 if(isLoading==false){  
     let dato=data.filter(elemento => elemento.id_Ruta==idRuta);
-    return(dato);
+    return(
+        dato
+    );
 }
 }
 

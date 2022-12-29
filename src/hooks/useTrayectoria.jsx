@@ -5,13 +5,15 @@ import { useQuery,queryKey } from "react-query";
 const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,setVisualizarRutas,
     setTiemposRutasTrayectorias,setIconosTransportes,setIdUsuariosDeTrayectoria,verRutasTrayecto,key)=>{
 
-    let {data, error, isLoading,isError, isSuccess,status}=useQuery(["gets",coordenadasOrigen,coordenadasDestino],async({queryKey})=>{
-        return await fetch('https://georutas.somee.com/api/SP_PCalcularMenorRutaEnFuncionDelTiempoModificado/'+queryKey[1].latitude
-        +','+queryKey[1].longitude+','+queryKey[2].latitude+','+queryKey[2].longitude).then(res=>datos=res.json()).catch(error => data=[]);
-    },{
-        refetchInterval:2500,
-        cacheTime:2000
-    });
+    // let {data, error, isLoading,isError, isSuccess,status}=useQuery(["gets",coordenadasOrigen,coordenadasDestino],async({queryKey})=>{
+    //     return await fetch('https://georutas.somee.com/api/SP_PCalcularMenorRutaEnFuncionDelTiempoModificado/'+queryKey[1].latitude
+    //     +','+queryKey[1].longitude+','+queryKey[2].latitude+','+queryKey[2].longitude).then(res=>datos=res.json()).catch(error => data=[]);
+    // },{
+    //     refetchInterval:2500,
+    //     cacheTime:2000
+    // });
+    let data=[];
+    let isLoading=true;
 
     const todasLasRutas=getAllRutas();
 

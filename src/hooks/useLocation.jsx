@@ -389,13 +389,23 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
             //Esta parte es la unica donde no
             //Generalisaste.
 
-            if(usuarioTransportista.id_Ruta==1){
-                primerDato=(idUsuarioIniciado-1)*120+(paradaMasCercana+1);
-            }else if(usuarioTransportista.id_Ruta==2){
-                primerDato=120*33+((idUsuarioIniciado-33)-1)*92+(paradaMasCercana+1);
-            }else if(usuarioTransportista.id_Ruta==3){
-                primerDato=120*33+92*36+((idUsuarioIniciado-69)-1)*97+(paradaMasCercana+1);
+            // if(usuarioTransportista.id_Ruta==1){
+            //     primerDato=(idUsuarioIniciado-1)*120+(paradaMasCercana+1);
+            // }else if(usuarioTransportista.id_Ruta==2){
+            //     primerDato=120*33+((idUsuarioIniciado-33)-1)*92+(paradaMasCercana+1);
+            // }else if(usuarioTransportista.id_Ruta==3){
+            //     primerDato=120*33+92*36+((idUsuarioIniciado-69)-1)*97+(paradaMasCercana+1);
+            // }
+
+            let dato=1;
+
+            if(idUsuarioIniciado%33==0){
+                dato=33
+            }else{
+                dato=idUsuarioIniciado%33;
             }
+
+            primerDato=(rutasParadas[0].id_Parada-1)*33+((dato)-1)*rutasParadas.length+(paradaMasCercana+1);
             
             let tiempoAnterior=await fetch('https://georutas.somee.com/api/UsuarioTransporteParada/'+primerDato).then(res=>datos=res.json());
             
