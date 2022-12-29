@@ -55,7 +55,7 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
         let usuariosTransportistas=await fetch('https://georutas.somee.com/api/UsuariosTransporte').then(res=>datos=res.json());
         
         for(let k=0;k<usuariosTransportistas.length;k++){
-            if(usuariosTransportistas[k].contrasenia==(contrasenia) && usuariosTransportistas[k].usuario==usuarioState){
+            if(usuariosTransportistas[k].contrasenia==MD5(contrasenia) && usuariosTransportistas[k].usuario==usuarioState){
                 
                 setIdUsuarioIniciado(usuariosTransportistas[k].id_UsuarioTransporte);
                 setUsuarioLogueado(usuariosTransportistas[k]);

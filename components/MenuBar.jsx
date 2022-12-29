@@ -1,13 +1,7 @@
 import * as react from 'react';
-import Perfil from './Perfil.jsx';
-import IntercambiosRutas from './IntercambiosRutas.jsx';
-import { ScrollView, View,Image,Text, TouchableHighlightBase, TouchableOpacity, StatusBar } from 'react-native';
-import getAllRutas from '../data/rutasManagua.js';
-import RutasBarItem from './RutasBarItem.jsx';
-import ParadasCercaDelOrigen from './ParadasCercaDeUbicacion.jsx';
+import { View,Image,Text, TouchableHighlightBase, TouchableOpacity} from 'react-native';
 import styles from '../componentStyles/menuBarStyles.js';
 import { useEffect } from 'react';
-import Cargando from './Cargando.jsx';
 
 const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRutasTrayecto
                 ,setVerTrayectoria,setIdRutaAMostrar,ocultarTercerMenu,coordenadasOrigenSecundario
@@ -21,21 +15,12 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                 ,tipoDeUsuario,serMostrarVentana,cargando,setCargando,idRutaAMostrar
             })=>{
     
-    // const {data,obtenerRutas} = useTrayectoria(coordenadasOrigen,coordenadasDestino,setRutasEnElMapa,rutasEnElMapa,setRutasTrayectoria,setVisualizarRutas,
-    //                     setVerRutasTrayecto,setTiemposRutasTrayectorias,setIconosTransportes,setIdUsuariosDeTrayectoria,verRutasTrayecto);
+
     const [verPerfil,setVerPerfil]=react.useState('none'); 
     
     useEffect(()=>{
         serMostrarVentana(verPerfil);
     },[verPerfil])
-
-    // const [menUno, setmenUno] = react.useState([{ display: 'none',color:'#102769' }]);
-    // const [menDos, setmenDos] = react.useState([{ display: 'none',color:'#102769' }]);
-    // const [menTres, setmenTres] = react.useState([{ display: 'none',color:'#102769' }]);
-    // const [menCuatro, setmenCuatro] = react.useState([{ display: 'flex',color:'#101043' }]);
-    // const [menCinco, setmenCinco] = react.useState([{ display: 'none',color:'#102769' }]);
-
-    let todasLasRutasData=getAllRutas();
     
     const resultado = () => {
         if (menUno[0].display == 'flex' ) {
@@ -71,46 +56,7 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
         {/* {verPerfil=='flex' && <Perfil tipoDeUsuario={tipoDeUsuario} activarPrecision={activarPrecision} setActivarPrecision={setActivarPrecision} permitirEnviarUbicacion={permitirEnviarUbicacion} secionIniciada={secionIniciada} setSecionIniciada={setSecionIniciada} 
         setTipoDeUsuario={setTipoDeUsuario} tipoDePerfil={[{principal:{width:'100%',height:height+StatusBar.currentHeight-width*0.2,position:'absolute',top:-1*(height-width*0.2),left:0,zIndex:200,backgroundColor:'#00000045'}
         }]} actualizar={setVerPerfil} setLoguearse={setLoguearse} setRegistrarse={setRegistrarse}></Perfil>} */}
-             {ocultarMenu==true && <View style={[menUno, {left:(height<width)?(width*0.2-height*0.2)/2:0, width: (height>width)?width*0.2:height*0.2, height: '300%', position: 'absolute', top: '-300%', backgroundColor: '#102769' }]}>
-                <ScrollView>
-                    
-                    <IntercambiosRutas rutasEnElMapa={rutasEnElMapa} rutasTrayectoria={rutasTrayectoria} visualizarRutas={visualizarRutas} 
-                    verRutasTrayecto={verRutasTrayecto} obtenerRutas={obtenerRutas}
-                    setVerTrayectoria={setVerTrayectoria}
-                    setVerRutasCercanas={setVerRutasCercanas} setVerCompetencia={setVerCompetencia} setOcultarTrayecto={setOcultarTrayecto}
-                    identificadorKey={identificadorKey} refCambiarLupa={refCambiarLupa} setCargando={setCargando}
-                    ></IntercambiosRutas>
-
-                </ScrollView>
-            </View>}
-
-            <View style={[menDos, { left:(height<width)?width*0.2+(width*0.2-height*0.2)/2:width*0.2, width: (height>width)?width*0.2:height*0.2, height: '300%', position: 'absolute', top: '-300%', backgroundColor: '#102769' }]}>
-                <ScrollView>
-                { todasLasRutasData!=undefined && todasLasRutasData.length>0 &&
-                
-                    todasLasRutasData.map((item,i)=>{
-                        return(                            
-                            <View key={i} onTouchEnd={()=>{                                
-                                setIdRutaAMostrar(i+1);
-                                //setMostrarSniperCargando(false);
-                            }}>
-                                <RutasBarItem color={item.color} numeroDeRuta={item.nombre}
-                                tiempoDeLlegada={'1231'}>
-                                </RutasBarItem>                       
-                            </View>
-                        )})
-                    
-                }
-                </ScrollView>
-            </View>
-
-            {ocultarTercerMenu==true && <View style={[menTres, { left:(height<width)?3*width*0.2+(width*0.2-height*0.2)/2:3*width*0.2, width: (height>width)?width*0.2:height*0.2, height: '300%', position: 'absolute', top: '-300%', backgroundColor: '#102769' }]}>
-                <ScrollView>
-                {
-                    <ParadasCercaDelOrigen lalitude={coordenadasOrigenSecundario.latitude} longitude={coordenadasOrigenSecundario.longitude} setVerParadasCercanas={setVerParadasCercanas}></ParadasCercaDelOrigen>
-                }
-                </ScrollView>
-            </View>}
+             
 
             <View style={{ flexDirection: 'row', height: '100%', width: '100%' }} >
                 <View style={[styles.container,{ backgroundColor: '#102769' }]}>

@@ -9,7 +9,7 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
     
 
 
-    const RutasCercaDelPasajero=({userLocation})=>{
+    const RutasCercaDelPasajero=({userLocation,rutasSeleccionadasCompetencia})=>{
 
         
 
@@ -18,7 +18,12 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
     },{
         //staleTime:Infinity,
         refetchInterval:2000,
-        cacheTime:1500
+        cacheTime:1500,
+        onSuccess:()=>{
+            console.log("Yes");
+            console.log(rutasSeleccionadasCompetencia);
+            console.log("Yes");
+        }
     })
 
     let coordenadasParadas=obtenerParadasPorParadasCompletas();
@@ -33,7 +38,7 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
 
     }
 
-    if(isLoading==false && coordenadasParadas.length>0 && todasLasRutas.length>0 && todasLasRutas.length>0 && rutasParadasObtenidas.length>0){
+    if(rutasSeleccionadasCompetencia!=undefined && rutasSeleccionadasCompetencia!=null && rutasSeleccionadasCompetencia.length>0 && isLoading==false && coordenadasParadas.length>0 && todasLasRutas.length>0 && todasLasRutas.length>0 && rutasParadasObtenidas.length>0){
         //setMostrarSniperCargando(true);       
 
         //console.log("El arreglo posee los siguientes elementos");
@@ -44,7 +49,7 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
         let contador=0;
         for(let s=0;s<data.length;s++){
              let distanciaComp=Math.sqrt(Math.pow((userLocation.longitude-data[s].latitude),2)+Math.pow((userLocation.latitude-data[s].longitude),2))
-             if(distanciaComp<=0.0140){
+             if(distanciaComp<=0.0140 && rutasSeleccionadasCompetencia[data[s].id_Ruta-1]=='✓'){
                 arregloFinal.push(data[s]);
                 contador++;
             }

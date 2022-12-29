@@ -4,7 +4,7 @@
     import { useQuery,queryKey } from "react-query";
     import { Polyline } from "react-native-maps";
     import getAllRutas from '../data/rutasManagua.js';
-import { View } from "react-native";
+    import { View } from "react-native";
 
     const LineaDeUnaRuta=({idRuta,setMostrarSniperCargando,setCargando})=>{
 
@@ -18,7 +18,14 @@ import { View } from "react-native";
         //     color="black";
         // }
 
-        color=getAllRutas().filter(elemento => elemento.id_Ruta==idRuta)[0].color;
+        let todasLasRutas=getAllRutas();
+        if(todasLasRutas.filter(elemento => elemento.id_Ruta==idRuta).length>0){
+            color=todasLasRutas.filter(elemento => elemento.id_Ruta==idRuta)[0].color;
+        }else{
+            color='red';
+        }
+
+
         
         //console.log(getAllRutas().filter(elemento => elemento.id_Ruta=idRuta)[0]);
 

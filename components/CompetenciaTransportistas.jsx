@@ -10,7 +10,7 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
     
 
 
-    const CompetenciaTransportistas=({tipoDeUsuario,idUsuarioIniciado,setCargando})=>{
+    const CompetenciaTransportistas=({tipoDeUsuario,idUsuarioIniciado,setCargando,rutasSeleccionadasCompetencia})=>{
 
         
 
@@ -55,7 +55,7 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
 }*/
 
 
-    if(idUsuarioIniciado>0 && isSuccess==true && rutasDeManagua.length>0 && todasLasParadas.length>0 && todasLasRutasParada.length>0 && rutasDeManagua!=undefined){
+    if(rutasSeleccionadasCompetencia!=undefined && rutasSeleccionadasCompetencia!=null && rutasSeleccionadasCompetencia.length>0 && idUsuarioIniciado>0 && isSuccess==true && rutasDeManagua.length>0 && todasLasParadas.length>0 && todasLasRutasParada.length>0 && rutasDeManagua!=undefined){
         //setMostrarSniperCargando(true);       
 
         //console.log("El arreglo posee los siguientes elementos");
@@ -68,15 +68,37 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
         
         let posicionUsuario=0;
         let contador=0;
+
+
         for(let s=0;s<data.length;s++){
             let distanciaComp=Math.sqrt(Math.pow((usuarioPrincipal.latitude-data[s].latitude),2)+Math.pow((usuarioPrincipal.longitude-data[s].longitude),2))
             if(distanciaComp<=0.018){
-                arregloFinal.push(data[s]);
-                
-                if(data.id_UsuarioTransporte==idUsuarioIniciado){
-                    posicionUsuario=contador;
+
+                let verificandoCompetencia=false;
+                let rutasParadasLogueado=todasLasRutasParada.filter(elemento=>elemento.id_Ruta==data[idUsuarioIniciado].id_Ruta);
+                let rutasParadasCompetencia=todasLasRutasParada.filter(elemento=>elemento.id_Ruta==data[s].id_Ruta);
+
+                let paradasLogueado=todasLasParadas.filter(elemento=>(elemento.id_Parada>=rutasParadasLogueado[0].id_Parada && elemento.id_Parada
+                    <=rutasParadasLogueado[rutasParadasLogueado.length-1].id_Parada));
+
+                let paradasCompetencia=todasLasParadas.filter(elemento=>(elemento.id_Parada>=rutasParadasCompetencia[0].id_Parada && elemento.id_Parada
+                    <=rutasParadasCompetencia[rutasParadasCompetencia.length-1].id_Parada));
+
+                for(let n=0;n<paradasLogueado.length;n++){
+                    if(paradasCompetencia.filter(elemento => elemento.longitude==paradasLogueado[n].longitude && elemento.latitude==paradasLogueado[n].latitude).length>0){
+                        verificandoCompetencia=true;
+                        break;
+                    }
                 }
-                contador++;
+
+                if(verificandoCompetencia==true && (rutasSeleccionadasCompetencia[data[s].id_Ruta-1]=='✓' || data[s].id_Ruta==data[idUsuarioIniciado].id_Ruta)){
+                    arregloFinal.push(data[s]);
+                
+                    if(data.id_UsuarioTransporte==idUsuarioIniciado){
+                        posicionUsuario=contador;
+                    }
+                    contador++;
+                }
             }
         }
 
@@ -175,47 +197,7 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
                 }else {
                     direccionesPorUsuario.push(obtenerCoordendasDeLasParadas[idParada].direccion);
                 }
-            }
-
-            //mayorParada=obtenerCoordendasDeLasParadas[obtenerCoordendasDeLasParadas.length-1].id_Parada;
-            
-            // if(obtenerCoordendasDeLasParadas[idParada].id_Parada<mayorParada){
-            //     let distanciaEntreActualYparadaSiguiente=Math.sqrt(Math.pow((arregloFinal[y].longitude-obtenerCoordendasDeLasParadas[idParada+1].longitude),2)
-            //     +Math.pow((arregloFinal[y].latitude-obtenerCoordendasDeLasParadas[idParada+1].latitude),2));
-
-            //     let distanciaEntreAnteriorYparadaSiguiente=Math.sqrt(Math.pow((arregloFinal[y].longitudeAnterior-obtenerCoordendasDeLasParadas[idParada+1].longitude),2)
-            //     +Math.pow((arregloFinal[y].latitudeAnterior-obtenerCoordendasDeLasParadas[idParada+1].latitude),2));
-
-            //     if(distanciaEntreActualYparadaSiguiente<=distanciaEntreAnteriorYparadaSiguiente){
-            //         direccionesPorUsuario.push(obtenerCoordendasDeLasParadas[idParada+1].direccion);
-                    
-            //     }else{
-            //         if(obtenerCoordendasDeLasParadas[idParada].direccion=='D'){
-            //             direccionesPorUsuario.push('I');
-            //         }else{
-            //             direccionesPorUsuario.push('D');
-            //         }
-            //     }
-
-
-            // }else if(obtenerCoordendasDeLasParadas[idParada].id_Parada==mayorParada){
-            //     let distanciaEntreActualYparadaSiguiente=Math.sqrt(Math.pow((arregloFinal[y].longitude-obtenerCoordendasDeLasParadas[0].longitude),2)
-            //     +Math.pow((arregloFinal[y].latitude-obtenerCoordendasDeLasParadas[0].latitude),2));
-
-            //     let distanciaEntreAnteriorYparadaSiguiente=Math.sqrt(Math.pow((arregloFinal[y].longitudeAnterior-obtenerCoordendasDeLasParadas[0].longitude),2)
-            //     +Math.pow((arregloFinal[y].latitudeAnterior-obtenerCoordendasDeLasParadas[0].latitude),2));
-
-
-            //     if(distanciaEntreActualYparadaSiguiente<=distanciaEntreAnteriorYparadaSiguiente){
-            //         direccionesPorUsuario.push(obtenerCoordendasDeLasParadas[0].direccion);
-            //     }else{
-            //         if(obtenerCoordendasDeLasParadas[idParada].direccion=='D'){
-            //             direccionesPorUsuario.push('I');
-            //         }else{
-            //             direccionesPorUsuario.push('D');
-            //         }
-            //     }
-            // }                   
+            }               
         }
 
         let direrecioinOriginal=direccionesPorUsuario[posicionUsuario];
@@ -239,8 +221,8 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
                             latitudeDelta:0.02,
                             longitudeDelta:0.05}}>
                                 
-                                {direccionesPorUsuario[i]=='D' && <Text>{"⇛"+nombresEnElArregloFinal[i]}</Text>}
-                                {direccionesPorUsuario[i]=='I' && <Text>{"⇚"+nombresEnElArregloFinal[i]}</Text>}
+                                {direccionesPorUsuario[i]=='D' && <Text style={{color:'black'}}>{"⇛"+nombresEnElArregloFinal[i]}</Text>}
+                                {direccionesPorUsuario[i]=='I' && <Text style={{color:'black'}}>{"⇚"+nombresEnElArregloFinal[i]}</Text>}
                                 
                                 <Image source={urlDeLasImagenes[item.id_Ruta-1]} style={{width:25,height:25}}/>
             

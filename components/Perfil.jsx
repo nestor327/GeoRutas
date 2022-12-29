@@ -1,16 +1,24 @@
 
 import { useEffect, useState } from 'react';
-import { View,Text,Image, TouchableOpacity } from 'react-native'
+import { View,Text,Image, TouchableOpacity, ScrollView, TextInputBase } from 'react-native'
 import imagen from '../assets/x_icon_imagen.png';
 import { getNombre,getCorreo } from '../data/asyncStorageData.js';
 import { check, openSettings, PERMISSIONS, request } from 'react-native-permissions';
+import RutasBarItem from './RutasBarItem';
+import ParadasFavoritas from './ParadasFavoritas';
+import { getRutasFavoritas,setRutasFavoritas } from '../data/asyncStorageData.js';
 
 const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,setLoguearse,setRegistrarse,
-    setSecionIniciada,setTipoDeUsuario,activarPrecision,setActivarPrecision,tipoDeUsuario,permisosEnSegundoPlano,setPermisosEnSegundoPlano})=>{
+    setSecionIniciada,setTipoDeUsuario,activarPrecision,
+    setActivarPrecision,tipoDeUsuario,permisosEnSegundoPlano,setPermisosEnSegundoPlano,
+    todasLasRutasCompetencia, rutasSeleccionadasCompetencia,setTodasLasRutasCompetencia, setRutasSeleccionadasCompetencia})=>{
 
 
     const [nombre,setnombre]=useState();
     const [correo,setcorreo]=useState();
+    const [mostrarMenu, setMostrarMenu]=useState(false);
+    const [arregloDeValores, setArregloDeValores]=useState([]);
+    const [arregloDeParadasFavoritasMomentaneo,setArregloDeParadasFavoritasMomentaneo]=useState([]);
 
     const obteniendoElPermiso=async()=>{
         setPermisosEnSegundoPlano(await check(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION));
@@ -20,7 +28,26 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
         getNombre(setnombre);
         getCorreo(setcorreo);
         obteniendoElPermiso();
+        getRutasFavoritas(setArregloDeValores);
+        getRutasFavoritas(setArregloDeParadasFavoritasMomentaneo);
+        //console.log(todasLasRutasCompetencia);
     },[])
+
+    useEffect(()=>{
+        if(arregloDeValores==undefined || arregloDeValores.length==0 || arregloDeValores==null){
+            let arreglo=[];
+            for(let i=0;i<45;i++){
+                arreglo.push("✓");
+            }
+            setArregloDeValores(arreglo);
+            setRutasSeleccionadasCompetencia(arreglo);
+            setArregloDeParadasFavoritasMomentaneo(arreglo);
+        }else{
+            setRutasSeleccionadasCompetencia(arregloDeValores);            
+        }
+        
+    },[arregloDeValores])
+    
     return(
         <View style={[tipoDePerfil[0].principal]}>
 
@@ -88,9 +115,68 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
             </TouchableOpacity>
 
             <TouchableOpacity style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10
-                ,height:40,paddingTop:8,alignItems:'center'}}>
-                <Text style={{color:'white',fontSize:15}}>Ajustes</Text>
+                ,height:40,paddingTop:8,alignItems:'center'}}
+                onPress={()=>{
+                    setMostrarMenu(true);
+                    getRutasFavoritas(setArregloDeValores);
+
+                }}
+                >
+                <Text style={{color:'white',fontSize:15}}>{(tipoDeUsuario=='Transportista')?"Seleccionar Competencia":"Seleccionar Favoritas"}</Text>
+                
             </TouchableOpacity>
+
+            {mostrarMenu==true && 
+            <View style={[{backgroundColor:'#103070',marginTop:'-80%',width:'79%',height:'60%',marginBottom:'40%'}
+                ,tipoDeUsuario=='Pasajero' && {marginTop:'-45%'}]}>
+                <View style={{alignItems:'center',flexDirection:'row'}}>
+                    
+                    <Text style={{color:'#f1f1f1',flex:1,textAlign:'center',fontSize:23,margin:'6%',marginLeft:'10%'}}>{(tipoDeUsuario=='Transportista')?"Competencia":"Favoritas"}</Text>
+                    
+                    <TouchableOpacity
+                        onPress={()=>{
+                            setMostrarMenu(false);
+                        }}
+                    >
+                        <Image source={imagen} style={{width:32,height:32, tintColor:'#f1f1f1',margin:'2.5%',marginTop:0}}></Image>
+                    </TouchableOpacity>
+
+                </View>
+
+                    <ParadasFavoritas setArregloDeValores={setArregloDeValores} 
+                    todasLasRutasCompetencia={todasLasRutasCompetencia} 
+                    arregloDeValores={arregloDeValores}></ParadasFavoritas>
+                        
+                        <View style={{flexDirection:'row',paddingTop:20,marginHorizontal:15}}>
+
+                            <TouchableOpacity style={{marginHorizontal:15,height:40
+                            ,borderColor:'#f1f1f1',borderWidth:2,alignItems:'center',marginBottom:10,paddingHorizontal:10,flex:1,
+                            borderRadius:10}}
+                                onPress={()=>{
+                                    setRutasSeleccionadasCompetencia(arregloDeValores);
+                                    setArregloDeParadasFavoritasMomentaneo(arregloDeValores);
+                                    setRutasFavoritas(JSON.stringify(arregloDeValores));
+                                    setMostrarMenu(false)
+                                }}
+                            >
+                                <Text style={{color:'#f1f1f1',textAlignVertical:'center',height:'100%'}}>Aceptar</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity style={{marginHorizontal:15,height:40,flex:1,
+                            borderColor:'#f1f1f1',borderWidth:2,alignItems:'center',marginBottom:10,paddingHorizontal:10,
+                            borderRadius:10}}
+                            onPress={()=>{
+                                //setArregloDeValores(arregloDeParadasFavoritasMomentaneo);
+                                getRutasFavoritas(setArregloDeValores);
+                                setMostrarMenu(false)
+                            }}>
+                                <Text style={{color:'#f1f1f1',textAlignVertical:'center',height:'100%'}}>Cancelar</Text>
+                            </TouchableOpacity>
+                        
+                        </View>
+
+
+                </View>}
 
             <Text style={{color:'white',fontSize:15,marginTop:0,marginBottom:8}}>______________________________________</Text>
             

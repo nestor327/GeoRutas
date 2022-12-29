@@ -164,3 +164,26 @@ export const getRutasParadasValue = async () => {
     }
   
 }
+
+export const setRutasFavoritas= async (rutasParadas) => {
+    try{
+        await AsyncStorage.setItem('rutasFavoritas',rutasParadas);
+    }catch (e){
+        console.log("No se encontro el usuario");
+    }
+  return true;
+}
+
+export const getRutasFavoritas = async (setRutas) => {   
+    try{
+        const value=await AsyncStorage.getItem('rutasFavoritas');
+        
+        setRutas(JSON.parse(value));      
+        
+          
+    }catch (e){
+        console.log("No se encontraron las paradas");
+        return "[]";
+    }
+  
+}

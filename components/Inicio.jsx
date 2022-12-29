@@ -36,7 +36,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     ,userLocation, setUserLocatio,setSecionIniciada, setTipoDeUsuario
     ,mostrarBarraSecundariaDeUbicacion,setMostrarBarraSecundariaDeUbicacion,setMostrarItemMenuUno,setIdRutaAMostrar
     ,refCambiarLupa,activarPrecision,setActivarPrecision,mostrarVentana,serMostrarVentana
-    ,setCargando,cargando})=>{
+    ,setCargando,cargando,
+    todasLasRutasCompetencia,rutasSeleccionadasCompetencia,setTodasLasRutasCompetencia,setRutasSeleccionadasCompetencia})=>{
     
 
 
@@ -111,9 +112,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         setCoordenadasDeLaRuta(await fetch('https://georutas.somee.com/api/Coordenadas/'+usuario.id_Ruta).then(res=>datos=res.json()));
         
         setRutasParadasValue(JSON.stringify(paradasRutas));
-        //getRutasParadasValue(setPruebaState);
-        //console.log("La prueba da como resultado");
-        //console.log(pruebaState);
+        
     }
     }
 
@@ -473,7 +472,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     },[permitirEnviarUbicacion])
 
   return(
-    <View style={{height:(height>width)?(height-width*0.2-StatusBar.currentHeight):height*0.8-StatusBar.currentHeight,width:'100%', backgroundColor:'#2060A5'}}>
+    <View style={{height:(height>width)?(height-width*0.2-StatusBar.currentHeight):height*0.8-StatusBar.currentHeight,
+    width:'100%', backgroundColor:'#2060A5'}}>
         
         {cargando==true && <Cargando height={height}></Cargando>}
         
@@ -1046,11 +1046,11 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setRegistrarse={setRegistrarse} 
             setLoguearse={setLoguearse} tipoDePerfil={[{principal:{width:'100%',height:height-width*0.2,position:'absolute',top:0,left:0,zIndex:200,backgroundColor:'#00000045'}}]} 
             actualizar={serMostrarVentana} activarPrecision={activarPrecision} setActivarPrecision={setActivarPrecision}
-            tipoDeUsuario={tipoDeUsuario} permisosEnSegundoPlano={bacgroundPermisos} setPermisosEnSegundoPlano={setBacgroundPermisos}></Perfil>}
+            tipoDeUsuario={tipoDeUsuario} permisosEnSegundoPlano={bacgroundPermisos} setPermisosEnSegundoPlano={setBacgroundPermisos}
+            todasLasRutasCompetencia={todasLasRutasCompetencia} rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}
+            setTodasLasRutasCompetencia={setTodasLasRutasCompetencia} setRutasSeleccionadasCompetencia={setRutasSeleccionadasCompetencia}></Perfil>}
         
-        {<MapView
-
-        userInterfaceStyle={'dark'}
+         {<MapView
 
         ref={(el)=>{
             refMapView.current=el;
@@ -1060,7 +1060,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         longitude:inicialPosition.longitude
                         ,latitudeDelta:0.04,longitudeDelta:0.04}}
 
-        style={{width:'100%',height:'100%'}}
+        style={{width:'100%',height:'100%',position:'absolute',top:0,left:0, zIndex:1}}
         
         //Esta vaina genero problemas en el primer renderizado, sirve para usar google map en IOS
         provider={PROVIDER_GOOGLE} 
@@ -1086,15 +1086,6 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             }
         }
         >
-            {/*Este no sera necesario despues de todo, debido a que ya esta el marcador que necesitabamos*/}
-            {/* {tipoDeUsuario=="Pasajero" && userLocation.latitude!=undefined && userLocation.latitude!=0 && <Marker coordinate={{
-                latitude:refChangeLocation.latitude,
-                longitude:refChangeLocation.longitude,
-                latitudeDelta:0.01,
-                longitudeDelta:0.04
-                }} icon={require("../assets/usuarioFinal.png")}>
-                    
-            </Marker>} */}
 
             {mostrarItemMenuUno==true && verRutasCercanas==false && verCompetencia==false &&
             <View>
@@ -1167,22 +1158,15 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         }} style={{alignItems:'center'}}>
                             {(item.direccionParadaInicial=='D') && <Text style={{color:'black'}}>{"⇛"+item.nombre}</Text>}
                             {(item.direccionParadaInicial=='I') && <Text style={{color:'black'}}>{"⇚"+item.nombre}</Text>}
-                            {/* {(item.id_Ruta==2) && (item.direccionParadaInicial=='D') && <Text>{"⇛"+item.nombre}</Text>}
-                            {(item.id_Ruta==2) && (item.direccionParadaInicial=='I') && <Text>{"⇚"+item.nombre}</Text>}
-                            {(item.id_Ruta==3) && (item.direccionParadaInicial=='D') && <Text>{"⇛"+item.nombre}</Text>}                                                        
-                            {(item.id_Ruta==3) && (item.direccionParadaInicial=='I') && <Text>{"⇚"+item.nombre}</Text>} */}
+
                             
                             {<Image style={{width:27,height:27}} source={urlDeLosIconos[item.id_Ruta-1]} ></Image>}
-                            {/* {(item.id_Ruta==2) && <Image style={{width:27,height:27}} source={require("../assets/114c.png")} ></Image>}
-                            {(item.id_Ruta==3) && <Image style={{width:27,height:27}} source={require("../assets/102c.png")} ></Image>}                             */}
                         
                             {<Text style={{color:'black'}}>{Math.floor(tiemposRutasTrayectorias[i]/3600)+":"+Math.floor(((tiemposRutasTrayectorias[i]-3600*(Math.floor(tiemposRutasTrayectorias[i]/3600)))/60))+":"+tiemposRutasTrayectorias[i]%60}</Text>}
                             
                         </Marker>
 
                             {<LineasTrayectorias iconoTrayectoItem={item} color={item.color}></LineasTrayectorias>}
-                            {/* {(item.id_Ruta==2) && <LineasTrayectorias iconoTrayectoItem={item} color={"red"}></LineasTrayectorias>}
-                            {(item.id_Ruta==3) && <LineasTrayectorias iconoTrayectoItem={item} color={"black"}></LineasTrayectorias>} */}
 
                             {iconosTransportes.length==(i+1) && <Marker coordinate={{                            
                             latitude:item.longitudParadaFinal,
@@ -1190,8 +1174,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                             latitudeDelta:0.02,
                             longitudeDelta:0.05}}>
                             {<Image style={{width:35,height:35}} source={urlDeLasBajadas[item.id_Ruta-1]} ></Image>}
-                            {/*{(item.id_Ruta==2) && <Image style={{width:35,height:35}} source={require("../assets/114paradaBajar.png")} ></Image>}
-                            {(item.id_Ruta==3) && <Image style={{width:35,height:35}} source={require("../assets/102aradaBajar.png")} ></Image>}*/}
+
                         </Marker>}
                         
                         <Marker coordinate={{                            
@@ -1200,8 +1183,6 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                             latitudeDelta:0.02,
                             longitudeDelta:0.05}}>
                             {<Image style={{width:35,height:35}} source={urlDeLasSubidas[item.id_Ruta-1]} ></Image>}
-                            {/* {(item.id_Ruta==2) && <Image style={{width:35,height:35}} source={require("../assets/114paradaSubir.png")} ></Image>}
-                            {(item.id_Ruta==3) && <Image style={{width:35,height:35}} source={require("../assets/102paradaSubir.png")} ></Image>} */}
                         </Marker>
 
                             {i==0 && <Polyline lineCap={"butt"} coordinates={[{latitude:coordenadasOrigen.latitude,longitude:coordenadasOrigen.longitude},{latitude:item.longitudParadaUsuarioComun,longitude:item.latitudParadaUsuarioComun}]} color={"black"}></Polyline>}
@@ -1220,8 +1201,10 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                      </View>
             }
 
-            {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=="Transportista" && verCompetencia==true && <CompetenciaTransportistas tipoDeUsuario={tipoDeUsuario} idUsuarioIniciado={idUsuarioIniciado}></CompetenciaTransportistas>}
-            {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=='Pasajero' && userLocation.latitude!=0 && verRutasCercanas==true &&  <RutasCercaDelPasajero userLocation ={userLocation}></RutasCercaDelPasajero>}
+            {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=="Transportista" && verCompetencia==true && <CompetenciaTransportistas tipoDeUsuario={tipoDeUsuario} idUsuarioIniciado={idUsuarioIniciado} 
+            rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}></CompetenciaTransportistas>}
+            {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=='Pasajero' && userLocation.latitude!=0 && verRutasCercanas==true &&  <RutasCercaDelPasajero userLocation ={userLocation}
+            rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}></RutasCercaDelPasajero>}
 
             {verParadasCercanas[0].observar==true && verParadasCercanas.map((item, i)=>{
             
@@ -1268,7 +1251,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             {idUsuarioIniciado>0 && permitirEnviarUbicacion==true && tipoDeUsuario=="Transportista" && <UsuarioTransportistaLogueado activarPrecision={activarPrecision} direccionesPorUsuario={direccionesPorUsuario}
             setDireccionPorUsuario={setDireccionPorUsuario} idUsuarioIniciado={idUsuarioIniciado} userLocation={userLocation}></UsuarioTransportistaLogueado>}
             
-        </MapView>}        
+        </MapView>}         
     </View>
   )
 }
