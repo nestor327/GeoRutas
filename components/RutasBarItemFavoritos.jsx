@@ -7,7 +7,12 @@ const RutasBarItemFavoritos=({numeroDeRuta,color,estado})=>{
 
     const [mostrar,setMostrar]=react.useState(false);
     react.useEffect(()=>{
-        setMostrar(estado);
+        if(estado==true || estado==false){
+            setMostrar(estado);
+        }else{
+            setMostrar(false);
+        }
+
     },[])
     
     return(
@@ -19,11 +24,11 @@ const RutasBarItemFavoritos=({numeroDeRuta,color,estado})=>{
         >
             
             {mostrar==true && <Text style={{color:'#f1f1f1',height:32,fontSize:20,textAlign:'center',width:32,borderColor:'white',borderWidth:2}}>
-                    ✓
+                    {"✓"}
             </Text>}
 
             {mostrar==false && <Text style={{height:32,fontSize:20,textAlign:'center',width:32,borderColor:'white',borderWidth:2}}>
-                    
+                    {""}
             </Text>}
 
         </TouchableOpacity>

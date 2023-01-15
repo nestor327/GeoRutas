@@ -60,7 +60,8 @@ import usePermissionsContext from '../src/hooks/usePermissionsContext.jsx';
 
     
     const {data,error,isLoading}=useQuery(['obtenerTodosLosUsuarioComunes'],async({queryKey})=>{
-        return await fetch('https://georutas.somee.com/api/UsuariosComunes').then(res=>datos=res.json())
+        //return await fetch('https://georutas.somee.com/api/UsuariosComunes').then(res=>datos=res.json())
+        return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosComunes').then(res=>datos=res.json())
     },{
         refetchInterval:1000
     })
@@ -78,7 +79,8 @@ import usePermissionsContext from '../src/hooks/usePermissionsContext.jsx';
                 }
             }    
 
-            let usuariosTransportistas=await fetch('https://georutas.somee.com/api/UsuariosTransporte').then(res=>datos=res.json());
+            //let usuariosTransportistas=await fetch('https://georutas.somee.com/api/UsuariosTransporte').then(res=>datos=res.json());
+            let usuariosTransportistas=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosTransporte').then(res=>datos=res.json());
             
             if(usuariosTransportistas.length>0){
                 for(let i=0;i<usuariosTransportistas.length;i++){

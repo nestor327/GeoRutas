@@ -4,6 +4,8 @@ import Geolocation from "@react-native-community/geolocation";
 import usePermissionsContext from "./usePermissionsContext.jsx";
 import { AppState } from "react-native";
 import { PermissionStatus,PERMISSIONS, request, check,openSettings } from "react-native-permissions";
+import { getActualizando, getCantidadDeActualizando, setActualizando, setCantidadDeActualizando } from "../../data/asyncStorageData.js";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, direccionesPorUsuario,userLocation,setUserLocation,activarPrecision)=>{
     
@@ -142,8 +144,8 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
                 watchID.current= Geolocation.watchPosition(
                     ({coords})=>{
                         setUserLocation({latitude:coords.latitude,longitude:coords.longitude});
-                        let fecha= new Date();
-                        console.log("Los segundos mientras sigues al usuario es: "+fecha.getSeconds());
+                        //let fecha= new Date();
+                        //console.log("Los segundos mientras sigues al usuario es: "+fecha.getSeconds());
                     },
                     ()=>{
                         (err)=>{console.log("Entraste al watch del usuario")};
@@ -189,7 +191,8 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
                 return;
             }
 
-        let datos=await fetch('https://georutas.somee.com/api/UsuariosTransporte',{
+        //let datos=await fetch('https://georutas.somee.com/api/UsuariosTransporte',{
+        let datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosTransporte',{
             method:"PUT",
             headers:{
                 "Content-Type":"application/json",
@@ -216,7 +219,33 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
 
     const actualizarUbicacionEnElBackEnd=async(paradasCompletas,rutasParadas,coordenadasDeLaRuta)=>{
         
-        if(idUsuarioIniciado>0){ 
+        let value=await AsyncStorage.getItem('actualizando');
+        //
+        //await AsyncStorage.setItem('actualizando',actualizando);
+        let cantidad=await AsyncStorage.getItem('actualizandoCantidad');
+        //await AsyncStorage.setItem('actualizandoCantidad',total);
+        //
+
+        if(cantidad>=8 || cantidad==undefined || cantidad==null || cantidad==NaN || cantidad=="NaN"){
+            //setActualizando("true");
+            let enviando=await AsyncStorage.setItem('actualizando',"true");
+            //setCantidadDeActualizando("0");
+            let total=await AsyncStorage.setItem('actualizandoCantidad',"0");
+        }
+
+        if(value=="false" || value==null || value==undefined){
+            //setCantidadDeActualizando(1+cantidad);
+            let total=await AsyncStorage.setItem('actualizandoCantidad',(1+parseInt(cantidad)).toString());
+        }
+
+        console.log("La cantidad de actualizaciones fallidas es:");
+        console.log(cantidad);
+        console.log(value);
+        console.log("La cantidad de actualizaciones fallidas fue:");
+
+        if(idUsuarioIniciado>0 && value=="true"){ 
+            
+            let enviando=await AsyncStorage.setItem('actualizando',"false");
 
         console.log("INICIASTE el rrecorrido de la actualizacion");
 
@@ -241,7 +270,7 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
         if(coordenadasDeLaRuta.length==0 || coordenadasDeLaRuta==undefined && activarPrecision==true){            
             userLocation=userLocationReal;            
         }else{
-            console.log("Entraste al segundo lugar");
+            //console.log("Entraste al segundo lugar");
             let pendiente=0;
 
             pendiente=(coordenadasDeLaRuta[0].latitude-coordenadasDeLaRuta[1].latitude)/(coordenadasDeLaRuta[0].longitude-coordenadasDeLaRuta[1].longitude);
@@ -333,7 +362,8 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
         }
 
 
-        let usuarioTransportista= await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json());
+        //let usuarioTransportista= await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json());
+        let usuarioTransportista= await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json());
         
         //let paradasCompletas=await fetch('https://georutas.somee.com/api/Paradas').then(res=>datos=res.json());
         //let rutasParadas=await fetch('https://georutas.somee.com/api/RutasParada').then(res=>datos=res.json());        
@@ -344,11 +374,12 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
         for(let k=0;k<paradasEnComunRuta.length;k++){
             paradasDelUsuario.push(paradasCompletas.filter(elemento => elemento.id_Parada==paradasEnComunRuta[k].id_Parada)[0]);
         }
-
+        let latitudActual=userLocation.latitude;
+        let longitudeActual=userLocation.longitude;
         
         actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                                    usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,userLocation.latitude,
-                                    userLocation.longitude,usuarioTransportista.longitudeAnterior,usuarioTransportista.latitudeAnterior,usuarioTransportista.estado);
+                                    usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
+                                    longitudeActual,usuarioTransportista.longitudeAnterior,usuarioTransportista.latitudeAnterior,usuarioTransportista.estado);
         
 
         let distanciaEntreUsuarioYRutaMenor=1000;
@@ -357,8 +388,7 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
         let distanciaEntreUsuarioYRutaMenorSinDireccion=1000;
     
         //De aqui toma la distancia, por tanto aqui debes de modificar la ubicacion putito
-        let latitudActual=userLocation.latitude;
-        let longitudeActual=userLocation.longitude;
+
 
         for(let y=0;y<paradasDelUsuario.length;y++){
                                 
@@ -407,7 +437,8 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
 
             primerDato=(rutasParadas[0].id_Parada-1)*33+((dato)-1)*rutasParadas.length+(paradaMasCercana+1);
             
-            let tiempoAnterior=await fetch('https://georutas.somee.com/api/UsuarioTransporteParada/'+primerDato).then(res=>datos=res.json());
+            //let tiempoAnterior=await fetch('https://georutas.somee.com/api/UsuarioTransporteParada/'+primerDato).then(res=>datos=res.json());
+            let tiempoAnterior=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuarioTransporteParada/'+primerDato).then(res=>datos=res.json());
             
             let fechaAnterior=new Date(tiempoAnterior.ultimaActualizacion);
             let minutosDesdeElPasado=fechaAnterior.getHours()*60+fechaAnterior.getMinutes();
@@ -418,7 +449,8 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
             if(Math.abs(minutosActuales-minutosDesdeElPasado)>30){
             try{
 
-                    let datos=await fetch('https://georutas.somee.com/api/UsuarioTransporteParada',{
+                    //let datos=await fetch('https://georutas.somee.com/api/UsuarioTransporteParada',{
+                    let datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuarioTransporteParada',{
                         method:"PUT",
                         headers:{
                             "Content-Type":"application/json",
@@ -470,14 +502,14 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
                        //Tienes que entender cabrom que es lo que va aqui
                        
                         actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,userLocation.latitude,
-                        userLocation.longitude,paradasDelUsuario[0].longitude,paradasDelUsuario[0].latitude,usuarioTransportista.estado);
+                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
+                        longitudeActual,paradasDelUsuario[0].longitude,paradasDelUsuario[0].latitude,usuarioTransportista.estado);
                         
                    }else if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)>=2){
                         
                         actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,userLocation.latitude,
-                        userLocation.longitude,paradasDelUsuario[1].longitude,paradasDelUsuario[1].latitude,usuarioTransportista.estado);
+                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
+                        longitudeActual,paradasDelUsuario[1].longitude,paradasDelUsuario[1].latitude,usuarioTransportista.estado);
 
                    }
                    
@@ -486,16 +518,16 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
                    if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)<2){
                            
                         actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,userLocation.latitude,
-                        userLocation.longitude,paradasDelUsuario[paradasDelUsuario.length-1].longitude,paradasDelUsuario[paradasDelUsuario.length-1].latitude,
+                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
+                        longitudeActual,paradasDelUsuario[paradasDelUsuario.length-1].longitude,paradasDelUsuario[paradasDelUsuario.length-1].latitude,
                         usuarioTransportista.estado);
 
 
                    }else if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)>=2){
                         
                         actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,userLocation.latitude,
-                        userLocation.longitude,paradasDelUsuario[paradasDelUsuario.length-2].longitude,paradasDelUsuario[paradasDelUsuario.length-2].latitude,
+                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
+                        longitudeActual,paradasDelUsuario[paradasDelUsuario.length-2].longitude,paradasDelUsuario[paradasDelUsuario.length-2].latitude,
                         usuarioTransportista.estado);
     
                    }
@@ -504,15 +536,15 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
                    if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)<2){
 
                         actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,userLocation.latitude,
-                        userLocation.longitude,paradasDelUsuario[ultimaParadaPorLaIzquierda].longitude,paradasDelUsuario[ultimaParadaPorLaIzquierda].latitude,
+                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
+                        longitudeActual,paradasDelUsuario[ultimaParadaPorLaIzquierda].longitude,paradasDelUsuario[ultimaParadaPorLaIzquierda].latitude,
                         usuarioTransportista.estado);
 
                    }else if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)>=2){
 
                         actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,userLocation.latitude,
-                        userLocation.longitude,paradasDelUsuario[ultimaParadaPorLaIzquierda-1].longitude,paradasDelUsuario[ultimaParadaPorLaIzquierda-1].latitude,
+                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
+                        longitudeActual,paradasDelUsuario[ultimaParadaPorLaIzquierda-1].longitude,paradasDelUsuario[ultimaParadaPorLaIzquierda-1].latitude,
                         usuarioTransportista.estado);
 
                    }
@@ -521,15 +553,15 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
                    if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)<2){
                        
                         actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,userLocation.latitude,
-                        userLocation.longitude,paradasDelUsuario[ultimaParadaPorLaDerecha].longitude,paradasDelUsuario[ultimaParadaPorLaDerecha].latitude,
+                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
+                        longitudeActual,paradasDelUsuario[ultimaParadaPorLaDerecha].longitude,paradasDelUsuario[ultimaParadaPorLaDerecha].latitude,
                         usuarioTransportista.estado);
 
                    }else if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)>=2){
 
                         actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,userLocation.latitude,
-                        userLocation.longitude,paradasDelUsuario[ultimaParadaPorLaDerecha+1].longitude,paradasDelUsuario[ultimaParadaPorLaDerecha+1].latitude,
+                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
+                        longitudeActual,paradasDelUsuario[ultimaParadaPorLaDerecha+1].longitude,paradasDelUsuario[ultimaParadaPorLaDerecha+1].latitude,
                         usuarioTransportista.estado);
 
                    }
@@ -539,15 +571,15 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
                        if(paradaBuscadaDelPasado>paradaMasCercanaSinDireccion){
 
                             actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                            usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,userLocation.latitude,
-                            userLocation.longitude,paradasDelUsuario[paradaMasCercanaSinDireccion+1].longitude,paradasDelUsuario[paradaMasCercanaSinDireccion+1].latitude,
+                            usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
+                            longitudeActual,paradasDelUsuario[paradaMasCercanaSinDireccion+1].longitude,paradasDelUsuario[paradaMasCercanaSinDireccion+1].latitude,
                             usuarioTransportista.estado);
                        
                    }else if(paradaBuscadaDelPasado<paradaMasCercanaSinDireccion){
 
                         actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,userLocation.latitude,
-                        userLocation.longitude,paradasDelUsuario[paradaMasCercanaSinDireccion-1].longitude,paradasDelUsuario[paradaMasCercanaSinDireccion-1].latitude,
+                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
+                        longitudeActual,paradasDelUsuario[paradaMasCercanaSinDireccion-1].longitude,paradasDelUsuario[paradaMasCercanaSinDireccion-1].latitude,
                         usuarioTransportista.estado);
 
                        }
@@ -557,8 +589,8 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
             //    else if(paradaBuscadaDelPasado==paradaMasCercanaSinDireccion && paradaMasCercanaSinDireccion>0){
 
             //         actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-            //         usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,userLocation.latitude,
-            //         userLocation.longitude,paradasDelUsuario[paradaMasCercanaSinDireccion-1].longitude,paradasDelUsuario[paradaMasCercanaSinDireccion-1].latitude,
+            //         usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
+            //         longitudeActual,paradasDelUsuario[paradaMasCercanaSinDireccion-1].longitude,paradasDelUsuario[paradaMasCercanaSinDireccion-1].latitude,
             //         usuarioTransportista.estado);
 
             //    }
@@ -567,10 +599,12 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
                // console.log("las coordendas son: ");
                // console.log(userLocation);
                actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,userLocation.latitude,
-                userLocation.longitude,usuarioTransportista.longitudeAnterior,usuarioTransportista.latitudeAnterior,
+                usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
+                longitudeActual,usuarioTransportista.longitudeAnterior,usuarioTransportista.latitudeAnterior,
                 usuarioTransportista.estado);
            }           
+           let enviandoDos=await AsyncStorage.setItem('actualizando',"true");
+           let total=await AsyncStorage.setItem('actualizandoCantidad',"1");
            console.log("FINALIZASTE el rrecorrido de la actualizacion");
         }
     }

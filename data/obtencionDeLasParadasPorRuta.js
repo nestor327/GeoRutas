@@ -8,7 +8,8 @@
     const obtenerParadasPorParadas=(idRuta)=>{
 
         const {data,error,isLoading}=useQuery(['obtenerParadasConDireccion',idRuta],async({queryKey})=>{
-            return await fetch('https://georutas.somee.com/api/Paradas').then(res=>datos=res.json())
+            //return await fetch('https://georutas.somee.com/api/Paradas').then(res=>datos=res.json())
+            return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/Paradas').then(res=>datos=res.json())
         },{
             staleTime:Infinity
         })
@@ -20,7 +21,7 @@
     if(isLoading==false){
         let paradasNecesarias=[];
 
-
+        //console.log("El id es: "+idRuta);
         if(idRuta==1){        
             for(let y=0;y<134;y++){
                 paradasNecesarias.push(data[y]);

@@ -30,7 +30,8 @@
         //console.log(getAllRutas().filter(elemento => elemento.id_Ruta=idRuta)[0]);
 
     const {data,error,isLoading}=useQuery(['obtenerIndividual',idRuta],async({queryKey})=>{
-        return await fetch('https://georutas.somee.com/api/Coordenadas/'+queryKey[1]).then(res=>datos=res.json())
+        //return await fetch('https://georutas.somee.com/api/Coordenadas/'+queryKey[1]).then(res=>datos=res.json())
+        return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/Coordenadas/'+queryKey[1]).then(res=>datos=res.json())
     },{
         staleTime:Infinity,
         cacheTime:20000,

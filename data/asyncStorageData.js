@@ -187,3 +187,72 @@ export const getRutasFavoritas = async (setRutas) => {
     }
   
 }
+
+
+export const setActualizando= async (actualizando) => {
+    try{
+        await AsyncStorage.setItem('actualizando',actualizando);
+    }catch (e){
+        console.log("No se actualizo el actualizando");
+    }
+  return true;
+}
+
+export const getActualizando = async () => {   
+    try{
+        const value=await AsyncStorage.getItem('actualizando');
+
+        if(value!=null){
+            return 
+            {
+                value
+            }
+        }else{
+            let value="false";
+            return 
+            {
+                value
+            }
+        }
+    }catch (e){
+        console.log("No se encontro el actualizando");
+        let value="false";
+            return 
+            {
+                value
+            }
+    }
+}
+
+export const setCantidadDeActualizando= async (total) => {
+    try{
+        await AsyncStorage.setItem('actualizandoCantidad',total);
+    }catch (e){
+        console.log("No se envio la cantida de actualizando");
+    }
+  return true;
+}
+
+export const getCantidadDeActualizando = async () => {   
+    try{
+        let cantidad=await AsyncStorage.getItem('actualizando');
+
+        if(value!=null){
+            return 
+            {
+                cantidad;
+            }
+        }else{
+            let cantidad="0";
+            return{
+                cantidad
+            }
+        }
+    }catch (e){
+        console.log("No se encontro la cantidad de actualizando");
+        let cantidad="0";
+            return{
+                cantidad
+            }
+    }
+}

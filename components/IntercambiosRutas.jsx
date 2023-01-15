@@ -1,5 +1,5 @@
-import React, { useEffect,useState } from "react";
-import { View,Image,TextInput,Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
+import React, { useEffect,useRef,useState } from "react";
+import { View,Image,TextInput,Text, ScrollView, TouchableOpacity, ActivityIndicator, Animated } from "react-native";
 import RutasBarItem from "./RutasBarItem.jsx";
 import getAllRutas from '../data/rutasManagua.js'
 
@@ -25,6 +25,7 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
 
     cantidadDeTrayectos.pop();
 
+    const fadeAnim=useRef(new Animated.Value(1));
 
    
     const RutasDelTrayecto=({rutasTrayectoria})=>{
@@ -54,7 +55,7 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
              })                               
         )
     }
-//-86.304667,12.15155,171,199,18
+//-86.304667,12.15155,171,199,18 
 
 
 return(
@@ -65,7 +66,13 @@ return(
                     return(
                         <View key={i} style={{alignItems:'center', marginTop:'17%'}} 
                         onTouchEnd={()=>{  
+                            
                             setCargando(true);
+                            Animated.timing(fadeAnim.current, {
+                                toValue: 1,
+                                duration: 150,
+                                useNativeDriver: true
+                            }).start();
                             if(identificadorKey.current==i+1){
                                 verRutasTrayecto.current==!verRutasTrayecto.current;
                             }
@@ -80,9 +87,26 @@ return(
                             setCargando(false);
                         }
                         }>
-                            <TouchableOpacity style={visualizarRutas==(i+1) && { backgroundColor:'#1e81ce', padding:5, borderRadius:10}}>
+                            <Animated.View style={visualizarRutas==(i+1) && {opacity:fadeAnim.current, backgroundColor:'#1e81ce', padding:5, borderRadius:10}}
+                                
+                                onTouchStart={()=>{
+                                    Animated.timing(fadeAnim.current, {
+                                        toValue: 0.25,
+                                        duration: 100,
+                                        useNativeDriver: true
+                                    }).start();
+                                    
+                                }}    
+                                onTouchCancel={()=>{
+                                    Animated.timing(fadeAnim.current, {
+                                        toValue: 1,
+                                        duration: 200,
+                                        useNativeDriver: true
+                                    }).start();
+                                }}
+                            >
                                 <Image source={require("../assets/rutasChulada5.png")} style={{height:50,width:50, borderRadius:25}}/>                                                             
-                             </TouchableOpacity>
+                             </Animated.View>
                              
                              <Text style={{color:'white'}} >Ruta: {i+1}</Text>
 
