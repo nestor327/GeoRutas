@@ -14,7 +14,8 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
         
 
     const {data,error,isLoading}=useQuery(['obtenerUsuariosCompetencia'],async({queryKey})=>{
-        return await fetch('https://georutas.somee.com/api/UsuariosTransporte').then(res=>datos=res.json())
+        //return await fetch('https://georutas.somee.com/api/UsuariosTransporte').then(res=>datos=res.json())
+        return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosTransporte').then(res=>datos=res.json())
     },{
         //staleTime:Infinity,
         refetchInterval:2000,
@@ -47,6 +48,7 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
 
         let arregloFinal=[];        
         let contador=0;
+        
         for(let s=0;s<data.length;s++){
              let distanciaComp=Math.sqrt(Math.pow((userLocation.longitude-data[s].latitude),2)+Math.pow((userLocation.latitude-data[s].longitude),2))
              if(distanciaComp<=0.0140 && rutasSeleccionadasCompetencia[data[s].id_Ruta-1]=='✓'){

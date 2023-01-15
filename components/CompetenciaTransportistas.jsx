@@ -15,7 +15,8 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
         
 
     const {data,error,isLoading,isSuccess}=useQuery(['obtenerUsuariosCompetencia'],async({queryKey})=>{
-        return await fetch('https://georutas.somee.com/api/UsuariosTransporte').then(res=>datos=res.json())
+        //return await fetch('https://georutas.somee.com/api/UsuariosTransporte').then(res=>datos=res.json())
+        return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosTransporte').then(res=>datos=res.json())
     },{
         //staleTime:Infinity,
         refetchInterval:2000,

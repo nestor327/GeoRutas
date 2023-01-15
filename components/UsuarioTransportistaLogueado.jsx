@@ -14,7 +14,8 @@ import getAllRutas from '../data/rutasManagua.js'
         let direccionesPorUsuarioDos='K';
 
         const {data,error,isLoading}=useQuery(['obtenerTodosLosUsuarioComunes'],async({queryKey})=>{
-            return await fetch('https://georutas.somee.com/api/UsuariosTransporte').then(res=>datos=res.json())
+            //return await fetch('https://georutas.somee.com/api/UsuariosTransporte').then(res=>datos=res.json())
+            return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosTransporte').then(res=>datos=res.json())
             
         },{
             refetchInterval:2000,
@@ -27,19 +28,23 @@ import getAllRutas from '../data/rutasManagua.js'
 
         
         let UsuarioEncontrado={};
-        
+        if(isLoading==false){
+            UsuarioEncontrado=data[idUsuarioIniciado];
+        }
         
 
     if(isLoading){
         //console.log("Se esta cargando la linea de la ruta");            
     }
     let paradas=obtenerParadasPorParadas(UsuarioEncontrado.id_Ruta);
+    //console.log("El id que pasas es: "+UsuarioEncontrado.id_Ruta);
     let rutasDeManagua=getAllRutas();
     
-
+    //console.log("No Entro");
+    //console.log("La cantidad de paradas es: "+paradas.length);
     if(isLoading==false && paradas.length>0 && rutasDeManagua.length>0){
 
-        
+        //console.log(UsuarioEncontrado);
         let nombresEnElArregloFinal=[];
         
 

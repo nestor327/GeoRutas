@@ -2,7 +2,6 @@
 import react, { useEffect, useState } from 'react';
 import { ScrollView,View,TouchableOpacity,Text } from 'react-native';
 import RutasBarItemFavoritos from './RutasBarItemFavoritos.jsx';
-import { getRutasFavoritas,setRutasFavoritas } from '../data/asyncStorageData.js';
 
 
 const ParadasFavoritas=({setArregloDeValores,todasLasRutasCompetencia,arregloDeValores})=>{

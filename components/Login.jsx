@@ -38,8 +38,11 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
 
     const verificandoContrasenia=async ()=>{
 
-        let data=await fetch('https://georutas.somee.com/api/UsuariosComunes').then(res=>datos=res.json());
+        alert("Mierda");
+        //let data=await fetch('https://georutas.somee.com/api/UsuariosComunes').then(res=>datos=res.json());
+        let data=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosComunes').then(res=>datos=res.json());
 
+        console.log(data);
         for(let k=0;k<data.length;k++){
             if(data[k].contrasenia==MD5(contrasenia) && data[k].usuario==usuarioState){                
                 setUsuario(usuarioState);
@@ -52,7 +55,8 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
             }
         }    
         
-        let usuariosTransportistas=await fetch('https://georutas.somee.com/api/UsuariosTransporte').then(res=>datos=res.json());
+        //let usuariosTransportistas=await fetch('https://georutas.somee.com/api/UsuariosTransporte').then(res=>datos=res.json());
+        let usuariosTransportistas=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosTransporte').then(res=>datos=res.json());
         
         for(let k=0;k<usuariosTransportistas.length;k++){
             if(usuariosTransportistas[k].contrasenia==MD5(contrasenia) && usuariosTransportistas[k].usuario==usuarioState){

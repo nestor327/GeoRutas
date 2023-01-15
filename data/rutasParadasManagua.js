@@ -3,7 +3,8 @@ import { useQuery } from "react-query";
 
 const rutasParadasManagua=async(idRuta)=>{
     const {data,error,isLoading}=useQuery(['obtenerRutasParadas'],async()=>{
-        return await fetch('https://georutas.somee.com/api/RutasParada').then(res=>datos=res.json())
+        //return await fetch('https://georutas.somee.com/api/RutasParada').then(res=>datos=res.json())
+        return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/RutasParada').then(res=>datos=res.json())
     },{
         staleTime:Infinity
     })

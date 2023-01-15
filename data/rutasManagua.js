@@ -10,7 +10,7 @@ const getAllRutas=()=>{
     // })
 
     // const {data,error,isLoading}=useQuery(['obtenerRutas'],async({queryKey})=>{
-    //     return await fetch('https://localhost:7123/api/Rutas').then(res=>datos=res.json()).catch(error => datos=[]);
+    //     return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/Rutas').then(res=>datos=res.json()).catch(error => datos=[]);
     // },{
     //     staleTime:Infinity
     // })
