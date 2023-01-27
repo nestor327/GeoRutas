@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { View,Text,Image, TouchableOpacity, ScrollView, TextInputBase } from 'react-native'
 import imagen from '../assets/x_icon_imagen.png';
-import { getNombre,getCorreo } from '../data/asyncStorageData.js';
+import { getNombre,getCorreo, setTokenGeoRutasCode } from '../data/asyncStorageData.js';
 import { check, openSettings, PERMISSIONS, request } from 'react-native-permissions';
 import RutasBarItem from './RutasBarItem';
 import ParadasFavoritas from './ParadasFavoritas';
@@ -11,7 +11,8 @@ import { getRutasFavoritas,setRutasFavoritas } from '../data/asyncStorageData.js
 const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,setLoguearse,setRegistrarse,
     setSecionIniciada,setTipoDeUsuario,activarPrecision,
     setActivarPrecision,tipoDeUsuario,permisosEnSegundoPlano,setPermisosEnSegundoPlano,
-    todasLasRutasCompetencia, rutasSeleccionadasCompetencia,setTodasLasRutasCompetencia, setRutasSeleccionadasCompetencia})=>{
+    todasLasRutasCompetencia, rutasSeleccionadasCompetencia,setTodasLasRutasCompetencia, 
+    setRutasSeleccionadasCompetencia, tipoDeSubscripcion,setVerAdministrarUsuarios})=>{
 
 
     const [nombre,setnombre]=useState();
@@ -60,18 +61,18 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
             </View>
             <View style={{alignItems:'center'}}>
                 <Text style={{color:'white',marginTop:'10%',fontSize:25}}>Ajustes</Text>
-                <View style={{flexDirection:'row',height:100,alignItems:'center'}}>
+                <View style={{flexDirection:'column',height:100,alignItems:'center'}}>
                     {/* <Image source={require('../assets/Sukuna.jpg')} style={{width:76,height:76,borderRadius:38}}/> */}
                     <Image source={require('../assets/ajustes.png')} style={{width:76,height:76,borderRadius:38}}/>
-                <View>
-                    <Text style={{color:'white',marginTop:'10%',fontSize:20,marginTop:0}}>{nombre}</Text>
-                    <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0}}>{correo}</Text>
-                </View>
+                    <View style={{alignItems:'center'}}>
+                        <Text style={{color:'white',fontSize:20,marginTop:0}}>{(nombre!='Desconocido')?nombre:"Nombre desconocido"}</Text>
+                        {mostrarMenu==false && <Text style={{color:'white',fontSize:15,marginTop:0}}>{(correo!=undefined && !correo.toString().toLowerCase().includes("@gmail.comfb"))?correo:""}</Text>}
+                    </View>
 
                 </View>                
             </View>
             <View style={{alignItems:'center'}}>
-            <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0,marginBottom:10}}>______________________________________</Text>
+            <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:'5%',marginBottom:10}}>______________________________________</Text>
 
             {tipoDeUsuario=='Transportista' && <TouchableOpacity style={{flexDirection:'row',borderWidth:1.5,borderColor:'#f1f1f1',width:'70%'
             ,height:40,paddingBottom:0,borderRadius:10,marginBottom:8}}
@@ -180,26 +181,32 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
 
             <Text style={{color:'white',fontSize:15,marginTop:0,marginBottom:8}}>______________________________________</Text>
             
-            <TouchableOpacity style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10
-                ,marginBottom:8,height:40,paddingTop:8,alignItems:'center'}}>
-                <Text style={{color:'white',fontSize:15}}>Contactanos</Text>
-            </TouchableOpacity>
+            {tipoDeSubscripcion=='S' && <TouchableOpacity style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10
+                ,marginBottom:8,height:40,paddingTop:8,alignItems:'center'}}
+                onPressOut={()=>{
+                    setVerAdministrarUsuarios(true);
+                }}
+                >
+                <Text style={{color:'white',fontSize:15}}>Administra tus Usuarios</Text>
+            </TouchableOpacity>}
 
             <TouchableOpacity style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10
-                ,marginBottom:8,height:40,paddingTop:8,alignItems:'center'}}>
-                <Text style={{color:'white',fontSize:15}} onPress={()=>{
-                if(secionIniciada==true){
-                    if(permitirEnviarUbicacion==true){
-                        alert("Antes debes dejar de compartir tu ubicacion")
-                        return;
+                ,marginBottom:8,height:40,paddingTop:8,alignItems:'center'}}
+                onPress={()=>{
+                    if(secionIniciada==true){
+                        if(permitirEnviarUbicacion==true){
+                            alert("Antes debes dejar de compartir tu ubicacion")
+                            return;
+                        }
+                        setSecionIniciada(false);
+                        setTipoDeUsuario("Ninguno");
+                        setTokenGeoRutasCode("");
+                        setLoguearse(true);
+                    }else{
+                        setLoguearse(true);
                     }
-                    setSecionIniciada(false);
-                    setTipoDeUsuario("Ninguno");
-                    setLoguearse(true);
-                }else{
-                    setLoguearse(true);
-                }
-                }}>{(secionIniciada==true)?"Cerrar secion":"Iniciar secion"}</Text>
+                    }}>
+                <Text style={{color:'white',fontSize:15}}>{(secionIniciada==true)?"Cerrar secion":"Iniciar secion"}</Text>
             </TouchableOpacity>
 
             {secionIniciada==false && <TouchableOpacity

@@ -2,21 +2,24 @@ import React from "react";
 import { useQuery } from "react-query";
 import { Polyline } from "react-native-maps";
 
-    const LineasTrayectorias=({iconoTrayectoItem,color})=>{
+    const LineasTrayectorias=({iconoTrayectoItem,color,emailState, tokenState})=>{
 
-    const {data,error,isLoading}=useQuery(['obtenerLineas',iconoTrayectoItem],async({queryKey})=>{
+    const {data,error,isLoading}=useQuery(['obtenerLineas',iconoTrayectoItem,emailState, tokenState],async({queryKey})=>{
         //return await fetch('https://georutas.somee.com/api/SP_PObtenerCoordendasDeLineaDeLaRutaEntreParadas/'+queryKey[1].latitudParadaUsuarioComun
-        return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/SP_PObtenerCoordendasDeLineaDeLaRutaEntreParadas/'+queryKey[1].latitudParadaUsuarioComun
-        +','+queryKey[1].longitudParadaUsuarioComun+','+queryKey[1].id_ParadaUsuarioComun+','+queryKey[1].id_ParadaFinal+','+queryKey[1].id_Usuario).then(res=>datos=res.json())
+        return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/SP_PObtenerCoordendasDeLineaDeLaRutaEntreParadas/'+queryKey[1].latitudParadaUsuarioComun+','+queryKey[1].longitudParadaUsuarioComun
+        +','+queryKey[1].id_ParadaUsuarioComun+','+queryKey[1].id_ParadaFinal+'?Email='+queryKey[2]+'&Token='+queryKey[3]).then(res=>datos=res.json())
     },{
         staleTime:Infinity,
         cacheTime:20000
     })
 
     if(isLoading){        
+        console.log("No se que pedo aqui");
     }
 
     if(isLoading==false){
+
+        
 
         let mayorDistancia=0;
         let posicion=0;

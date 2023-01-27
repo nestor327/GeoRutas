@@ -18,7 +18,12 @@ export const getUsuario = async (setUsuarioState) => {
     try{
         const value=await AsyncStorage.getItem('usuario');
 
-        setUsuarioState(value);      
+        if(value==null){
+            setUsuarioState("");
+        }else{
+            setUsuarioState(value);
+        }
+
           
     }catch (e){
         console.log("No se encontro el usuario");
@@ -39,9 +44,11 @@ export const setTipoDeUsuario= async (usuarioState) => {
 export const getTipoDeUsuario = async (setTipoDeUsuarioState) => {   
     try{
         const value=await AsyncStorage.getItem('tipoDeUsuario');
-
-        setTipoDeUsuarioState(value);      
-          
+        if(value==null){
+            setTipoDeUsuarioState("Niinguno");
+        }else{
+            setTipoDeUsuarioState(value);
+        }          
     }catch (e){
         console.log("No se encontro el usuario");
         setTipoDeUsuarioState("");      
@@ -62,7 +69,12 @@ export const getContraseña = async (setContraseña) => {
     try{
         const value=await AsyncStorage.getItem('contraseñausuario');
 
-        setContraseña(value);      
+        if(value==null){
+            setContraseña("");      
+        }else{
+            setContraseña(value);      
+        }
+        
           
     }catch (e){
         console.log("No se encontro el usuario");
@@ -83,8 +95,12 @@ export const setNombre= async (contraseña) => {
 export const getNombre = async (setNombre) => {   
     try{
         const value=await AsyncStorage.getItem('nombreUsuario');
+        if(value==null){
+            setNombre("");
+        }else{
+            setNombre(value);      
+        }
 
-        setNombre(value);      
           
     }catch (e){
         console.log("No se encontro el usuario");
@@ -105,8 +121,12 @@ export const setCorreo= async (correo) => {
 export const getCorreo = async (setCorreo) => {   
     try{
         const value=await AsyncStorage.getItem('correo');
+        if(value==null){
+            setCorreo("");      
+        }else{
+            setCorreo(value);      
+        }
 
-        setCorreo(value);      
           
     }catch (e){
         console.log("No se encontro el usuario");
@@ -134,6 +154,8 @@ export const getPermitirEnvio = async (setPermitirEnvio) => {
             setPermitirEnvio(false);
         }else if(value==="true"){
             setPermitirEnvio(true);
+        }else{
+            setPermitirEnvio(false);
         }
     }catch (e){
         console.log("No se encontro el permitir envio");
@@ -154,13 +176,15 @@ export const setRutasParadasValue= async (rutasParadas) => {
 export const getRutasParadasValue = async () => {   
     try{
         const value=await AsyncStorage.getItem('rutasParadas');
-        
-        return (JSON.parse(value));      
-        
+        if(value==null){
+            return [];
+        }else{
+            return (JSON.parse(value));
+        }
           
     }catch (e){
         console.log("No se encontraron las paradas");
-        return "[]";
+        return [];
     }
   
 }
@@ -177,9 +201,11 @@ export const setRutasFavoritas= async (rutasParadas) => {
 export const getRutasFavoritas = async (setRutas) => {   
     try{
         const value=await AsyncStorage.getItem('rutasFavoritas');
-        
-        setRutas(JSON.parse(value));      
-        
+        if(value==null){
+            setRutas([]);
+        }else{
+            setRutas(JSON.parse(value));
+        }
           
     }catch (e){
         console.log("No se encontraron las paradas");
@@ -255,4 +281,90 @@ export const getCantidadDeActualizando = async () => {
                 cantidad
             }
     }
+}
+
+export const setTokenGeoRutasCode= async (token) => {
+    try{
+        await AsyncStorage.setItem('tokenCodeGeoRutas',token);
+    }catch (e){
+        return false;
+    }
+  return true;
+}
+
+export const getTokenGeoRutasCode = async (setToken) => {   
+    try{
+        const value=await AsyncStorage.getItem('tokenCodeGeoRutas');
+        if(value==null){
+            setToken("");
+        }else{
+            setToken(value);
+        }        
+    }catch (e){        
+        setToken("");
+        return false;
+    }
+  return true;
+}
+
+export const setTipoDeMenbresiaCode= async (menbresia) => {
+    try{
+        await AsyncStorage.setItem('tipoDeMenbresia',menbresia);
+    }catch (e){
+        return false;
+    }
+  return true;
+}
+
+export async function getTipoDeMenbresia(){   
+    try{
+        const value=await AsyncStorage.getItem('tipoDeMenbresia');
+        if(value==null){
+            return ""
+        }else{
+            return {
+                value
+            };
+        }
+    }catch (e){       
+
+        return {
+            value:""
+        };
+    }
+}
+export const setTipoDeUsuarioCode= async (tipoDeUsuario) => {
+    try{
+        await AsyncStorage.setItem('tipoDeUsuario',tipoDeUsuario);
+    }catch (e){
+        return false;
+    }
+  return true;
+}
+
+export async function getTipoDeUsuarioCode(){   
+    try{
+        const value=await AsyncStorage.getItem('tipoDeUsuario');
+        if(value==null){
+            return ""
+        }else{
+            return {
+                value
+            };
+        }
+    }catch (e){       
+
+        return {
+            value:""
+        };
+    }
+}
+
+export const setIdUsuarioIniciadoCode= async (idUsuario) => {
+    try{
+        await AsyncStorage.setItem('IdUsuarioIniciado',idUsuario);
+    }catch (e){
+        return false;
+    }
+  return true;
 }

@@ -1,17 +1,16 @@
-    
+    //NUEVA ACTUALIZACION 18-1-23 El endpoint devuelve directamente las paradas para una ruta en especifico
     
     import React, { useEffect } from "react";
     import { useQuery,queryKey } from "react-query";
     import { Marker, Polyline } from "react-native-maps";
     import {Image,View,Text} from 'react-native'
-    import rutasParadasManagua from '../data/rutasParadasManagua.js';
     
     
-    const UsuariosTransportistas=({idRuta})=>{
+    const UsuariosTransportistas=({idRuta,emailState, tokenState})=>{
 
-    const {data,error,isLoading}=useQuery(['obtenerParadasConDireccion',idRuta],async({queryKey})=>{
+    const {data,error,isLoading}=useQuery(['obtenerParadasConDireccion',idRuta,emailState, tokenState],async({queryKey})=>{
         //return await fetch('https://georutas.somee.com/api/Paradas').then(res=>datos=res.json())
-        return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/Paradas').then(res=>datos=res.json())
+        return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/Paradas?IdRuta='+queryKey[1]+'&Email='+queryKey[2]+'&Token='+queryKey[3]).then(res=>datos=res.json())
     },{
         staleTime:Infinity,
         cacheTime:60000
@@ -24,19 +23,15 @@
         //setMostrarSniperCargando(true);
     }
 
-    let paradasEnComun=rutasParadasManagua(idRuta)._j;    
-    let paradasNecesarias=[];
+    //let paradasEnComun=rutasParadasManagua(idRuta)._j;    
+    
  
  
 
-    if(isLoading==false && (paradasEnComun!=null && paradasEnComun.length>0)){    
-
-        for(let r=0;r<paradasEnComun.length;r++){
-            paradasNecesarias.push(data[paradasEnComun[r].id_Parada-1]);
-        }
+    if(isLoading==false){
 
         return(
-            paradasNecesarias.map((item, i)=>{
+            data.map((item, i)=>{
                 return(
                     <View key={i}>
                         {item.direccion=='D' && <Marker coordinate={{latitude:item.longitude,

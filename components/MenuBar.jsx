@@ -2,6 +2,7 @@ import * as react from 'react';
 import { View,Image,Text, TouchableHighlightBase, TouchableOpacity} from 'react-native';
 import styles from '../componentStyles/menuBarStyles.js';
 import { useEffect } from 'react';
+import { setTokenGeoRutasCode } from '../data/asyncStorageData.js';
 
 const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRutasTrayecto
                 ,setVerTrayectoria,setIdRutaAMostrar,ocultarTercerMenu,coordenadasOrigenSecundario
@@ -37,8 +38,7 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
         }
         return false;
     }
-
-
+    
 
   return (
     <View style={[{height:(height>width)?width*0.2:height*0.2,backgroundColor:'blue'}]}>
@@ -78,6 +78,7 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                                 setVerParadasCercanas([{observar:false,latitude:coordenadasOrigenSecundario.latitude,longitude:coordenadasOrigenSecundario.longitude,direccion:'K',id_Ruta:1}]);
                                 //console.log(userLocation);
                                 setMostrarBarraSecundariaDeUbicacion(true);
+                                //obtenerRutas(2);
                             }else{
                                 setLoguearse(true);
                             }

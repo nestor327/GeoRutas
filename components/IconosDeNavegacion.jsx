@@ -1,3 +1,7 @@
+
+//NUEVA ACTUALIZACION 18-1-23 El endpoint devuelve solo lo necesario del usuario transporte
+//debes actualizar el state de usuariotransporte a los datos necesarios de NUsuarioTransporte
+
 import { useState,useEffect } from "react";
 import { Alert, View } from "react-native"
 import { getPermitirEnvio, setPermitirEnvio } from "../data/asyncStorageData.js";
@@ -10,7 +14,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
     verTransportistasPorLaDerecha,verTransportistasPorLaIzquierda,idRutaAMostrar,mostrarUsuarios,permitirEnviarUbicacion,
     tipoDeUsuario,mostrarParadas,mostrarItemMenuUno,verTrayectoria,verCompetencia,verRutasCercanas,centrePosition,siguiendoAlUsuario,
     askLocationPermission,followUseLocation, stopFollowUserLocation,permitirSeguirPasajero, setPermitirSeguirPasajero,setVerTrayectoria,
-    ocultarTrayecto,permisos,askLocationPermissionSetting, setUsuarioTransportista,setCargando
+    ocultarTrayecto,permisos,askLocationPermissionSetting, setUsuarioTransportista,setCargando,emailState, tokenState
     })=>{
 
         // useEffect(()=>{
@@ -41,9 +45,14 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         return;
                     }
                     //let usuarioTransportista= await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json());
-                    let usuarioTransportista= await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json());
+                    let usuarioTransportista={};
+                    try{
+                        usuarioTransportista= await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/NUsuariosTransporte/'+idUsuarioIniciado.toString()+'?Email='+emailState+'&Token='+tokenState).then(res=>dat=res.json());
+                    }catch{
+                        usuarioTransportista={};
+                    }
                     
-                    if(usuarioTransportista=={} || usuarioTransportista.nombre==null){                        
+                    if(usuarioTransportista=={} || usuarioTransportista.id_Ruta==null){                        
                         alert("Has perdido tu usuario, vuelve a iniciar secion");
                         setCargando(false);
                         return;
@@ -53,43 +62,67 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
 
 
                 //let datos=await fetch('https://georutas.somee.com/api/UsuariosTransporte',{
-                let datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosTransporte',{
-                    method:"PUT",
-                    headers:{
-                        "Content-Type":"application/json",
-                        },
-                        body:JSON.stringify(
-                            {
-                                    id_UsuarioTransporte: idUsuarioIniciado,
-                                    id_Tipo_Transporte: 1,
-                                    id_Ruta: usuarioTransportista.id_Ruta,
-                                    nombre: usuarioTransportista.nombre,
-                                    usuario: usuarioTransportista.usuario,
-                                    contrasenia: usuarioTransportista.contrasenia,
-                                    correo: usuarioTransportista.correo,
-                                    telefono: usuarioTransportista.telefono,
-                                    longitude: usuarioTransportista.longitude,
-                                    latitude: usuarioTransportista.latitude,
-                                    longitudeAnterior: usuarioTransportista.longitudeAnterior,
-                                    latitudeAnterior: usuarioTransportista.latitudeAnterior,
-                                    estado: 'A'
-                            })
-                    })    
+                    try{
+                        let datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/NUsuariosTransporte?Email='+emailState+'&Token='+tokenState,
+                        {
+                            method:"PUT",
+                            headers:{
+                                "Content-Type":"application/json",
+                                },
+                                body:JSON.stringify(
+                                    {
+                                        id_UsuarioTransporte: idUsuarioIniciado,
+                                        id_Tipo_Transporte: 1,
+                                        id_Ruta: usuarioTransportista.id_Ruta,
+                                        longitude: usuarioTransportista.longitude,
+                                        latitude: usuarioTransportista.latitude,
+                                        longitudeAnterior: usuarioTransportista.longitudeAnterior,
+                                        latitudeAnterior: usuarioTransportista.latitudeAnterior,
+                                        estado: 'A',
+                                        direccion: 'I'
+                                    })
+                            });
+        
+                            let json=null;
+        
+                            if(datos.ok){
+                                try{
+                                    json=await datos.json();
+                                }catch{
+                                    json=null;
+                                }
+        
+                                if(json==null){
+                                    alert("Tu conexión a internet es inestable");
+                                    setCargando(false);
+                                }else if(json.id_UsuarioTransporte==0){
+                                    alert("Tu conexión a internet es inestable");
+                                    setCargando(false);
+                                }
+                                
+                            }else{
+                                alert("Tu conexión a internet es inestable");
+                                setCargando(false);
+                            }
+        
+        
+                    }catch{
+                        alert("Tu conexión a internet es inestable");   
+                        setCargando(false);                     
+                    }
+
                     setUsuarioTransportista({
-                        id_UsuarioTransporte: idUsuarioIniciado,
-                        id_Tipo_Transporte: 1,
-                        id_Ruta: usuarioTransportista.id_Ruta,
-                        nombre: usuarioTransportista.nombre,
-                        usuario: usuarioTransportista.usuario,
-                        contrasenia: usuarioTransportista.contrasenia,
-                        correo: usuarioTransportista.correo,
-                        telefono: usuarioTransportista.telefono,
-                        longitude: usuarioTransportista.longitude,
-                        latitude: usuarioTransportista.latitude,
-                        longitudeAnterior: usuarioTransportista.longitudeAnterior,
-                        latitudeAnterior: usuarioTransportista.latitudeAnterior,
-                        estado: 'A'
+                        id_UsuarioTransporte:idUsuarioIniciado,
+                        id_Tipo_Transporte:1,
+                        id_Ruta:usuarioTransportista.id_Ruta,
+                        longitude:usuarioTransportista.longitude,
+                        latitude:usuarioTransportista.latitude,
+                        longitudeAnterior:usuarioTransportista.longitudeAnterior,
+                        latitudeAnterior:usuarioTransportista.latitudeAnterior,
+                        estado:"A",
+                        direccion:usuarioTransportista.direccion
                     });
+
                     setPermitirEnvio("true");
                     setPermitirEnviarUbicacion(true);
                     setCargando(false);
@@ -111,53 +144,77 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         return;
                     }
                     //let usuarioTransportista= await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json())
-                    let usuarioTransportista= await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json())
-                    
-                    if(usuarioTransportista=={} || usuarioTransportista.nombre==null){
+                    let usuarioTransportista={};
+                    try{
+                        usuarioTransportista= await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/NUsuariosTransporte/'+idUsuarioIniciado.toString()+'?Email='+emailState+'&Token='+tokenState).then(res=>dat=res.json());
+                    }catch{
+                        usuarioTransportista={};
+                    }
+
+                    if(usuarioTransportista=={} || usuarioTransportista.id_Ruta==null){
                         setCargando(false);
                         return;
                     }
                     stopFollowUserLocation();
 
                     //let datos=await fetch('https://georutas.somee.com/api/UsuariosTransporte',{
-                    let datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosTransporte',{
-                        method:"PUT",
-                        headers:{
-                            "Content-Type":"application/json",
-                            },
-                            body:JSON.stringify(
-                                {
+
+                    try{
+                        let datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/NUsuariosTransporte?Email='+emailState+'&Token='+tokenState,
+                        {
+                            method:"PUT",
+                            headers:{
+                                "Content-Type":"application/json",
+                                },
+                                body:JSON.stringify(
+                                    {
                                         id_UsuarioTransporte: idUsuarioIniciado,
                                         id_Tipo_Transporte: 1,
                                         id_Ruta: usuarioTransportista.id_Ruta,
-                                        nombre: usuarioTransportista.nombre,
-                                        usuario: usuarioTransportista.usuario,
-                                        contrasenia: usuarioTransportista.contrasenia,
-                                        correo: usuarioTransportista.correo,
-                                        telefono: usuarioTransportista.telefono,
                                         longitude: usuarioTransportista.longitude,
                                         latitude: usuarioTransportista.latitude,
                                         longitudeAnterior: usuarioTransportista.longitudeAnterior,
                                         latitudeAnterior: usuarioTransportista.latitudeAnterior,
-                                        estado: 'I'
-                                })
-                        })
+                                        estado: 'I',
+                                        direccion: 'I'
+                                    })
+                            });
+        
+                            let json=null;
+        
+                            if(datos.ok){
+                                try{
+                                    json=await datos.json();
+                                }catch{
+                                    json=null;
+                                }
+        
+                                if(json==null){
+                                    alert("Tu conexión a internet es inestable");
+                                }else if(json.id_UsuarioTransporte==0){
+                                    alert("Tu conexión a internet es inestable");
+                                }
+                                
+                            }else{
+                                alert("Tu conexión a internet es inestable");
+                            }
+        
+        
+                    }catch{
+                        alert("Tu conexión a internet es inestable");                        
+                    }
 
                         
                         setUsuarioTransportista({
-                            id_UsuarioTransporte: idUsuarioIniciado,
-                            id_Tipo_Transporte: 1,
-                            id_Ruta: usuarioTransportista.id_Ruta,
-                            nombre: usuarioTransportista.nombre,
-                            usuario: usuarioTransportista.usuario,
-                            contrasenia: usuarioTransportista.contrasenia,
-                            correo: usuarioTransportista.correo,
-                            telefono: usuarioTransportista.telefono,
-                            longitude: usuarioTransportista.longitude,
-                            latitude: usuarioTransportista.latitude,
-                            longitudeAnterior: usuarioTransportista.longitudeAnterior,
-                            latitudeAnterior: usuarioTransportista.latitudeAnterior,
-                            estado: 'I'
+                            id_UsuarioTransporte:idUsuarioIniciado,
+                            id_Tipo_Transporte:1,
+                            id_Ruta:usuarioTransportista.id_Ruta,
+                            longitude:usuarioTransportista.longitude,
+                            latitude:usuarioTransportista.latitude,
+                            longitudeAnterior:usuarioTransportista.longitudeAnterior,
+                            latitudeAnterior:usuarioTransportista.latitudeAnterior,
+                            estado:"I",
+                            direccion:usuarioTransportista.direccion
                         });
                         setCargando(false);
                 }}

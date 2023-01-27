@@ -13,11 +13,15 @@ import useTrayectoria from './src/hooks/useTrayectoria.jsx';
 import RutasBarItem from './components/RutasBarItem.jsx';
 import IntercambiosRutas from './components/IntercambiosRutas.jsx';
 import ParadasCercaDelOrigen from './components/ParadasCercaDeUbicacion.jsx';
-import { getRutasFavoritas, setRutasFavoritas } from './data/asyncStorageData.js';
+import { getRutasFavoritas, getTokenGeoRutasCode, getUsuario, setRutasFavoritas, setTipoDeMenbresiaCode, setTipoDeUsuarioCode, setTokenGeoRutasCode } from './data/asyncStorageData.js';
+import ConfirmarCodigo from './components/ConfirmarCodigo.jsx';
+import CambiarPassword from './components/CambiarPassword.jsx';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import AdministrarUsuarios from './components/AdministrarUsuarios.jsx';
 
 
 export default function App() {
-    const [loguearse,setLoguearse]=React.useState(true);
+    const [loguearse,setLoguearse]=React.useState(false);
     const [tipoDeUsuario, setTipoDeUsuario]=React.useState("Ninguno");
 
     const [secionIniciada, setSecionIniciada]=React.useState(false);
@@ -93,12 +97,16 @@ export default function App() {
       const [verRutasCercanas, setVerRutasCercanas]=React.useState(false);
       const [ocultarTrayecto, setOcultarTrayecto]=React.useState(false);
 
+      
+      const [emailState, setEmailState]=React.useState("");
+      const [tokenState, setTokenState]=React.useState("");
+
       const {height,width}=useWindowDimensions();
 
       let alturaTotal=height+StatusBar.currentHeight;
 
       const {data,obtenerRutas} = useTrayectoria(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,setVisualizarRutas,
-      setTiemposRutasTrayectorias,setIconosTransportes,setIdUsuariosDeTrayectoria,verRutasTrayecto,identificadorKey);
+      setTiemposRutasTrayectorias,setIconosTransportes,setIdUsuariosDeTrayectoria,verRutasTrayecto,identificadorKey,emailState,tokenState);
 
       const [menUno, setmenUno] = React.useState([{ display: 'none',color:'#102769' }]);
       const [menDos, setmenDos] = React.useState([{ display: 'none',color:'#102769' }]);
@@ -118,8 +126,64 @@ export default function App() {
       const [todasLasRutasCompetencia, setTodasLasRutasCompetencia]=React.useState(getAllRutas());
       const [rutasSeleccionadasCompetencia, setRutasSeleccionadasCompetencia]=React.useState([]);
 
+      const [tokenGeoRutas,setTokenGeoRutas]=React.useState("");
+      const [confirmarCodigo,setConfirmarCodigo]=React.useState(false);
+      const [cambiarPassword,setCambiarPassword]=React.useState(false);
+      const [tipoDeSubscripcion,setTipoDeSubscripcion]=React.useState('C');
+      const [verAdministrarUsuarios, setVerAdministrarUsuarios]=React.useState(false);
+
+
+      const obtenerToken=async()=>{
+        const tokenValue=await AsyncStorage.getItem('tokenCodeGeoRutas');
+            
+        if(tokenValue!=null && tokenValue.length>10){
+
+            //setLoguearse(false);
+            setSecionIniciada(true);
+            getUsuario(setEmailState);
+
+            const tipoSubs=await AsyncStorage.getItem('tipoDeMenbresia');
+
+            if(tipoSubs!=null && tipoSubs.length>0){
+                setTipoDeMenbresiaCode(tipoSubs);
+                setTipoDeSubscripcion(tipoSubs);
+            }else{
+                setTipoDeMenbresiaCode('C');
+                setTipoDeSubscripcion('C');
+            }
+
+            setTokenState(tokenValue);
+            setTokenGeoRutas(tokenValue);                
+
+            const tipoUsuarioAsync=await AsyncStorage.getItem('tipoDeUsuario');
+
+            if(tipoUsuarioAsync!=null && tipoUsuarioAsync=='Transportista'){
+                setTipoDeUsuario("Transportista");
+
+                let idUsuario=await AsyncStorage.getItem('IdUsuarioIniciado');
+
+                if(idUsuario!=null && (idUsuario.length>0)){
+                    setIdUsuarioIniciado(parseInt(idUsuario));
+                }else{
+                    setLoguearse(true);
+                    setSecionIniciada(false);
+                }
+
+                setTipoDeUsuarioCode("Transportista");                  
+            }else{
+                setTipoDeUsuario("Pasajero");
+                setTipoDeUsuarioCode("Pasajero");
+            }                
+            return;
+        }else{
+            setLoguearse(true);
+        }   
+      }
+
       React.useEffect(()=>{
-        getRutasFavoritas(setRutasSeleccionadasCompetencia);        
+        obtenerToken();
+        getRutasFavoritas(setRutasSeleccionadasCompetencia);
+        getTokenGeoRutasCode(setTokenGeoRutas);
       },[])
 
       React.useEffect(()=>{
@@ -131,6 +195,54 @@ export default function App() {
             setRutasSeleccionadasCompetencia(arreglo);
         }
       },[rutasSeleccionadasCompetencia])
+
+      
+
+    const refrescarToken=async(email,token)=>{
+        let usuario=null;
+        // console.log("El token que envias es: "+token);
+        // console.log("El correo que envias es: "+email);
+        // console.log("El id que envias es: "+idUsuarioIniciado);
+
+        //%  %  
+        //%25 %25
+        try{
+            let url='http://georutas.us-east-2.elasticbeanstalk.com/api/RefrescarToken?Email='+email+'&Token='+token;
+            
+            //Al momento de guardarlo en la base de datos, no debes de guardarlo con la misma estructura
+
+            usuario=await fetch(url).then(res=>usuario=res.json());
+            //usuario=await fetch(url);
+            console.log("El usuario es: ");
+            console.log(usuario);
+            
+        }catch{
+            alert("Revisa tu conexión a internet");
+            return;
+        }   
+
+        if(usuario==null){
+            alert("Revisa tu conexión a internet");
+            return;
+        }
+
+        if(usuario.token=="0" || usuario.token=="3"){
+            return;
+        }else if(usuario.token=="2" || usuario.token=="1"){
+            setSecionIniciada(false);            
+            setTipoDeUsuario("Ninguno");
+            setLoguearse(true);
+        }else{
+            setTokenState(usuario.token);
+            setTokenGeoRutasCode(usuario.token);
+        }
+    }
+
+    React.useEffect(()=>{
+        if(emailState.length>2){
+            refrescarToken(emailState,tokenState);
+        }
+    },[idRutaAMostrar,visualizarRutas])
 
   return (
      <View style={{height:alturaTotal, width:width}}>
@@ -158,6 +270,8 @@ export default function App() {
         mostrarVentana={mostrarVentana} serMostrarVentana={serMostrarVentana} setCargando={setCargando} cargando={cargando}
         todasLasRutasCompetencia={todasLasRutasCompetencia} rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}
         setTodasLasRutasCompetencia={setTodasLasRutasCompetencia} setRutasSeleccionadasCompetencia={setRutasSeleccionadasCompetencia}
+        emailState={emailState} tokenState={tokenState} setTokenState={setTokenState} tipoDeSubscripcion={tipoDeSubscripcion}
+        setVerAdministrarUsuarios={setVerAdministrarUsuarios}
         ></Inicio>
         
         <View style={{height:0,width:width,padding:0}}>
@@ -205,7 +319,7 @@ export default function App() {
           height: width*0.6, position: 'absolute', bottom:0, backgroundColor: '#102769' }]}>
                 <ScrollView>
                 {
-                    <ParadasCercaDelOrigen lalitude={coordenadasOrigenSecundario.latitude} longitude={coordenadasOrigenSecundario.longitude} setVerParadasCercanas={setVerParadasCercanas}></ParadasCercaDelOrigen>
+                    <ParadasCercaDelOrigen emailState={emailState} tokenState={tokenState} lalitude={coordenadasOrigenSecundario.latitude} longitude={coordenadasOrigenSecundario.longitude} setVerParadasCercanas={setVerParadasCercanas}></ParadasCercaDelOrigen>
                 }
                 </ScrollView>
             </View>}
@@ -229,17 +343,20 @@ export default function App() {
         setCoordenadasOrigenSecundario={setCoordenadasOrigenSecundario} setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario}
         permitirEnviarUbicacion={permitirEnviarUbicacion} setMostrarBarraSecundariaDeUbicacion={setMostrarBarraSecundariaDeUbicacion} refCambiarLupa={refCambiarLupa}
         activarPrecision={activarPrecision} setActivarPrecision={setActivarPrecision} tipoDeUsuario={tipoDeUsuario} 
-        serMostrarVentana={serMostrarVentana} cargando={cargando} setCargando={setCargando} idRutaAMostrar={idRutaAMostrar}
+        serMostrarVentana={serMostrarVentana} cargando={cargando} setCargando={setCargando} idRutaAMostrar={idRutaAMostrar}        
         ></MenuBar>
   
         
-        {loguearse==true && <Login setTipoDeUsuario={setTipoDeUsuario} setSecionIniciada={setSecionIniciada} setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} setLosguearTransportista={setLosguearTransportista} height={height} width={width} 
-        setIdUsuarioIniciado={setIdUsuarioIniciado} setUsuarioLogueado={setUsuarioLogueado}></Login>}
+        {loguearse==true && <Login setTipoDeSubscripcion={setTipoDeSubscripcion} setCambiarPassword={setCambiarPassword} setTipoDeUsuario={setTipoDeUsuario} setSecionIniciada={setSecionIniciada} setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} setLosguearTransportista={setLosguearTransportista} height={height} width={width} 
+        setIdUsuarioIniciado={setIdUsuarioIniciado} setUsuarioLogueado={setUsuarioLogueado} setTokenGeoRutas={setTokenGeoRutas} setConfirmarCodigo={setConfirmarCodigo} setEmailState={setEmailState} setTokenState={setTokenState}></Login>}
+        {confirmarCodigo==true &&<ConfirmarCodigo height={height} width={width} setConfirmarCodigo={setConfirmarCodigo}></ConfirmarCodigo>}
+        {cambiarPassword==true && <CambiarPassword height={height} width={width} setCambiarPassword={setCambiarPassword}></CambiarPassword>}
         {/* {loguearTransportista==true && <LoginTransportistas setLosguearTransportista={setLosguearTransportista} setRegistrarse={setRegistrarse} setSecionIniciada={setSecionIniciada} setLoguearse={setLoguearse} setTipoDeUsuario={setTipoDeUsuario}
         setIdUsuarioIniciado={setIdUsuarioIniciado} setUsuarioLogueado={setUsuarioLogueado} height={height} width={width}></LoginTransportistas>} */}
 
         {/* //DEBES ELIMINAR EL COMPONENTE QUE SE ENCIENTRA EN LA PARTE SUPERIOR */}
 
+        {verAdministrarUsuarios==true && <AdministrarUsuarios setVerAdministrarUsuarios={setVerAdministrarUsuarios} height={height} width={width} emailState={emailState} tokenState={tokenState}></AdministrarUsuarios>}
         {registrarse==true && <Register setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} 
         height={height} width={width}></Register>}
     </View>

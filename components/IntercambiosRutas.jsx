@@ -13,7 +13,7 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
     let todasLasRutas=getAllRutas();
     
 
-    if(rutasEnElMapa==undefined){
+    if(rutasEnElMapa==undefined){        
         return;
     }
 
@@ -76,6 +76,7 @@ return(
                             if(identificadorKey.current==i+1){
                                 verRutasTrayecto.current==!verRutasTrayecto.current;
                             }
+                            console.log("Aqui se deberia de hacer el cambio"+(visualizarRutas));
                             obtenerRutas(i+1);
                             //RutasTrayectorias(setRutasEnElMapa);
                             setVerTrayectoria(true);   
@@ -84,7 +85,7 @@ return(
                             setVerCompetencia(false);    
                             setOcultarTrayecto(true); 
                             refCambiarLupa.current=false;
-                            setCargando(false);
+                            setCargando(false);                            
                         }
                         }>
                             <Animated.View style={visualizarRutas==(i+1) && {opacity:fadeAnim.current, backgroundColor:'#1e81ce', padding:5, borderRadius:10}}

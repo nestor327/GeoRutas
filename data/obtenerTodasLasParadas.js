@@ -5,11 +5,11 @@
     import { Marker, Polyline } from "react-native-maps";
     import {Image,View,Text} from 'react-native'
 
-    const obtenerTodasLasParadas=()=>{
+    const obtenerTodasLasParadas=(email,token)=>{
 
-        const {data,error,isLoading}=useQuery(['obtenerTodasLasParadas'],async({queryKey})=>{
+        const {data,error,isLoading}=useQuery(['obtenerTodasLasParadas',email,token],async({queryKey})=>{
             //return await fetch('https://georutas.somee.com/api/Paradas').then(res=>datos=res.json())
-            return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/Paradas').then(res=>datos=res.json())
+            return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/Paradas/Email?Email='+queryKey[1]+'&token='+queryKey[2]).then(res=>datos=res.json())
         },{
             staleTime:Infinity            
         })

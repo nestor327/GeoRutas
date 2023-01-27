@@ -1,5 +1,9 @@
+
+//NUEVA ACTUALIZACION 18-1-23 El endpoint devuelve lo necesario del usuario Transporte
+//Hay un endpoint que devuelve las paradasrutas para una sola ruta
+
 import React, { useEffect,useRef, useState  } from 'react'
-import { View,Text, Platform, StatusBar, ActivityIndicator, Image, TextInput, TouchableOpacity, Keyboard, AppState} from 'react-native';
+import { View,Text, Platform, StatusBar, ActivityIndicator, Image, TextInput, TouchableOpacity, Keyboard, AppState, Alert} from 'react-native';
 import {enableLatestRenderer, Marker, PROVIDER_GOOGLE,Polyline} from 'react-native-maps';
 import MapView from 'react-native-maps';
 import IconosDeNavegacion from './IconosDeNavegacion.jsx';
@@ -19,7 +23,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import BackgroundService from 'react-native-background-actions';
 import Geolocation from '@react-native-community/geolocation';
 import { PermissionStatus,PERMISSIONS, request, check,openSettings } from "react-native-permissions";
-import { getPermitirEnvio, getRutasParadasValue, setRutasParadasValue } from '../data/asyncStorageData.js';
+import { getPermitirEnvio, getRutasParadasValue, setRutasParadasValue, setTokenGeoRutasCode } from '../data/asyncStorageData.js';
 import Cargando from './Cargando.jsx';
 
 export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoordenadasOrigen,tipoDeUsuario
@@ -37,7 +41,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     ,mostrarBarraSecundariaDeUbicacion,setMostrarBarraSecundariaDeUbicacion,setMostrarItemMenuUno,setIdRutaAMostrar
     ,refCambiarLupa,activarPrecision,setActivarPrecision,mostrarVentana,serMostrarVentana
     ,setCargando,cargando,
-    todasLasRutasCompetencia,rutasSeleccionadasCompetencia,setTodasLasRutasCompetencia,setRutasSeleccionadasCompetencia})=>{
+    todasLasRutasCompetencia,rutasSeleccionadasCompetencia,setTodasLasRutasCompetencia,setRutasSeleccionadasCompetencia
+    ,emailState, tokenState,setTokenState,tipoDeSubscripcion,setVerAdministrarUsuarios})=>{
     
 
 
@@ -60,13 +65,24 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             checkLocationPermission,
             checkBacgroundLocationPermission,
             bacgroundPermisos,
-            setBacgroundPermisos
+            setBacgroundPermisos,
+            actualizarTiemposDeLasParadas
         }=useLocation(permitirEnviarUbicacion,tipoDeUsuario,idUsuarioIniciado,direccionesPorUsuario,userLocation,setUserLocatio,activarPrecision);
 
     
     const [mostrarUsuarios, setMostrarUsuarios]=useState(false);
     const [mostrarParadas, serMostrarParadas]=useState(false);
-    const [usuarioTransportista,setUsuarioTransportista]=useState({});    
+    const [usuarioTransportista,setUsuarioTransportista]=useState({
+        id_UsuarioTransporte:0,
+        id_Tipo_Transporte:0,
+        id_Ruta:0,
+        longitude:0,
+        latitude:0,
+        longitudeAnterior:0,
+        latitudeAnterior:0,
+        estado:"I",
+        direccion:"I"
+    });    
     const [paradasCompletas, setParadasCompletas]=useState([]);
     const [rutasParadas,setRutasParadas]=useState([]);
 
@@ -77,6 +93,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     const [verRecomendacionesDeUbicaciones, setVerRecomendacionesDeUbicacion]=useState(false);
     const [coordenadasDeLaRuta, setCoordenadasDeLaRuta]=useState([]);
     const [estadoAplicacion, setEstadoAplicacion]=useState(true);
+    const [actualizarUsuarioTransportista, setActualizarUsuarioTransportista]=useState(false);
 
 
 
@@ -86,50 +103,112 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     const refEnvioDeUbicacionesPasajero=useRef(true);
     const refInputAutoComplete=useRef();
     const refNombreDelDestino=useRef("Desconocido");
-    const refNombreDelOrigen=useRef("Desconocido");
+    const refNombreDelOrigen=useRef("Desconocido");    
 
-    const [pruebaState, setPruebaState]=useState([]);
-        
-    const capturarUsuarioTransportistaYDemas=async()=>{  
-        //let usuario=await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json());
-        let usuario=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json());
-        setUsuarioTransportista(usuario);
-        if(usuario.id_Ruta>0){
+    const refrescarToken=async(email,token)=>{
+        let usuario=null;
+        // console.log("El token que envias es: "+token);
+        // console.log("El correo que envias es: "+email);
+        // console.log("El id que envias es: "+idUsuarioIniciado);
 
-        //let paradas=await fetch('https://georutas.somee.com/api/RutasParada').then(res=>datos=res.json());
-        let paradas=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/RutasParada').then(res=>datos=res.json());
-        let paradasRutas=paradas.filter(elemento => elemento.id_Ruta==usuario.id_Ruta);
-        setRutasParadas(paradasRutas);
-        //let paradasComple=await fetch('https://georutas.somee.com/api/Paradas').then(res=>datos=res.json());
-        let paradasComple=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/Paradas').then(res=>datos=res.json());
-        
-        let paradasFilter=[];
-        for(let i=0;i<paradas.length;i++){
-            paradasFilter.push(paradasComple.filter(elemento => elemento.id_Parada==paradas[i].id_Parada)[0]);
+        //%  %  
+        //%25 %25
+        try{
+            let url='http://georutas.us-east-2.elasticbeanstalk.com/api/RefrescarToken?Email='+email+'&Token='+token;
+            
+            //Al momento de guardarlo en la base de datos, no debes de guardarlo con la misma estructura
+
+            usuario=await fetch(url).then(res=>usuario=res.json());
+            //usuario=await fetch(url);
+            console.log("El usuario es: ");
+            console.log(usuario);
+            
+        }catch{
+            alert("Revisa tu conexión a internet");
+            return;
+        }   
+
+        if(usuario==null){
+            alert("Revisa tu conexión a internet");
+            return;
         }
 
-        setParadasCompletas(paradasFilter);
-        
-        //setCoordenadasDeLaRuta(await fetch('https://georutas.somee.com/api/Coordenadas/'+usuario.id_Ruta).then(res=>datos=res.json()));
-        setCoordenadasDeLaRuta(await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/Coordenadas/'+usuario.id_Ruta).then(res=>datos=res.json()));
-        
-        setRutasParadasValue(JSON.stringify(paradasRutas));
-        
+        if(usuario.token=="0" || usuario.token=="3"){
+            return;
+        }else if(usuario.token=="2" || usuario.token=="1"){
+            setSecionIniciada(false);            
+            setTipoDeUsuario("Ninguno");
+            setLoguearse(true);
+        }else{
+            setTokenState(usuario.token);
+            setTokenGeoRutasCode(usuario.token);
+        }
     }
+        
+    const capturarUsuarioTransportistaYDemas=async(email,token)=>{  
+        
+        let usuario=null;
+        try{
+            let url='http://georutas.us-east-2.elasticbeanstalk.com/api/NUsuariosTransporte/'+idUsuarioIniciado.toString()+'?Email='+email+'&Token='+token;
+            
+            usuario=await fetch(url).then(res=>dat=res.json());
+            
+        }catch{
+            alert("Revisa tu conexión a internet");
+        }
+
+        if(usuario==null || usuario.id_Tipo_Transporte==0){
+            alert("Revisa tu conexión a internet");
+            return;
+        }else if(usuario.id_Tipo_Transporte==-1){            
+            alert("Hubo un problema con su usuario");
+            return;
+        }else if(usuario.id_Tipo_Transporte==-2){
+
+            refrescarToken(email,token);
+            return;
+        }else if(usuario.id_Tipo_Transporte>0){
+            setUsuarioTransportista(usuario);
+        }
+        
+        if(usuario!=null && usuario.id_Ruta>0){
+            let paradasRutas=[];
+
+            try{
+                paradasRutas=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/RutasParada?IdRuta='+usuario.id_Ruta+'&Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());        
+            }catch{
+                paradasRutas=[];
+            }        
+
+            if(paradasRutas.length>0){
+                setRutasParadas(paradasRutas);
+            }
+
+            let paradasComple=[];
+            try{
+                paradasComple=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/Paradas/Email?Email='+email+'&token='+token).then(res=>datos=res.json());
+            }catch{
+                paradasComple=[];
+            }
+
+            if(paradasComple.length>0){
+                setParadasCompletas(paradasComple);
+            }            
+
+            let lineaDeLaR=[];
+
+            try{
+                lineaDeLaR=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/Coordenadas/'+usuario.id_Ruta+'?email='+email+'&token='+token).then(res=>datos=res.json());
+            }catch{
+                lineaDeLaR=[];
+            }
+
+            if(lineaDeLaR.length>0){
+                setCoordenadasDeLaRuta(lineaDeLaR);                
+            }            
+            // setRutasParadasValue(JSON.stringify(paradasRutas));        
+        }
     }
-
-    // useEffect(()=>{
-    //     if(pruebaState.length==0)
-    //     {
-    //         return;
-    //     }
-    //     console.log("Prueba");
-    //     let datos=JSON.parse(pruebaState);
-    //     console.log((datos[0]).id_Ruta);
-    //     console.log("Prueba");
-    // },[pruebaState])
-
-
 
     const centrePosition=async()=>{
         //AQUI VA LA LLAMADA A LA UBICACION DE DONDE SE ENCUENTRA EL USUARIO
@@ -145,30 +224,74 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
     }
 
-    const ocultarUsuarioTransportistaEnElBackend=async()=>{
-        //let datos=await fetch('https://georutas.somee.com/api/UsuariosTransporte',{
-        let datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosTransporte',{
-            method:"PUT",
-            headers:{
-                "Content-Type":"application/json",
-                },
-                body:JSON.stringify(
-                    {
-                            id_UsuarioTransporte: idUsuarioIniciado,
-                            id_Tipo_Transporte: 1,
-                            id_Ruta: usuarioTransportista.id_Ruta,
-                            nombre: usuarioTransportista.nombre,
-                            usuario: usuarioTransportista.usuario,
-                            contrasenia: usuarioTransportista.contrasenia,
-                            correo: usuarioTransportista.correo,
-                            telefono: usuarioTransportista.telefono,
-                            longitude: usuarioTransportista.longitude,
-                            latitude: usuarioTransportista.latitude,
-                            longitudeAnterior: usuarioTransportista.longitudeAnterior,
-                            latitudeAnterior: usuarioTransportista.latitudeAnterior,
-                            estado: 'I'
-                    })
-            })
+    const ocultarUsuarioTransportistaEnElBackend=async(email,token)=>{
+        console.log("NO ENTRO");
+        
+        if(usuarioTransportista.id_Ruta>0){
+
+            console.log("El email es: "+email);
+            console.log("El token es: "+token);
+            try{
+                let datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/NUsuariosTransporte?Email='+email+'&Token='+token,
+                {
+                    method:"PUT",
+                    headers:{
+                        "Content-Type":"application/json",
+                        },
+                        body:JSON.stringify(
+                            {
+                                id_UsuarioTransporte: idUsuarioIniciado,
+                                id_Tipo_Transporte: 1,
+                                id_Ruta: usuarioTransportista.id_Ruta,
+                                longitude: usuarioTransportista.longitude,
+                                latitude: usuarioTransportista.latitude,
+                                longitudeAnterior: usuarioTransportista.longitudeAnterior,
+                                latitudeAnterior: usuarioTransportista.latitudeAnterior,
+                                estado: 'I',
+                                direccion: 'I'
+                            })
+                    });
+
+                    let json=null;
+
+                    if(datos.ok){
+                        try{
+                            json=await datos.json();
+                        }catch{
+                            json=null;
+                        }
+
+                        if(json==null){
+                            alert("Tu conexión a internet es inestable");
+                        }else if(json.id_UsuarioTransporte==0){
+                            alert("Tu conexión a internet es inestable");
+                        }
+                        //else if(json.id_UsuarioTransporte==-1){
+                        //     alert("Hubo un problema con tu usuario");
+                        // }else if(json.id_UsuarioTransporte==-2){
+                        //     refrescarToken(email,token);
+                        //     alert("No se logró actualizar tu estado");
+                        // }else if(json.id_UsuarioTransporte==-3){
+                        //     alert("Hubo un problema con tu usuario");
+                        // }
+                        
+                    }else{
+                        alert("Tu conexión a internet es inestable");
+                    }
+
+                    console.log("La respuesta a la actualizacion ess: ");
+                    console.log(json);
+
+
+            }catch{
+                alert("Tu conexión a internet es inestable");
+                console.log("La respuesta a la actualizacion es: ");
+                console.log(datos);
+            }
+            
+
+        }
+        console.log("NO ENTRO");
     }
 
 
@@ -186,7 +309,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         if(idUsuarioIniciado>0){
             let Fecha= new Date();
             console.log("No se que pedo "+Fecha.getSeconds());
-            capturarUsuarioTransportistaYDemas();
+            capturarUsuarioTransportistaYDemas(emailState,tokenState);
             checkLocationPermission();
             //askLocationPermission();
             askLocationBacgroundPermission();
@@ -207,6 +330,12 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             setPermitirEnviarUbicacion(false);
         }else if(permitirEnviarUbicacion==="true"){
             setPermitirEnviarUbicacion(true);
+        }
+
+        if(permitirEnviarUbicacion==false){
+            setActualizarUsuarioTransportista(false);
+        }else if(permitirEnviarUbicacion==true){
+            setActualizarUsuarioTransportista(true);
         }
         //console.log("Estas en el UseEffet numero 4");
     },[permitirEnviarUbicacion])
@@ -240,7 +369,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                 // //Este espacio, esta totalmente vacio
                 // console.log("Pedo");
 
-                actualizarUbicacionEnElBackEnd(paradasCompletas,rutasParadas,coordenadasDeLaRuta);
+                //actualizarUbicacionEnElBackEnd(paradasCompletas,rutasParadas,coordenadasDeLaRuta,emailState, tokenState);
+                actualizarUbicacionEnElBackEnd(emailState, tokenState);
                 
                 // //console.log(userLocation);
                 //let fecha= new Date();
@@ -248,9 +378,15 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                 //console.log(fecha.getSeconds());
             
                 // console.log("Fin del Pedo");
-            }else if(tipoDeUsuario=='Transportista' && permitirEnviarUbicacion==false && usuarioTransportista.estado!=undefined
+
+                let fecha=new Date();
+                if(usuarioTransportista.id_Ruta!=null && usuarioTransportista.id_Ruta!=undefined && ((fecha.getMinutes()) + usuarioTransportista.id_Ruta)%30==0 && idUsuarioIniciado%33<15){
+                    actualizarTiemposDeLasParadas(usuarioTransportista.id_Ruta,emailState,tokenState);
+                }
+
+            }else if(actualizarUsuarioTransportista==true && tipoDeUsuario=='Transportista' && permitirEnviarUbicacion==false && usuarioTransportista.estado!=undefined
                 && usuarioTransportista!={}){
-                ocultarUsuarioTransportistaEnElBackend();
+                ocultarUsuarioTransportistaEnElBackend(emailState,tokenState);
             }
 
         },4000)
@@ -260,7 +396,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             console.log("Eliminando y actualizando");
         }
 
-    },[tipoDeUsuario,coordenadasDeLaRuta,permitirEnviarUbicacion,estadoAplicacion,activarPrecision])
+    },[tipoDeUsuario,coordenadasDeLaRuta,permitirEnviarUbicacion,estadoAplicacion,activarPrecision,emailState,actualizarUsuarioTransportista])
 
 
 
@@ -306,6 +442,12 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     setmenCinco([{display:'none',color:'#102769'}])                    
                 }
                 setmenCuatro([{ display: 'flex',color:'#101043' }]);
+        }
+        
+        if(secionIniciada==true && tipoDeUsuario=='Pasajero'){
+            askLocationPermission();
+        }else if(secionIniciada==true && tipoDeUsuario=='Transportista'){
+            askLocationBacgroundPermission();            
         }
     },[secionIniciada])
 
@@ -419,11 +561,16 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                 if(permisosSegundoPlano!='granted' || permisosSegundoPlano==undefined){
                     let detener=await BackgroundService.stop();
                     console.log("Los permisos no estan activos: "+permisosSegundoPlano);
-                }else{
-                    console.log(3*i);
+                }else{                    
                     
                     if(tipoDeUsuario=='Transportista' && permitirEnviarUbicacion==true){
-                        actualizarUbicacionEnElBackEnd(paradasCompletas,rutasParadas,coordenadasDeLaRuta);
+                        //actualizarUbicacionEnElBackEnd(paradasCompletas,rutasParadas,coordenadasDeLaRuta,emailState, tokenState);
+                        actualizarUbicacionEnElBackEnd(emailState, tokenState);
+                        console.log("Mira en el fondo pasa esto"+usuarioTransportista.id_Ruta);
+                        let fecha=new Date();
+                        if(usuarioTransportista.id_Ruta!=null && usuarioTransportista.id_Ruta!=undefined && ((fecha.getMinutes()) + usuarioTransportista.id_Ruta)%30==0 && idUsuarioIniciado%33<15){
+                            actualizarTiemposDeLasParadas(usuarioTransportista.id_Ruta,emailState,tokenState);
+                        }
                     }else{
                         console.log("Se cancelo la tarea en segundo plano");
                         let detener=await BackgroundService.stop();
@@ -492,7 +639,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     <View style={{height:(height>width)?(height-width*0.2-StatusBar.currentHeight):height*0.8-StatusBar.currentHeight,
     width:'100%', backgroundColor:'#2060A5'}}>
         
-        {cargando==true && <Cargando height={height}></Cargando>}
+        {cargando==true && <Cargando height={height}></Cargando>}        
         
         <IconosDeNavegacion
         setPermitirEnviarUbicacion={setPermitirEnviarUbicacion} idUsuarioIniciado={idUsuarioIniciado} setMostrarUsuarios={setMostrarUsuarios}
@@ -506,6 +653,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         stopFollowUserLocation={stopFollowUserLocation} permitirSeguirPasajero={permitirSeguirPasajero} setPermitirSeguirPasajero={setPermitirSeguirPasajero}
         setVerTrayectoria={setVerTrayectoria} ocultarTrayecto={ocultarTrayecto} permisos={permisos}
         askLocationPermissionSetting={askLocationPermissionSetting} setUsuarioTransportista={setUsuarioTransportista} setCargando={setCargando}
+        emailState={emailState} tokenState={tokenState}
         ></IconosDeNavegacion>
 
 
@@ -1060,7 +1208,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
 
 
-        {mostrarVentana=="flex" && <Perfil permitirEnviarUbicacion={permitirEnviarUbicacion} secionIniciada={secionIniciada} 
+        {mostrarVentana=="flex" && <Perfil setVerAdministrarUsuarios={setVerAdministrarUsuarios} tipoDeSubscripcion={tipoDeSubscripcion} permitirEnviarUbicacion={permitirEnviarUbicacion} secionIniciada={secionIniciada} 
             setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setRegistrarse={setRegistrarse} 
             setLoguearse={setLoguearse} tipoDePerfil={[{principal:{width:'100%',height:height-width*0.2,position:'absolute',top:0,left:0,zIndex:200,backgroundColor:'#00000045'}}]} 
             actualizar={serMostrarVentana} activarPrecision={activarPrecision} setActivarPrecision={setActivarPrecision}
@@ -1186,7 +1334,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                             
                         </Marker>
 
-                            {<LineasTrayectorias iconoTrayectoItem={item} color={item.color}></LineasTrayectorias>}
+                            {<LineasTrayectorias emailState={emailState} tokenState={tokenState} iconoTrayectoItem={item} color={item.color}></LineasTrayectorias>}
 
                             {iconosTransportes.length==(i+1) && <Marker coordinate={{                            
                             latitude:item.longitudParadaFinal,
@@ -1214,15 +1362,15 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
             {idRutaAMostrar>0 &&
                      <View>
-                         {mostrarParadas==true && <DireccionesSegunUbicacion idRuta={idRutaAMostrar}></DireccionesSegunUbicacion>}
-                         <LineaDeUnaRuta setCargando={setCargando} setMostrarSniperCargando={setMostrarSniperCargando} idRuta={idRutaAMostrar} ></LineaDeUnaRuta>
-                         {mostrarUsuarios==true && <UsuariosTransportistas tipoDeUsuario={tipoDeUsuario} idRuta={idRutaAMostrar} idUsuarioIniciado={idUsuarioIniciado}
+                         {mostrarParadas==true && <DireccionesSegunUbicacion emailState={emailState} tokenState={tokenState} idRuta={idRutaAMostrar}></DireccionesSegunUbicacion>}
+                         <LineaDeUnaRuta emailState={emailState} tokenState={tokenState} setCargando={setCargando} setMostrarSniperCargando={setMostrarSniperCargando} idRuta={idRutaAMostrar} ></LineaDeUnaRuta>
+                         {mostrarUsuarios==true && <UsuariosTransportistas emailState={emailState} tokenState={tokenState} tipoDeUsuario={tipoDeUsuario} idRuta={idRutaAMostrar} idUsuarioIniciado={idUsuarioIniciado}
                          verTransportistasPorLaDerecha={verTransportistasPorLaDerecha} verTransportistasPorLaIzquierda={verTransportistasPorLaIzquierda}></UsuariosTransportistas>}                        
                      </View>
             }
 
-            {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=="Transportista" && verCompetencia==true && <CompetenciaTransportistas tipoDeUsuario={tipoDeUsuario} idUsuarioIniciado={idUsuarioIniciado} 
-            rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}></CompetenciaTransportistas>}
+            {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=="Transportista" && verCompetencia==true && <CompetenciaTransportistas emailState={emailState} tokenState={tokenState} 
+            tipoDeUsuario={tipoDeUsuario} idUsuarioIniciado={idUsuarioIniciado} rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}></CompetenciaTransportistas>}
             {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=='Pasajero' && userLocation.latitude!=0 && verRutasCercanas==true &&  <RutasCercaDelPasajero userLocation ={userLocation}
             rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}></RutasCercaDelPasajero>}
 
@@ -1268,7 +1416,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     </View>
                 )
             })}  
-            {idUsuarioIniciado>0 && permitirEnviarUbicacion==true && tipoDeUsuario=="Transportista" && <UsuarioTransportistaLogueado activarPrecision={activarPrecision} direccionesPorUsuario={direccionesPorUsuario}
+            {idUsuarioIniciado>0 && permitirEnviarUbicacion==true && tipoDeUsuario=="Transportista" && <UsuarioTransportistaLogueado emailState={emailState} tokenState={tokenState} activarPrecision={activarPrecision} direccionesPorUsuario={direccionesPorUsuario}
             setDireccionPorUsuario={setDireccionPorUsuario} idUsuarioIniciado={idUsuarioIniciado} userLocation={userLocation}></UsuarioTransportistaLogueado>}
             
         </MapView>}         
