@@ -172,52 +172,43 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
         }
     }
 
-    const actualizarUsuarioTransporte=async(id_UsuarioTransporte,id_Tipo_Transporte,id_Ruta,nombre,usuario,contrasenia,
-        correo,telefono,latitude,longitude,longitudeAnterior,latitudeAnterior,estado)=>{
+    const actualizarUsuarioTransporte=async(id_UsuarioTransporte,id_Tipo_Transporte,id_Ruta
+        ,latitude,longitude,longitudeAnterior,latitudeAnterior,emailState, tokenState)=>{
 
-
-            // console.log("QUE PEDO GUEY");
-            
-            // console.log("id_UsuarioTransporte:"+ id_UsuarioTransporte + "id_Tipo_Transporte:" + id_Tipo_Transporte
-            //             +"id_Ruta:"+ id_Ruta +"nombre:"+ nombre+ "usuario:"+ usuario +"contrasenia:"+ contrasenia
-            //             +"correo:"+ correo+"telefono:"+ telefono+"longitude:"+ latitude +"latitude:"+ longitude
-            //             +"longitudeAnterior:"+ longitudeAnterior +"latitudeAnterior:" +latitudeAnterior
-            //             +"estado:" +estado);
-
-            // console.log("QUE PEDO GUEY");
-
-            if(nombre==null || usuario==null || contrasenia==null){
-                console.log("Intentaste actualizar algo nulo");
+            if(id_Ruta==null){                
                 return;
             }
 
-        //let datos=await fetch('https://georutas.somee.com/api/UsuariosTransporte',{
-        let datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosTransporte',{
-            method:"PUT",
-            headers:{
-                "Content-Type":"application/json",
-                },
-                body:JSON.stringify(
-                {
-                    id_UsuarioTransporte: id_UsuarioTransporte,
-                    id_Tipo_Transporte: id_Tipo_Transporte,
-                    id_Ruta: id_Ruta,
-                    nombre: nombre,
-                    usuario: usuario,
-                    contrasenia: contrasenia,
-                    correo: correo,
-                    telefono: telefono,
-                    longitude: latitude,
-                    latitude: longitude,
-                    longitudeAnterior: longitudeAnterior,
-                    latitudeAnterior: latitudeAnterior,
-                    estado: 'A'
-                })
-        })
-        //console.log(datos);        
+        try{
+            let datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/NUsuariosTransporte?Email='+emailState+'&Token='+tokenState,
+            {
+                method:"PUT",
+                headers:{
+                    "Content-Type":"application/json",
+                    },
+                    body:JSON.stringify(
+                        {
+                            id_UsuarioTransporte: id_UsuarioTransporte,
+                            id_Tipo_Transporte: id_Tipo_Transporte,
+                            id_Ruta: id_Ruta,
+                            longitude: latitude,
+                            latitude: longitude,
+                            longitudeAnterior: longitudeAnterior,
+                            latitudeAnterior: latitudeAnterior,
+                            estado: 'A',
+                            direccion: 'I'
+                        })
+                });
+
+
+        }catch(e){
+            console.log("El token es: "+e.message);
+            console.log("No se actualizo el usuario");
+        }              
     }
 
-    const actualizarUbicacionEnElBackEnd=async(paradasCompletas,rutasParadas,coordenadasDeLaRuta)=>{
+    //const actualizarUbicacionEnElBackEnd=async(paradasCompletas,rutasParadas,coordenadasDeLaRuta,emailState, tokenState,id_Ruta)=>{
+    const actualizarUbicacionEnElBackEnd=async(emailState, tokenState)=>{
         
         let value=await AsyncStorage.getItem('actualizando');
         //
@@ -243,7 +234,7 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
         console.log(value);
         console.log("La cantidad de actualizaciones fallidas fue:");
 
-        if(idUsuarioIniciado>0 && value=="true"){ 
+        if(value=="true"){ 
             
             let enviando=await AsyncStorage.setItem('actualizando',"false");
 
@@ -264,351 +255,387 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
             return;
         }
 
-        let userLocation={latitude:0,longitude:0}
+        //let userLocation={latitude:0,longitude:0}
         //console.log(coordenadasDeLaRuta);
 
-        if(coordenadasDeLaRuta.length==0 || coordenadasDeLaRuta==undefined && activarPrecision==true){            
-            userLocation=userLocationReal;            
-        }else{
-            //console.log("Entraste al segundo lugar");
-            let pendiente=0;
-
-            pendiente=(coordenadasDeLaRuta[0].latitude-coordenadasDeLaRuta[1].latitude)/(coordenadasDeLaRuta[0].longitude-coordenadasDeLaRuta[1].longitude);
-
-            
-            let xValue=(userLocationReal.longitude+((1/pendiente)*(userLocationReal.latitude))
-                -coordenadasDeLaRuta[0].latitude+pendiente*coordenadasDeLaRuta[0].longitude)/(pendiente+1/pendiente);
-            
-            let yValue=(-1/pendiente)*xValue+userLocationReal.longitude+(1/pendiente)*userLocationReal.latitude;
-
-            let menorDistanciaHaciaLaLineaRuta=Math.sqrt(Math.pow(xValue-userLocationReal.latitude,2)+Math.pow(yValue-userLocationReal.longitude,2));
-
-            let distanciaDeFiltroDeDistanciaHaciaLaLinea=2*menorDistanciaHaciaLaLineaRuta+10;
-
-            let xValueFinal=xValue;
-            let yValueFinal=yValue;
-            
-            for(let k=1;k<coordenadasDeLaRuta.length;k++){
-
-                    pendiente=(coordenadasDeLaRuta[k-1].latitude-coordenadasDeLaRuta[k].latitude)/(coordenadasDeLaRuta[k-1].longitude-coordenadasDeLaRuta[k].longitude);
-
-                    xValue=(userLocationReal.longitude+((1/pendiente)*(userLocationReal.latitude))
-                    -coordenadasDeLaRuta[k-1].latitude+pendiente*coordenadasDeLaRuta[k-1].longitude)/(pendiente+1/pendiente);
-    
-                    yValue=(-1/pendiente)*xValue+userLocationReal.longitude+(1/pendiente)*userLocationReal.latitude;
-    
-                    distanciaDeFiltroDeDistanciaHaciaLaLinea=Math.sqrt(Math.pow(xValue-userLocationReal.latitude,2)+Math.pow(yValue-userLocationReal.longitude,2))
-    
-                    let latRectaUno=0;
-                    let latRectaDos=0;
-                    let longRectaUno=0;
-                    let longRectaDos=0;
-
-                    if(coordenadasDeLaRuta[k-1].latitude<coordenadasDeLaRuta[k].latitude){
-                        latRectaUno=coordenadasDeLaRuta[k].latitude;
-                        latRectaDos=coordenadasDeLaRuta[k-1].latitude;
-                    }else{
-                        latRectaUno=coordenadasDeLaRuta[k-1].latitude;
-                        latRectaDos=coordenadasDeLaRuta[k].latitude;
+        let datos=null;
+        try{
+            datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/ActualizacionDelBackendParadas?latitude='+userLocationReal.latitude+'&longitude='+userLocationReal.longitude+'&Email='+emailState+'&Token='+tokenState,
+            {
+                method:"PUT",
+                headers:{
+                    "Content-Type":"application/json",
                     }
-
-                    if(coordenadasDeLaRuta[k-1].longitude<coordenadasDeLaRuta[k].longitude){
-                        longRectaUno=coordenadasDeLaRuta[k].longitude;
-                        longRectaDos=coordenadasDeLaRuta[k-1].longitude;
-                    }else{
-                        longRectaUno=coordenadasDeLaRuta[k-1].longitude;
-                        longRectaDosRectaDos=coordenadasDeLaRuta[k].longitude;
-                    }
-
-                    if(distanciaDeFiltroDeDistanciaHaciaLaLinea < menorDistanciaHaciaLaLineaRuta 
-                        && (yValue>=latRectaDos && yValue<=latRectaUno) && (xValue>=longRectaDos && xValue<=longRectaUno)){
-                        menorDistanciaHaciaLaLineaRuta=distanciaDeFiltroDeDistanciaHaciaLaLinea;
-                        xValueFinal=xValue;
-                        yValueFinal=yValue;
-                    }
-
-                    xValue=(userLocationReal.longitude-coordenadasDeLaRuta[k-1].latitude+pendiente*coordenadasDeLaRuta[k-1].longitude)/pendiente;
-                    yValue=userLocationReal.longitude;
-
-                    distanciaDeFiltroDeDistanciaHaciaLaLinea=Math.abs(xValue-userLocation.latitude);
-
-                    if(distanciaDeFiltroDeDistanciaHaciaLaLinea < menorDistanciaHaciaLaLineaRuta 
-                        && (yValue>=latRectaDos && yValue<=latRectaUno) && (xValue>=longRectaDos && xValue<=longRectaUno)){
-                        menorDistanciaHaciaLaLineaRuta=distanciaDeFiltroDeDistanciaHaciaLaLinea;
-                        xValueFinal=xValue;
-                        yValueFinal=yValue;
-                    }
-
-                    xValue=userLocationReal.latitude;
-                    yValue=pendiente*xValue+coordenadasDeLaRuta[k-1].latitude-pendiente*coordenadasDeLaRuta[k-1].longitude;
-
-                    distanciaDeFiltroDeDistanciaHaciaLaLinea=Math.abs(yValue-userLocation.longitude);
-
-                    if(distanciaDeFiltroDeDistanciaHaciaLaLinea < menorDistanciaHaciaLaLineaRuta 
-                        && (yValue>=latRectaDos && yValue<=latRectaUno) && (xValue>=longRectaDos && xValue<=longRectaUno)){
-                        menorDistanciaHaciaLaLineaRuta=distanciaDeFiltroDeDistanciaHaciaLaLinea;
-                        xValueFinal=xValue;
-                        yValueFinal=yValue;
-                    }
-
-            }
-
-            userLocation={latitude:xValueFinal,longitude:yValueFinal};            
-            
-            if(xValueFinal==0 || xValueFinal==undefined){
-                userLocation=userLocationReal;
-            }
-
+            }).then(res=>datos=res.json());
+            console.log("SE LOGRO REALIZAR LA ACTUALIZACION");
+            console.log(datos);
+        }catch{
+            console.log("No se logro actualizar");
+            console.log(datos);
         }
 
+        // if(coordenadasDeLaRuta.length==0 || coordenadasDeLaRuta==undefined && activarPrecision==true){            
+        //     userLocation=userLocationReal;            
+        // }else{
+        //     //console.log("Entraste al segundo lugar");
+        //     let pendiente=0;
 
-        //let usuarioTransportista= await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json());
-        let usuarioTransportista= await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json());
-        
-        //let paradasCompletas=await fetch('https://georutas.somee.com/api/Paradas').then(res=>datos=res.json());
-        //let rutasParadas=await fetch('https://georutas.somee.com/api/RutasParada').then(res=>datos=res.json());        
+        //     pendiente=(coordenadasDeLaRuta[0].latitude-coordenadasDeLaRuta[1].latitude)/(coordenadasDeLaRuta[0].longitude-coordenadasDeLaRuta[1].longitude);
 
-        let paradasDelUsuario=[];
-        let paradasEnComunRuta=rutasParadas.filter(elemento => elemento.id_Ruta==usuarioTransportista.id_Ruta);
+            
+        //     let xValue=(userLocationReal.longitude+((1/pendiente)*(userLocationReal.latitude))
+        //         -coordenadasDeLaRuta[0].latitude+pendiente*coordenadasDeLaRuta[0].longitude)/(pendiente+1/pendiente);
+            
+        //     let yValue=(-1/pendiente)*xValue+userLocationReal.longitude+(1/pendiente)*userLocationReal.latitude;
 
-        for(let k=0;k<paradasEnComunRuta.length;k++){
-            paradasDelUsuario.push(paradasCompletas.filter(elemento => elemento.id_Parada==paradasEnComunRuta[k].id_Parada)[0]);
-        }
-        let latitudActual=userLocation.latitude;
-        let longitudeActual=userLocation.longitude;
-        
-        actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                                    usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
-                                    longitudeActual,usuarioTransportista.longitudeAnterior,usuarioTransportista.latitudeAnterior,usuarioTransportista.estado);
-        
+        //     let menorDistanciaHaciaLaLineaRuta=Math.sqrt(Math.pow(xValue-userLocationReal.latitude,2)+Math.pow(yValue-userLocationReal.longitude,2));
 
-        let distanciaEntreUsuarioYRutaMenor=1000;
-        let paradaMasCercana=-1;
-        let paradaMasCercanaSinDireccion=-1;
-        let distanciaEntreUsuarioYRutaMenorSinDireccion=1000;
+        //     let distanciaDeFiltroDeDistanciaHaciaLaLinea=2*menorDistanciaHaciaLaLineaRuta+10;
+
+        //     let xValueFinal=xValue;
+        //     let yValueFinal=yValue;
+            
+        //     for(let k=1;k<coordenadasDeLaRuta.length;k++){
+
+        //             pendiente=(coordenadasDeLaRuta[k-1].latitude-coordenadasDeLaRuta[k].latitude)/(coordenadasDeLaRuta[k-1].longitude-coordenadasDeLaRuta[k].longitude);
+
+        //             xValue=(userLocationReal.longitude+((1/pendiente)*(userLocationReal.latitude))
+        //             -coordenadasDeLaRuta[k-1].latitude+pendiente*coordenadasDeLaRuta[k-1].longitude)/(pendiente+1/pendiente);
     
-        //De aqui toma la distancia, por tanto aqui debes de modificar la ubicacion putito
+        //             yValue=(-1/pendiente)*xValue+userLocationReal.longitude+(1/pendiente)*userLocationReal.latitude;
+    
+        //             distanciaDeFiltroDeDistanciaHaciaLaLinea=Math.sqrt(Math.pow(xValue-userLocationReal.latitude,2)+Math.pow(yValue-userLocationReal.longitude,2))
+    
+        //             let latRectaUno=0;
+        //             let latRectaDos=0;
+        //             let longRectaUno=0;
+        //             let longRectaDos=0;
+
+        //             if(coordenadasDeLaRuta[k-1].latitude<coordenadasDeLaRuta[k].latitude){
+        //                 latRectaUno=coordenadasDeLaRuta[k].latitude;
+        //                 latRectaDos=coordenadasDeLaRuta[k-1].latitude;
+        //             }else{
+        //                 latRectaUno=coordenadasDeLaRuta[k-1].latitude;
+        //                 latRectaDos=coordenadasDeLaRuta[k].latitude;
+        //             }
+
+        //             if(coordenadasDeLaRuta[k-1].longitude<coordenadasDeLaRuta[k].longitude){
+        //                 longRectaUno=coordenadasDeLaRuta[k].longitude;
+        //                 longRectaDos=coordenadasDeLaRuta[k-1].longitude;
+        //             }else{
+        //                 longRectaUno=coordenadasDeLaRuta[k-1].longitude;
+        //                 longRectaDos=coordenadasDeLaRuta[k].longitude;
+        //             }
+
+        //             if(distanciaDeFiltroDeDistanciaHaciaLaLinea < menorDistanciaHaciaLaLineaRuta 
+        //                 && (yValue>=latRectaDos && yValue<=latRectaUno) && (xValue>=longRectaDos && xValue<=longRectaUno)){
+        //                 menorDistanciaHaciaLaLineaRuta=distanciaDeFiltroDeDistanciaHaciaLaLinea;
+        //                 xValueFinal=xValue;
+        //                 yValueFinal=yValue;
+        //             }
+
+        //             xValue=(userLocationReal.longitude-coordenadasDeLaRuta[k-1].latitude+pendiente*coordenadasDeLaRuta[k-1].longitude)/pendiente;
+        //             yValue=userLocationReal.longitude;
+
+        //             distanciaDeFiltroDeDistanciaHaciaLaLinea=Math.abs(xValue-userLocation.latitude);
+
+        //             if(distanciaDeFiltroDeDistanciaHaciaLaLinea < menorDistanciaHaciaLaLineaRuta 
+        //                 && (yValue>=latRectaDos && yValue<=latRectaUno) && (xValue>=longRectaDos && xValue<=longRectaUno)){
+        //                 menorDistanciaHaciaLaLineaRuta=distanciaDeFiltroDeDistanciaHaciaLaLinea;
+        //                 xValueFinal=xValue;
+        //                 yValueFinal=yValue;
+        //             }
+
+        //             xValue=userLocationReal.latitude;
+        //             yValue=pendiente*xValue+coordenadasDeLaRuta[k-1].latitude-pendiente*coordenadasDeLaRuta[k-1].longitude;
+
+        //             distanciaDeFiltroDeDistanciaHaciaLaLinea=Math.abs(yValue-userLocation.longitude);
+
+        //             if(distanciaDeFiltroDeDistanciaHaciaLaLinea < menorDistanciaHaciaLaLineaRuta 
+        //                 && (yValue>=latRectaDos && yValue<=latRectaUno) && (xValue>=longRectaDos && xValue<=longRectaUno)){
+        //                 menorDistanciaHaciaLaLineaRuta=distanciaDeFiltroDeDistanciaHaciaLaLinea;
+        //                 xValueFinal=xValue;
+        //                 yValueFinal=yValue;
+        //             }
+
+        //     }
+
+        //     userLocation={latitude:xValueFinal,longitude:yValueFinal};            
+            
+        //     if(xValueFinal==0 || xValueFinal==undefined){
+        //         userLocation=userLocationReal;
+        //     }
+
+        // }
+
+        // //let usuarioTransportista= await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json());        
+        // let usuarioTransportista={};
+        //             try{
+        //                 usuarioTransportista= await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/NUsuariosTransporte/'+idUsuarioIniciado.toString()+'?Email='+emailState+'&Token='+tokenState).then(res=>dat=res.json());
+        //             }catch{
+        //                 usuarioTransportista={};
+        //             }
+        // //let paradasCompletas=await fetch('https://georutas.somee.com/api/Paradas').then(res=>datos=res.json());
+        // //let rutasParadas=await fetch('https://georutas.somee.com/api/RutasParada').then(res=>datos=res.json());        
+
+        // let paradasDelUsuario=[];
+        // let paradasEnComunRuta=rutasParadas.filter(elemento => elemento.id_Ruta==usuarioTransportista.id_Ruta);
+
+        // for(let k=0;k<paradasEnComunRuta.length;k++){
+        //     paradasDelUsuario.push(paradasCompletas.filter(elemento => elemento.id_Parada==paradasEnComunRuta[k].id_Parada)[0]);
+        // }
+        // let latitudActual=userLocation.latitude;
+        // let longitudeActual=userLocation.longitude;
+        
+        // actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,latitudActual,
+        //                             longitudeActual,usuarioTransportista.longitudeAnterior,usuarioTransportista.latitudeAnterior,emailState, tokenState);
+        
+
+        // let distanciaEntreUsuarioYRutaMenor=1000;
+        // let paradaMasCercana=-1;
+        // let paradaMasCercanaSinDireccion=-1;
+        // let distanciaEntreUsuarioYRutaMenorSinDireccion=1000;
+    
+        // //De aqui toma la distancia, por tanto aqui debes de modificar la ubicacion putito
 
 
-        for(let y=0;y<paradasDelUsuario.length;y++){
+        // for(let y=0;y<paradasDelUsuario.length;y++){
                                 
-            let distanciaActual=Math.sqrt(Math.pow((latitudActual-paradasDelUsuario[y].longitude),2)
-            +Math.pow((longitudeActual-paradasDelUsuario[y].latitude),2));
+        //     let distanciaActual=Math.sqrt(Math.pow((latitudActual-paradasDelUsuario[y].longitude),2)
+        //     +Math.pow((longitudeActual-paradasDelUsuario[y].latitude),2));
                                 
-            //console.log(distanciaActual);
+        //     //console.log(distanciaActual);
     
-            if(distanciaEntreUsuarioYRutaMenor>distanciaActual && paradasDelUsuario[y].direccion==direccionesPorUsuario){
-                distanciaEntreUsuarioYRutaMenor=distanciaActual;
-                paradaMasCercana=y;
-            }
+        //     if(distanciaEntreUsuarioYRutaMenor>distanciaActual && paradasDelUsuario[y].direccion==direccionesPorUsuario){
+        //         distanciaEntreUsuarioYRutaMenor=distanciaActual;
+        //         paradaMasCercana=y;
+        //     }
 
-            if(distanciaEntreUsuarioYRutaMenorSinDireccion>distanciaActual){
-                distanciaEntreUsuarioYRutaMenorSinDireccion=distanciaActual;
-                paradaMasCercanaSinDireccion=y;
-            }
-        }
+        //     if(distanciaEntreUsuarioYRutaMenorSinDireccion>distanciaActual){
+        //         distanciaEntreUsuarioYRutaMenorSinDireccion=distanciaActual;
+        //         paradaMasCercanaSinDireccion=y;
+        //     }
+        // }
 
 
-        if(distanciaEntreUsuarioYRutaMenor<=0.001097577788 && paradaMasCercana>=0 && tipoDeUsuario=='Transportista'){    
+        // if(distanciaEntreUsuarioYRutaMenor<=0.001097577788 && paradaMasCercana>=0 && tipoDeUsuario=='Transportista'){    
             
-            let primerDato=0;
-            let segundoDato=idUsuarioIniciado;
-            let tercerDato=paradasDelUsuario[paradaMasCercana].id_Parada;            
-            let ultimoDato=0;
+        //     let primerDato=0;
+        //     let segundoDato=idUsuarioIniciado;
+        //     let tercerDato=paradasDelUsuario[paradaMasCercana].id_Parada;            
+        //     let ultimoDato=0;
 
-            //Esta parte es la unica donde no
-            //Generalisaste.
+        //     //Esta parte es la unica donde no
+        //     //Generalisaste.
 
-            // if(usuarioTransportista.id_Ruta==1){
-            //     primerDato=(idUsuarioIniciado-1)*120+(paradaMasCercana+1);
-            // }else if(usuarioTransportista.id_Ruta==2){
-            //     primerDato=120*33+((idUsuarioIniciado-33)-1)*92+(paradaMasCercana+1);
-            // }else if(usuarioTransportista.id_Ruta==3){
-            //     primerDato=120*33+92*36+((idUsuarioIniciado-69)-1)*97+(paradaMasCercana+1);
-            // }
+        //     // if(usuarioTransportista.id_Ruta==1){
+        //     //     primerDato=(idUsuarioIniciado-1)*120+(paradaMasCercana+1);
+        //     // }else if(usuarioTransportista.id_Ruta==2){
+        //     //     primerDato=120*33+((idUsuarioIniciado-33)-1)*92+(paradaMasCercana+1);
+        //     // }else if(usuarioTransportista.id_Ruta==3){
+        //     //     primerDato=120*33+92*36+((idUsuarioIniciado-69)-1)*97+(paradaMasCercana+1);
+        //     // }
 
-            let dato=1;
+        //     let dato=1;
 
-            if(idUsuarioIniciado%33==0){
-                dato=33
-            }else{
-                dato=idUsuarioIniciado%33;
-            }
+        //     if(idUsuarioIniciado%33==0){
+        //         dato=33
+        //     }else{
+        //         dato=idUsuarioIniciado%33;
+        //     }
 
-            primerDato=(rutasParadas[0].id_Parada-1)*33+((dato)-1)*rutasParadas.length+(paradaMasCercana+1);
+        //     primerDato=(rutasParadas[0].id_Parada-1)*33+((dato)-1)*rutasParadas.length+(paradaMasCercana+1);
             
-            //let tiempoAnterior=await fetch('https://georutas.somee.com/api/UsuarioTransporteParada/'+primerDato).then(res=>datos=res.json());
-            let tiempoAnterior=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuarioTransporteParada/'+primerDato).then(res=>datos=res.json());
+        //     //let tiempoAnterior=await fetch('https://georutas.somee.com/api/UsuarioTransporteParada/'+primerDato).then(res=>datos=res.json());
+        //     let tiempoAnterior={ultimaActualizacion:null}
+        //     try{
+        //         tiempoAnterior=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/ActualizarUsuarioTransporteParada/'+primerDato+'?Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());
+        //         console.log("Tu tiempo anterior es: ");
+        //         console.log(tiempoAnterior);
+        //     }catch{
+        //         tiempoAnterior={ultimaActualizacion:null};
+        //     }
             
-            let fechaAnterior=new Date(tiempoAnterior.ultimaActualizacion);
-            let minutosDesdeElPasado=fechaAnterior.getHours()*60+fechaAnterior.getMinutes();
+        //     let fechaAnterior=new Date();
 
-            let fechaActual=new Date();
-            let minutosActuales=fechaActual.getHours()*60+fechaActual.getMinutes();
+        //     if(tiempoAnterior.ultimaActualizacion!=null){
+        //         fechaAnterior=new Date(tiempoAnterior.ultimaActualizacion);
+        //     }
+
+        //     let minutosDesdeElPasado=fechaAnterior.getHours()*60+fechaAnterior.getMinutes();
+
+        //     let fechaActual=new Date();
+
+        //     let minutosActuales=fechaActual.getHours()*60+fechaActual.getMinutes();
+
+        //     console.log("La diferencia de tiempos es: "+Math.abs(minutosActuales-minutosDesdeElPasado));
+        //     console.log("la fecha anterior es: "+fechaAnterior);
             
-            if(Math.abs(minutosActuales-minutosDesdeElPasado)>30){
-            try{
+        //     if(Math.abs(minutosActuales-minutosDesdeElPasado)>30){
+        //     try{
 
-                    //let datos=await fetch('https://georutas.somee.com/api/UsuarioTransporteParada',{
-                    let datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuarioTransporteParada',{
-                        method:"PUT",
-                        headers:{
-                            "Content-Type":"application/json",
-                            },
-                            body:JSON.stringify(
-                                {
-                                    id_UsuarioTransporte_Parada: primerDato,
-                                    id_Usuario_Transporte: segundoDato,
-                                    id_Parada: tercerDato,
-                                    tiempoDeLlegadaAnterior: tiempoAnterior.tiempoDeLlegadaAnterior,
-                                    ultimaActualizacion: fechaActual.toISOString()
-                                }
-                            )
-                        }
-                    )
-                }catch(e){
-                
-            }
-        }
-        }
+        //             //let datos=await fetch('https://georutas.somee.com/api/UsuarioTransporteParada',{
+        //             let datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuarioTransporteParada?Email='+emailState+'&Token='+tokenState,{
+        //                 method:"PUT",
+        //                 headers:{
+        //                     "Content-Type":"application/json",
+        //                     },
+        //                     body:JSON.stringify(
+        //                         {
+        //                             id_UsuarioTransporte_Parada: primerDato,
+        //                             id_Usuario_Transporte: segundoDato,
+        //                             id_Parada: tercerDato,
+        //                             tiempoDeLlegadaAnterior: tiempoAnterior.tiempoDeLlegadaAnterior,
+        //                             ultimaActualizacion: fechaActual.toISOString()                                      
+        //                         }
+        //                     )
+        //                 }
+        //             )                    
+        //             console.log(datos);
+        //         }catch(e){
+        //         console.log("La parada no se logro actualizar");
+        //        }
+        //     }
+        // }
 
-        let menorDistanciaBuscada=10000;
-        let paradaBuscadaDelPasado=-1;
-        let ultimaParadaPorLaDerecha=-1;
-        let ultimaParadaPorLaIzquierda=-1;
+        // let menorDistanciaBuscada=10000;
+        // let paradaBuscadaDelPasado=-1;
+        // let ultimaParadaPorLaDerecha=-1;
+        // let ultimaParadaPorLaIzquierda=-1;
         
-        for(let z=0;z<paradasDelUsuario.length;z++){
-            let distanciaEntrePasadoYParada=Math.sqrt(Math.pow((usuarioTransportista.latitudeAnterior-paradasDelUsuario[z].latitude),2)
-                                                     +Math.pow((usuarioTransportista.longitudeAnterior-paradasDelUsuario[z].longitude),2));
-            if(distanciaEntrePasadoYParada<=menorDistanciaBuscada && paradasDelUsuario[z].direccion==paradasDelUsuario[paradaMasCercanaSinDireccion].direccion){
-                menorDistanciaBuscada=distanciaEntrePasadoYParada;
-                paradaBuscadaDelPasado=z;
-            }
-            if(z<paradasDelUsuario.length-1 && paradasDelUsuario[z].direccion!=paradasDelUsuario[z+1].direccion){
-                ultimaParadaPorLaDerecha=z+1;
-                ultimaParadaPorLaIzquierda=z;
-            }
-        }
+        // for(let z=0;z<paradasDelUsuario.length;z++){
+        //     let distanciaEntrePasadoYParada=Math.sqrt(Math.pow((usuarioTransportista.latitudeAnterior-paradasDelUsuario[z].latitude),2)
+        //                                              +Math.pow((usuarioTransportista.longitudeAnterior-paradasDelUsuario[z].longitude),2));
+        //     if(distanciaEntrePasadoYParada<=menorDistanciaBuscada && paradasDelUsuario[z].direccion==paradasDelUsuario[paradaMasCercanaSinDireccion].direccion){
+        //         menorDistanciaBuscada=distanciaEntrePasadoYParada;
+        //         paradaBuscadaDelPasado=z;
+        //     }
+        //     if(z<paradasDelUsuario.length-1 && paradasDelUsuario[z].direccion!=paradasDelUsuario[z+1].direccion){
+        //         ultimaParadaPorLaDerecha=z+1;
+        //         ultimaParadaPorLaIzquierda=z;
+        //     }
+        // }
 
-        if(distanciaEntreUsuarioYRutaMenorSinDireccion<=0.001097577788 && paradaMasCercanaSinDireccion>=0 && tipoDeUsuario=='Transportista'){
-            //Primero verifica en que parada se encuentra y comparala con la de su antepasado, si son la misma, ni verga
-            //poseen la misma direccion, sino si son de distinta direeccion encuentra la parada mas cercana a tu pasado y verifica 
-            //si son las mismas, si lo son entonces ni verga, ahora si no, en base a si es mayor o no entonces la direccion estara 
-            //dada, ahora si la direfencia de paradas es almenos dos, hay que la diferencia sea 1.
+        // if(distanciaEntreUsuarioYRutaMenorSinDireccion<=0.001097577788 && paradaMasCercanaSinDireccion>=0 && tipoDeUsuario=='Transportista'){
+        //     //Primero verifica en que parada se encuentra y comparala con la de su antepasado, si son la misma, ni verga
+        //     //poseen la misma direccion, sino si son de distinta direeccion encuentra la parada mas cercana a tu pasado y verifica 
+        //     //si son las mismas, si lo son entonces ni verga, ahora si no, en base a si es mayor o no entonces la direccion estara 
+        //     //dada, ahora si la direfencia de paradas es almenos dos, hay que la diferencia sea 1.
 
             
-               if(paradaMasCercanaSinDireccion==0){
-                   if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)<2){
-                       //Tienes que entender cabrom que es lo que va aqui
+        //        if(paradaMasCercanaSinDireccion==0){
+        //            if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)<2){
+        //                //Tienes que entender cabrom que es lo que va aqui
                        
-                        actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
-                        longitudeActual,paradasDelUsuario[0].longitude,paradasDelUsuario[0].latitude,usuarioTransportista.estado);
+        //                 actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,
+        //                 latitudActual,longitudeActual,paradasDelUsuario[0].longitude,paradasDelUsuario[0].latitude,emailState, tokenState);
                         
-                   }else if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)>=2){
-                        
-                        actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
-                        longitudeActual,paradasDelUsuario[1].longitude,paradasDelUsuario[1].latitude,usuarioTransportista.estado);
+        //            }else if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)>=2){
 
-                   }
+        //                 actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,
+        //                 latitudActual,longitudeActual,paradasDelUsuario[1].longitude,paradasDelUsuario[1].latitude,emailState, tokenState);
+
+        //            }
                    
-               }else if(paradaMasCercanaSinDireccion==paradasDelUsuario.length-1){
+        //        }else if(paradaMasCercanaSinDireccion==paradasDelUsuario.length-1){
 
-                   if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)<2){
-                           
-                        actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
-                        longitudeActual,paradasDelUsuario[paradasDelUsuario.length-1].longitude,paradasDelUsuario[paradasDelUsuario.length-1].latitude,
-                        usuarioTransportista.estado);
+        //            if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)<2){
+                    
+        //                 actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,
+        //                 latitudActual,longitudeActual,paradasDelUsuario[paradasDelUsuario.length-1].longitude
+        //                 ,paradasDelUsuario[paradasDelUsuario.length-1].latitude,emailState, tokenState);
 
 
-                   }else if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)>=2){
-                        
-                        actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
-                        longitudeActual,paradasDelUsuario[paradasDelUsuario.length-2].longitude,paradasDelUsuario[paradasDelUsuario.length-2].latitude,
-                        usuarioTransportista.estado);
+        //            }else if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)>=2){
+
+        //                 actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,
+        //                 latitudActual,longitudeActual,paradasDelUsuario[paradasDelUsuario.length-2].longitude,
+        //                 paradasDelUsuario[paradasDelUsuario.length-2].latitude,emailState, tokenState);
     
-                   }
+        //            }
                    
-               }else if(paradaMasCercanaSinDireccion==ultimaParadaPorLaIzquierda){
-                   if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)<2){
+        //        }else if(paradaMasCercanaSinDireccion==ultimaParadaPorLaIzquierda){
+        //            if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)<2){
+                        
+        //                 actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,
+        //                 latitudActual,longitudeActual,paradasDelUsuario[ultimaParadaPorLaIzquierda].longitude,
+        //                 paradasDelUsuario[ultimaParadaPorLaIzquierda].latitude,emailState, tokenState);
 
-                        actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
-                        longitudeActual,paradasDelUsuario[ultimaParadaPorLaIzquierda].longitude,paradasDelUsuario[ultimaParadaPorLaIzquierda].latitude,
-                        usuarioTransportista.estado);
+        //            }else if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)>=2){
 
-                   }else if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)>=2){
+        //                 actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,
+        //                 latitudActual,longitudeActual,paradasDelUsuario[ultimaParadaPorLaIzquierda-1].longitude,
+        //                 paradasDelUsuario[ultimaParadaPorLaIzquierda-1].latitude,emailState, tokenState);
 
-                        actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
-                        longitudeActual,paradasDelUsuario[ultimaParadaPorLaIzquierda-1].longitude,paradasDelUsuario[ultimaParadaPorLaIzquierda-1].latitude,
-                        usuarioTransportista.estado);
+        //            }
 
-                   }
-
-               }else if(paradaMasCercanaSinDireccion==ultimaParadaPorLaDerecha){
-                   if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)<2){
+        //        }else if(paradaMasCercanaSinDireccion==ultimaParadaPorLaDerecha){
+        //            if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)<2){
                        
-                        actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
-                        longitudeActual,paradasDelUsuario[ultimaParadaPorLaDerecha].longitude,paradasDelUsuario[ultimaParadaPorLaDerecha].latitude,
-                        usuarioTransportista.estado);
+        //                 actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,
+        //                 latitudActual,longitudeActual,paradasDelUsuario[ultimaParadaPorLaDerecha].longitude,
+        //                 paradasDelUsuario[ultimaParadaPorLaDerecha].latitude,emailState, tokenState);
 
-                   }else if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)>=2){
+        //            }else if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)>=2){
 
-                        actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
-                        longitudeActual,paradasDelUsuario[ultimaParadaPorLaDerecha+1].longitude,paradasDelUsuario[ultimaParadaPorLaDerecha+1].latitude,
-                        usuarioTransportista.estado);
+        //                 actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,
+        //                 latitudActual,longitudeActual,paradasDelUsuario[ultimaParadaPorLaDerecha+1].longitude,
+        //                 paradasDelUsuario[ultimaParadaPorLaDerecha+1].latitude,emailState, tokenState);
 
-                   }
-               }else if(paradaBuscadaDelPasado!=paradaMasCercanaSinDireccion){
-                   if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)>=2){
-                       //Aqui asignas la parada del pasado que debe de ser reajustada
-                       if(paradaBuscadaDelPasado>paradaMasCercanaSinDireccion){
+        //            }
+        //        }else if(paradaBuscadaDelPasado!=paradaMasCercanaSinDireccion){
+        //            if(Math.abs(paradaBuscadaDelPasado-paradaMasCercanaSinDireccion)>=2){
+        //                //Aqui asignas la parada del pasado que debe de ser reajustada
+        //                if(paradaBuscadaDelPasado>paradaMasCercanaSinDireccion){
 
-                            actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                            usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
-                            longitudeActual,paradasDelUsuario[paradaMasCercanaSinDireccion+1].longitude,paradasDelUsuario[paradaMasCercanaSinDireccion+1].latitude,
-                            usuarioTransportista.estado);
+        //                     actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,
+        //                     latitudActual,longitudeActual,paradasDelUsuario[paradaMasCercanaSinDireccion+1].longitude,
+        //                     paradasDelUsuario[paradaMasCercanaSinDireccion+1].latitude,emailState, tokenState);
                        
-                   }else if(paradaBuscadaDelPasado<paradaMasCercanaSinDireccion){
+        //            }else if(paradaBuscadaDelPasado<paradaMasCercanaSinDireccion){
 
-                        actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                        usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
-                        longitudeActual,paradasDelUsuario[paradaMasCercanaSinDireccion-1].longitude,paradasDelUsuario[paradaMasCercanaSinDireccion-1].latitude,
-                        usuarioTransportista.estado);
+        //                 actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,
+        //                 latitudActual,longitudeActual,paradasDelUsuario[paradaMasCercanaSinDireccion-1].longitude,
+        //                 paradasDelUsuario[paradaMasCercanaSinDireccion-1].latitude,emailState, tokenState);
 
-                       }
-                   }
-                }
+        //                }
+        //            }
+        //         }
 
-            //    else if(paradaBuscadaDelPasado==paradaMasCercanaSinDireccion && paradaMasCercanaSinDireccion>0){
+        //     //    else if(paradaBuscadaDelPasado==paradaMasCercanaSinDireccion && paradaMasCercanaSinDireccion>0){
 
-            //         actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-            //         usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
-            //         longitudeActual,paradasDelUsuario[paradaMasCercanaSinDireccion-1].longitude,paradasDelUsuario[paradaMasCercanaSinDireccion-1].latitude,
-            //         usuarioTransportista.estado);
+        //     //         actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
+        //     //         usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
+        //     //         longitudeActual,paradasDelUsuario[paradaMasCercanaSinDireccion-1].longitude,paradasDelUsuario[paradaMasCercanaSinDireccion-1].latitude,
+        //     //         usuarioTransportista.estado);
 
-            //    }
-           }else{
+        //     //    }
+        //    }else{
                
-               // console.log("las coordendas son: ");
-               // console.log(userLocation);
-               actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,usuarioTransportista.nombre,usuarioTransportista.usuario,
-                usuarioTransportista.contrasenia,usuarioTransportista.correo,usuarioTransportista.telefono,latitudActual,
-                longitudeActual,usuarioTransportista.longitudeAnterior,usuarioTransportista.latitudeAnterior,
-                usuarioTransportista.estado);
-           }           
+        //        // console.log("las coordendas son: ");
+        //        // console.log(userLocation);
+        //        actualizarUsuarioTransporte(idUsuarioIniciado,1,usuarioTransportista.id_Ruta,
+        //         latitudActual,longitudeActual,usuarioTransportista.longitudeAnterior,usuarioTransportista.latitudeAnterior,emailState, tokenState);
+        //    }           
            let enviandoDos=await AsyncStorage.setItem('actualizando',"true");
            let total=await AsyncStorage.setItem('actualizandoCantidad',"1");
            console.log("FINALIZASTE el rrecorrido de la actualizacion");
         }
-    }
 
+
+        
+    }
+    const actualizarTiemposDeLasParadas= async(id_Ruta,emailState,tokenState)=>{
+        let datos=null;
+        try{
+            datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/NActualizacionDeTiempos/'+id_Ruta+'?Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());
+            console.log(datos);
+            console.log("Los datos son los anteriosres");
+        }catch{
+            console.log("No se actualizaron las paradas");
+            console.log(datos);
+        }
+    }
     return{
         permisos,
         hasLocation,
@@ -625,7 +652,8 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
         checkLocationPermission,
         checkBacgroundLocationPermission,
         bacgroundPermisos,
-        setBacgroundPermisos
+        setBacgroundPermisos,
+        actualizarTiemposDeLasParadas
     };
 }
 

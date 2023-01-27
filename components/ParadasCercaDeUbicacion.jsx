@@ -7,11 +7,11 @@
     import RutasBarItem from '../components/RutasBarItem.jsx';
     import getAllRutas from "../data/rutasManagua.js";
 
-    const ParadasCercaDelOrigen=({lalitude,longitude,setVerParadasCercanas})=>{
+    const ParadasCercaDelOrigen=({lalitude,longitude,setVerParadasCercanas,emailState, tokenState})=>{
 
     const {data,error,isLoading}=useQuery(['obtenerParadasEnElOrigen',lalitude,longitude],async({queryKey})=>{
         //return await fetch('https://georutas.somee.com/api/SP_PCalcularRutasQuePasanCercaDeUnPunto/'+queryKey[1]+','+queryKey[2]).then(res=>datos=res.json())
-        return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/SP_PCalcularRutasQuePasanCercaDeUnPunto/'+queryKey[1]+','+queryKey[2]).then(res=>datos=res.json())
+        return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/SP_PCalcularRutasQuePasanCercaDeUnPunto/'+queryKey[1]+','+queryKey[2]+'?Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());
     },{
         staleTime:Infinity,
         refetchOnMount:false,

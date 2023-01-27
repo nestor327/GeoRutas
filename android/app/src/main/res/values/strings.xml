@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">GeoRutas</string>
+    <string name="facebook_app_id">697785708452827</string>
+    <string name="facebook_client_token">9efcc13d9589b068c549da86c7967367</string>
 </resources>

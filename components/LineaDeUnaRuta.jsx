@@ -6,7 +6,7 @@
     import getAllRutas from '../data/rutasManagua.js';
     import { View } from "react-native";
 
-    const LineaDeUnaRuta=({idRuta,setMostrarSniperCargando,setCargando})=>{
+    const LineaDeUnaRuta=({idRuta,setMostrarSniperCargando,setCargando,emailState, tokenState})=>{
 
          let color="red";
         // if(idRuta==1)
@@ -29,9 +29,9 @@
         
         //console.log(getAllRutas().filter(elemento => elemento.id_Ruta=idRuta)[0]);
 
-    const {data,error,isLoading}=useQuery(['obtenerIndividual',idRuta],async({queryKey})=>{
+    const {data,error,isLoading}=useQuery(['obtenerIndividual',idRuta,emailState,tokenState],async({queryKey})=>{
         //return await fetch('https://georutas.somee.com/api/Coordenadas/'+queryKey[1]).then(res=>datos=res.json())
-        return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/Coordenadas/'+queryKey[1]).then(res=>datos=res.json())
+        return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/Coordenadas/'+queryKey[1]+'?email='+queryKey[2]+'&token='+queryKey[3]).then(res=>datos=res.json())
     },{
         staleTime:Infinity,
         cacheTime:20000,
@@ -44,6 +44,7 @@
 
     if(error){
         setCargando(false);
+        console.log("Esta ocurriendo un error");
     }
 
     if(isLoading){
@@ -55,7 +56,13 @@
         
         let coordenadas=[]
 
-        if(data.length==0 || data==undefined){
+        if(data!=null && data.length!=0 && data!=undefined && data[0].id_Coordenada==-2){
+            return(
+                <View></View>
+            )
+        }
+
+        if(data.length==0 || data==undefined || data[0].id_Coordenada<=0){
             return(
                 <View></View>
             )

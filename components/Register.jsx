@@ -3,7 +3,6 @@ import { View,Text, TextInput,Image, ScrollView,Keyboard,TouchableOpacity, Platf
 import imagen from '../assets/x_icon_imagen.png';
 //import * as Location from 'expo-location';
 import MD5 from 'md5';
-import registrarUsuarioComun from '../data/registrarUsuarioComun.js';
 import { useQuery } from 'react-query';
 import { setNombre,setCorreo } from '../data/asyncStorageData.js';
 import { StatusBar } from 'react-native';
@@ -15,6 +14,7 @@ import usePermissionsContext from '../src/hooks/usePermissionsContext.jsx';
  const Register=({setRegistrarse,setLoguearse,height, width})=>{
 
     const [nombre, setNombreU]=react.useState("");
+    const [apellidos, setApellidos]=react.useState("");
     const [usuario, setUsuario]=react.useState("");
     const [validante, setValidante]=react.useState("");
     const [validarValidante, setValidarValidante]=react.useState("");
@@ -23,17 +23,9 @@ import usePermissionsContext from '../src/hooks/usePermissionsContext.jsx';
     const [email, setEmail]=react.useState("");
     const [estylosStates, setEstilosStare]=react.useState({height:(height>width)?height*0.7:height*0.85});
 
-    
-    // react.useEffect(()=>{        
-
-    //     //console.log(encriptarContraseña("rutasManagua"));    
-    //     //console.log(encriptarContraseña("zorondgt27"));    
-    // },[])
-        
-
     const validarElementos=()=>{
         if(nombre.length==0){
-            alert("Ingrese un nombre valido pequeño");
+            alert("Ingrese sus nombres");
             return false;
         }else if(validante==!validarValidante){
             alert("Las contraseñas no coinciden, ingreselas correctamente");
@@ -41,58 +33,23 @@ import usePermissionsContext from '../src/hooks/usePermissionsContext.jsx';
         }else if(validante.length<8){
             alert("Ingrese una mejor contraseña")
             return false;
-        }else if(!email.includes("@")){
+        }else if(!email.includes("@") || email.length>256){
             alert("Ingrese un correo electronico valido");
             return false;
-        }else if(telefono.includes(".")){
+        }else if(telefono.includes(".") || telefono.length>100){
             alert("Ingrese un numero de telefono valido");
+            return false;
+        }else if(apellidos.length>200){
+            alert("El apellido exede el limite de longitud");
+            return false;
+        }else if(nombre.length>200){
+            alert("El nombre exede el limite de longitud");
+            return false;
+        }else if(validante.length>50){
+            alert("La contraseña exede el limite de longitud");
             return false;
         }
         return true;
-    }
-
-    const encriptarContraseña=(constrasenia)=>{
-
-        var result=MD5(constrasenia)        
-        return result;
-    }
-
-
-    
-    const {data,error,isLoading}=useQuery(['obtenerTodosLosUsuarioComunes'],async({queryKey})=>{
-        //return await fetch('https://georutas.somee.com/api/UsuariosComunes').then(res=>datos=res.json())
-        return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosComunes').then(res=>datos=res.json())
-    },{
-        refetchInterval:1000
-    })
-
-    const verificandoExistencia=async()=>{
-        if(isLoading){
-            //console.log("Se estan buscando los usuarios");
-        }
-    
-        if(isLoading==false){
-    
-            for(let k=0;k<data.length;k++){
-                if(data[k].usuario==usuario){
-                    return false;
-                }
-            }    
-
-            //let usuariosTransportistas=await fetch('https://georutas.somee.com/api/UsuariosTransporte').then(res=>datos=res.json());
-            let usuariosTransportistas=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosTransporte').then(res=>datos=res.json());
-            
-            if(usuariosTransportistas.length>0){
-                for(let i=0;i<usuariosTransportistas.length;i++){
-                    if(usuariosTransportistas[i].usuario==usuario){
-                        return false;
-                    }
-                }
-            }
-            
-            return true;
-        }
-
     }
     
     react.useEffect(() => {
@@ -107,11 +64,69 @@ import usePermissionsContext from '../src/hooks/usePermissionsContext.jsx';
           showSubscription.remove();
           hideSubscription.remove();          
         };
-        }, []);
+    }, []);
 
-      useEffect(()=>{
-        setEstilosStare({height:(height>width)?height*0.7:height*0.85});        
-      },[height])
+    useEffect(()=>{
+        setEstilosStare({height:(height>width)?height*0.7:height*0.85});
+    },[height])
+
+      const registrarUsuario=async()=>{
+        let objeto={
+                email: email.toLowerCase(),
+                password: validante,
+                confirmPassword: validarValidante,
+                nombres: nombre,
+                apellidos: apellidos,
+                telefono: telefono
+            }
+
+          const options= {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(objeto)
+            };
+
+        let datos="";
+
+        try{
+            let res=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/Registro',options);
+            if(res.ok){                
+                datos=await res.json();                
+            }else{
+                alert("Ocurrió un error, vuelva a intentarlo");
+                return;
+            }
+        }catch{
+            alert("Ocurrió un error, vuelva a intentarlo");
+            return;
+        }
+
+        console.log("Los datos obtenidos despues del registro fueron: ");
+        console.log(datos);
+        console.log(typeof(datos));
+
+        if(datos=="0" || datos==null || datos==undefined){
+            alert("Ocurrió un error, vuelva a intentarlo");
+            return;
+        }else if(datos=="1"){
+            alert("Usted ya esta registrado, inicie sesion");
+            setRegistrarse(false);
+            setLoguearse(true);
+        }else if(datos>10){
+            alert("Registro exitoso");
+            console.log("El registro fue exitoso");
+            setRegistrarse(false);
+            setLoguearse(true);
+            setNombre(nombre);
+            setCorreo(email.toLowerCase());
+            setUsuario(email.toLowerCase());
+        }
+
+
+
+      }
 
     return(
         <View style={{backgroundColor:'#103070',position:'absolute',zIndex:221, height:height+StatusBar.currentHeight, width:width, paddingTop:(height>width)?height*0.15:StatusBar.currentHeight}}>          
@@ -127,37 +142,37 @@ import usePermissionsContext from '../src/hooks/usePermissionsContext.jsx';
                 </Text>
             
                 <ScrollView style={{ height:(height>width)?height*0.55:height*0.3}}>
-                <TextInput placeholder='Ingrese su Nombre' style={{paddingLeft:10,borderRadius:20, backgroundColor:'#5060A0',marginLeft:'10%',marginRight:'10%',height:40}}
+                <TextInput placeholder='Ingresa tus nombres' style={{paddingLeft:10,borderRadius:20, backgroundColor:'#5060A0',marginLeft:'10%',marginRight:'10%',height:40}}
                 onChangeText={
                     (em)=>{
                         setNombreU(em);
                     }
                 }></TextInput>
-                <TextInput placeholder='Ingrese nombre de usuario' style={{paddingLeft:10,marginTop:'6%',borderRadius:20,backgroundColor:'#5060A0',marginLeft:'10%',marginRight:'10%',height:40}}
+                <TextInput placeholder='Ingresa tus apellidos' style={{paddingLeft:10,marginTop:'6%',borderRadius:20,backgroundColor:'#5060A0',marginLeft:'10%',marginRight:'10%',height:40}}
                 onChangeText={
                     (em)=>{
-                        setUsuario(em);
+                        setApellidos(em);
                     }
                 }></TextInput>
-                <TextInput secureTextEntry={true} placeholder='Ingrese una contraseña' style={{paddingLeft:10,marginTop:'6%',borderRadius:20,backgroundColor:'#5060A0',marginLeft:'10%',marginRight:'10%',height:40}}
-                onChangeText={
-                    (em)=>{
-                        setValidante(em);
-                    }
-                }></TextInput>
-                <TextInput secureTextEntry={true} placeholder='Confirme su contraseña' style={{paddingLeft:10,marginTop:'6%',borderRadius:20,backgroundColor:'#5060A0',marginLeft:'10%',marginRight:'10%',height:40}}
-                onChangeText={
-                    (em)=>{
-                        setValidarValidante(em);
-                    }
-                }></TextInput>
-                <TextInput keyboardType='email-address' placeholder='Ingrese correo electronico' style={{paddingLeft:10,marginTop:'6%',borderRadius:20,backgroundColor:'#5060A0',marginLeft:'10%',marginRight:'10%',height:40}}
+                <TextInput keyboardType='email-address' placeholder='Ingresa tu correo' style={{paddingLeft:10,marginTop:'6%',borderRadius:20,backgroundColor:'#5060A0',marginLeft:'10%',marginRight:'10%',height:40}}
                 onChangeText={
                     (em)=>{
                         setEmail(em);
                     }
                 }></TextInput>                
-                                <TextInput keyboardType='number-pad' placeholder='Ingrese un numero de telefono' style={{paddingLeft:10,marginTop:'6%',borderRadius:20,backgroundColor:'#5060A0',marginLeft:'10%',marginRight:'10%',height:40}}
+                <TextInput secureTextEntry={true} placeholder='Ingrese su contraseña' style={{paddingLeft:10,marginTop:'6%',borderRadius:20,backgroundColor:'#5060A0',marginLeft:'10%',marginRight:'10%',height:40}}
+                onChangeText={
+                    (em)=>{
+                        setValidante(em);
+                    }
+                }></TextInput>
+                <TextInput secureTextEntry={true} placeholder='Vuelva a ingresar su contraseña' style={{paddingLeft:10,marginTop:'6%',borderRadius:20,backgroundColor:'#5060A0',marginLeft:'10%',marginRight:'10%',height:40}}
+                onChangeText={
+                    (em)=>{
+                        setValidarValidante(em);
+                    }
+                }></TextInput>
+                <TextInput keyboardType='number-pad' placeholder='Ingrese su numero de telefono' style={{paddingLeft:10,marginTop:'6%',borderRadius:20,backgroundColor:'#5060A0',marginLeft:'10%',marginRight:'10%',height:40}}
                 onChangeText={
                     (em)=>{
                         setTelefono(em);
@@ -168,26 +183,11 @@ import usePermissionsContext from '../src/hooks/usePermissionsContext.jsx';
                 <TouchableOpacity style={{backgroundColor:'#2060A5', height:55,width:'60%',marginLeft:'auto', marginRight:'auto',alignItems:'center', justifyContent:'center', borderRadius:20}}>
                     <Text style={{ color:'white',fontSize:27,marginLeft:'auto', marginRight:'auto',marginBottom:'5%',textAlign:'center',marginTop:5}} 
                     onTouchEnd={
-                        ()=>{   
-                            if(!isLoading){                                  
-                                console.log(validante);                         
-                                if(verificandoExistencia()==true){
-                                    if(validarElementos()){
-                                        registrarUsuarioComun({nombre: nombre,usuario: usuario,contrasenia: encriptarContraseña(validante),correo: email,
-                                        telefono: telefono,longitude: ubicacion.longitude,latitude:ubicacion.latitude});
-                                        alert("Registro exitoso");
-                                        setRegistrarse(false);
-                                        setLoguearse(true);
-                                        setNombre(nombre);
-                                        setCorreo(email);
-
-                                    }
-                                }else{
-                                    alert("El nombre de usuario ya existe");
-                                }                                
-                            }else{
-                                alert("Reintente registrarse");
-                            }
+                        ()=>{
+                            if(validarElementos()){
+                                
+                                registrarUsuario();                               
+                            }                            
                         }
                     }>
                         Registrarse
