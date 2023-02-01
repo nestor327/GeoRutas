@@ -19,7 +19,7 @@ import getAllRutas from '../data/rutasManagua.js'
             return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/NUsuariosTransporte/'+queryKey[1]+'?Email='+queryKey[2]+'&Token='+queryKey[3]).then(res=>datos=res.json())
             
         },{
-            refetchInterval:2000,
+            refetchInterval:4000,
             onSuccess:()=>{                
                 setDireccionPorUsuario(direccionesPorUsuarioDos);
             }   

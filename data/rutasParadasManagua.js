@@ -6,7 +6,8 @@ const rutasParadasManagua=async(idRuta)=>{
         //return await fetch('https://georutas.somee.com/api/RutasParada').then(res=>datos=res.json())
         return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/RutasParada').then(res=>datos=res.json())
     },{
-        staleTime:Infinity
+        staleTime:Infinity,
+        cacheTime:3600000
     })
 
 if(isLoading){

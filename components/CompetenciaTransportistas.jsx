@@ -21,7 +21,7 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
         return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/NUsuariosTransporte?Email='+queryKey[1]+'&Token='+queryKey[2]).then(res=>datos=res.json())
     },{
         //staleTime:Infinity,
-        refetchInterval:2000,
+        refetchInterval:4000,
         cacheTime:1500
     })
 

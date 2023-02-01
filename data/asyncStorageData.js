@@ -108,6 +108,57 @@ export const getNombre = async (setNombre) => {
     }
   return true;
 }
+export const setTelefonoAsync= async (telefono) => {
+    try{
+        await AsyncStorage.setItem('telefonoUsuario',telefono);
+    }catch (e){
+        console.log("No se encontro el usuario");
+    }
+  return true;
+}
+
+export const getTelefono = async (setTelefono) => {   
+    try{
+        const value=await AsyncStorage.getItem('telefonoUsuario');
+        if(value==null){
+            setTelefono("");
+        }else{
+            setTelefono(value);      
+        }
+
+          
+    }catch (e){
+        console.log("No se encontro el usuario");
+        setNombre("");      
+    }
+  return true;
+}
+
+export const setApellidos= async (apellidos) => {
+    try{
+        await AsyncStorage.setItem('apellidosUsuario',apellidos);
+    }catch (e){
+        console.log("No se encontro el usuario");
+    }
+  return true;
+}
+
+export const getApellidos = async (setApellidos) => {   
+    try{
+        const value=await AsyncStorage.getItem('apellidosUsuario');
+        if(value==null){
+            setApellidos("");
+        }else{
+            setApellidos(value);      
+        }
+
+          
+    }catch (e){
+        console.log("No se encontro el usuario");
+        setNombre("");      
+    }
+  return true;
+}
 
 export const setCorreo= async (correo) => {
     try{

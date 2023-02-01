@@ -3,7 +3,7 @@
 //Hay un endpoint que devuelve las paradasrutas para una sola ruta
 
 import React, { useEffect,useRef, useState  } from 'react'
-import { View,Text, Platform, StatusBar, ActivityIndicator, Image, TextInput, TouchableOpacity, Keyboard, AppState, Alert} from 'react-native';
+import { View,Text, Platform, StatusBar, ActivityIndicator, Image, TextInput, TouchableOpacity, Keyboard, AppState, Linking} from 'react-native';
 import {enableLatestRenderer, Marker, PROVIDER_GOOGLE,Polyline} from 'react-native-maps';
 import MapView from 'react-native-maps';
 import IconosDeNavegacion from './IconosDeNavegacion.jsx';
@@ -42,7 +42,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     ,refCambiarLupa,activarPrecision,setActivarPrecision,mostrarVentana,serMostrarVentana
     ,setCargando,cargando,
     todasLasRutasCompetencia,rutasSeleccionadasCompetencia,setTodasLasRutasCompetencia,setRutasSeleccionadasCompetencia
-    ,emailState, tokenState,setTokenState,tipoDeSubscripcion,setVerAdministrarUsuarios})=>{
+    ,emailState, tokenState,setTokenState,tipoDeSubscripcion,setVerAdministrarUsuarios,setCambiarPassword,setEditarPerfil
+    ,registrarse,estadoAplicacion, setEstadoAplicacion,setMostrarAlerte,setMensajeAlerta})=>{
     
 
 
@@ -92,7 +93,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     const [tipoDeModificacionDeLugar, setTipoDeModificacionDeLugar]=useState('Destino');
     const [verRecomendacionesDeUbicaciones, setVerRecomendacionesDeUbicacion]=useState(false);
     const [coordenadasDeLaRuta, setCoordenadasDeLaRuta]=useState([]);
-    const [estadoAplicacion, setEstadoAplicacion]=useState(true);
+    
     const [actualizarUsuarioTransportista, setActualizarUsuarioTransportista]=useState(false);
 
 
@@ -121,15 +122,16 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             usuario=await fetch(url).then(res=>usuario=res.json());
             //usuario=await fetch(url);
             console.log("El usuario es: ");
-            console.log(usuario);
-            
+            console.log(usuario);    
         }catch{
-            alert("Revisa tu conexión a internet");
+            setMensajeAlerta("Revisa tu conexión a internet");
+            setMostrarAlerte(true);
             return;
         }   
 
         if(usuario==null){
-            alert("Revisa tu conexión a internet");
+            setMensajeAlerta("Revisa tu conexión a internet");
+            setMostrarAlerte(true);
             return;
         }
 
@@ -154,14 +156,17 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             usuario=await fetch(url).then(res=>dat=res.json());
             
         }catch{
-            alert("Revisa tu conexión a internet");
+            setMensajeAlerta("Revisa tu conexión a internet");
+            setMostrarAlerte(true);
         }
 
         if(usuario==null || usuario.id_Tipo_Transporte==0){
-            alert("Revisa tu conexión a internet");
+            setMensajeAlerta("Revisa tu conexión a internet");
+            setMostrarAlerte(true);
             return;
         }else if(usuario.id_Tipo_Transporte==-1){            
-            alert("Hubo un problema con su usuario");
+            setMensajeAlerta("Hubo un problema con su usuario");
+            setMostrarAlerte(true);
             return;
         }else if(usuario.id_Tipo_Transporte==-2){
 
@@ -262,9 +267,11 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         }
 
                         if(json==null){
-                            alert("Tu conexión a internet es inestable");
+                            setMensajeAlerta("Revisa tu conexión a internet");
+                            setMostrarAlerte(true);
                         }else if(json.id_UsuarioTransporte==0){
-                            alert("Tu conexión a internet es inestable");
+                            setMensajeAlerta("Revisa tu conexión a internet");
+                            setMostrarAlerte(true);
                         }
                         //else if(json.id_UsuarioTransporte==-1){
                         //     alert("Hubo un problema con tu usuario");
@@ -276,7 +283,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         // }
                         
                     }else{
-                        alert("Tu conexión a internet es inestable");
+                        setMensajeAlerta("Revisa tu conexión a internet");
+                        setMostrarAlerte(true);
                     }
 
                     console.log("La respuesta a la actualizacion ess: ");
@@ -284,7 +292,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
 
             }catch{
-                alert("Tu conexión a internet es inestable");
+                setMensajeAlerta("Revisa tu conexión a internet");
+                setMostrarAlerte(true);
                 console.log("La respuesta a la actualizacion es: ");
                 console.log(datos);
             }
@@ -623,7 +632,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             
             if(state=='active'){
                 desactivarTarea();
-                setEstadoAplicacion(true);
+                setEstadoAplicacion(true);                
                 console.log("La tarea se desactivo");
             }
 
@@ -653,7 +662,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         stopFollowUserLocation={stopFollowUserLocation} permitirSeguirPasajero={permitirSeguirPasajero} setPermitirSeguirPasajero={setPermitirSeguirPasajero}
         setVerTrayectoria={setVerTrayectoria} ocultarTrayecto={ocultarTrayecto} permisos={permisos}
         askLocationPermissionSetting={askLocationPermissionSetting} setUsuarioTransportista={setUsuarioTransportista} setCargando={setCargando}
-        emailState={emailState} tokenState={tokenState}
+        emailState={emailState} tokenState={tokenState} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta}
         ></IconosDeNavegacion>
 
 
@@ -671,7 +680,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     serMostrarVentana('flex');
                 }else if(bacgroundPermisos!='granted'){                    
                     serMostrarVentana('flex');
-                    alert("\"Permite\" que la aplicacion tenga acceso \"Siempre\" a la \"Localizacion\" con el boton verde que se muestra a continuacion")
+                    setMensajeAlerta("\"Permite\" que la aplicacion tenga acceso \"Siempre\" a la \"Localizacion\" con el boton verde que se muestra a continuacion");
+                    setMostrarAlerte(true);                    
                 }
 
             }}
@@ -687,7 +697,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             <TouchableOpacity 
                 onPress={()=>{
 
-                    if(mostrarBarraSecundariaDeUbicacion==false){
+                    if(mostrarBarraSecundariaDeUbicacion==false && secionIniciada==true){
                         setMostrarBarraSecundariaDeUbicacion(true);
                         if(tipoDeModificacionDeLugar=='Destino'){
                             refMapView.current?.animateCamera({
@@ -728,7 +738,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         setOcultarMenu(true);       
                         setVerParadasCercanas([{observar:false,latitude:coordenadasOrigenSecundario.latitude,longitude:coordenadasOrigenSecundario.longitude,direccion:'K',id_Ruta:1}]);
                         
-                    }else{                        
+                    }else if(secionIniciada==true){                        
                         if(tipoDeModificacionDeLugar=='Destino'){
                             refMapView.current?.animateCamera({
                                 center:{...coordenadasOrigen}
@@ -837,7 +847,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                            
                 onPress={(data, details)=>{
 
-                    if(details!=null){
+                    if(details!=null && secionIniciada==true){
                         
 
                         let latitude=details.geometry.location.lat;
@@ -951,7 +961,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             
             <TouchableOpacity 
                 onPress={()=>{
-                    if(tipoDeModificacionDeLugar=='Destino'){
+                    if(tipoDeModificacionDeLugar=='Destino' && secionIniciada==true){
                         refMapView.current?.animateCamera({
                             center:{...coordenadasOrigen}
                         })
@@ -962,7 +972,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         }else{
                             refInputAutoComplete.current.setAddressText(refNombreDelOrigen.current);
                         }
-                    }else{
+                    }else if(secionIniciada==true){
                         refMapView.current?.animateCamera({
                             center:{...coordenadasDestino}
                         })
@@ -1023,8 +1033,9 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     }}
                     editable={false}
                     onPressOut={()=>{
+                        if(secionIniciada==true){                            
                         setVerRecomendacionesDeUbicacion(!verRecomendacionesDeUbicaciones);
-
+                        }
                     }}
                         >
                     <Text
@@ -1058,25 +1069,28 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                             marginBottom:0,
                         }}  
                         onPress={()=>{
-                            setVerRecomendacionesDeUbicacion(false);
+                            if(secionIniciada==true){
+                                setVerRecomendacionesDeUbicacion(false);
 
-                            if(tipoDeModificacionDeLugar=='Destino'){
-                                refMapView.current?.animateCamera({
-                                    center:{...coordenadasOrigen}
-                                })
-                                setTipoDeModificacionDeLugar('Origen');
-                                refInputAutoComplete.current.blur();
-                                //refInputAutoComplete.current.setAddressText(refNombreDelOrigen.current);                        
-                                refInputAutoComplete.current.focus();
-                            }else{
-                                refMapView.current?.animateCamera({
-                                    center:{...coordenadasDestino}
-                                })
-                                setTipoDeModificacionDeLugar('Destino');
-                                refInputAutoComplete.current.blur();
-                                refInputAutoComplete.current.focus();
-                                //refInputAutoComplete.current.setAddressText(refNombreDelDestino.current);
+                                if(tipoDeModificacionDeLugar=='Destino'){
+                                    refMapView.current?.animateCamera({
+                                        center:{...coordenadasOrigen}
+                                    })
+                                    setTipoDeModificacionDeLugar('Origen');
+                                    refInputAutoComplete.current.blur();
+                                    //refInputAutoComplete.current.setAddressText(refNombreDelOrigen.current);                        
+                                    refInputAutoComplete.current.focus();
+                                }else{
+                                    refMapView.current?.animateCamera({
+                                        center:{...coordenadasDestino}
+                                    })
+                                    setTipoDeModificacionDeLugar('Destino');
+                                    refInputAutoComplete.current.blur();
+                                    refInputAutoComplete.current.focus();
+                                    //refInputAutoComplete.current.setAddressText(refNombreDelDestino.current);
+                                }
                             }
+                            
                         }}                      
                     >
                         <Text style={{color:'gray',fontSize:15}}>Buscar</Text>
@@ -1100,10 +1114,12 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         }}
 
                         onPress={()=>{
-                            setVerRecomendacionesDeUbicacion(false);
-                            refMapView.current?.animateCamera({
-                                center:{...coordenadasOrigen}
-                            })
+                            if(secionIniciada==true){
+                                setVerRecomendacionesDeUbicacion(false);
+                                refMapView.current?.animateCamera({
+                                    center:{...coordenadasOrigen}
+                                })
+                            }
                             //setTipoDeModificacionDeLugar('Origen');
                             //refInputAutoComplete.current.blur();
                             //refInputAutoComplete.current.setAddressText(refNombreDelOrigen.current);                        
@@ -1131,10 +1147,12 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         height:40}}
                         
                         onPress={()=>{
-                            setVerRecomendacionesDeUbicacion(false);
-                            refMapView.current?.animateCamera({
-                                center:{...coordenadasDestino}
-                            })
+                            if(secionIniciada==true){
+                                setVerRecomendacionesDeUbicacion(false);
+                                refMapView.current?.animateCamera({
+                                    center:{...coordenadasDestino}
+                                })
+                            }
                         }}
                         >
                         <Text style={{color:'black',fontSize:15}}>{refNombreDelDestino.current}</Text>
@@ -1156,20 +1174,22 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         height:40}}
 
                         onPress={()=>{
-                            if(permisos!='granted'){
-                                askLocationPermission();
-                                askLocationPermissionSetting();
-                                return;
-                            }
-                            refNombreDelOrigen.current='Tu ubicación';
-                            setVerRecomendacionesDeUbicacion(false);
-                            const {latitude,longitude}=getCurrentLocation();
-                            
-                            setCoordenadasOrigen(userLocation);
-
-                            refMapView.current?.animateCamera({
-                                center:{...userLocation}
-                            })
+                            if(secionIniciada==true){
+                                if(permisos!='granted'){
+                                    askLocationPermission();
+                                    askLocationPermissionSetting();
+                                    return;
+                                }
+                                refNombreDelOrigen.current='Tu ubicación';
+                                setVerRecomendacionesDeUbicacion(false);
+                                const {latitude,longitude}=getCurrentLocation();
+                                
+                                setCoordenadasOrigen(userLocation);
+    
+                                refMapView.current?.animateCamera({
+                                    center:{...userLocation}
+                                })
+                            }                            
                         }}
                     >
                         <Text style={{color:'black',fontSize:15}}>Tu ubicación</Text>
@@ -1180,6 +1200,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
         {mostrarBarraSecundariaDeUbicacion==true && <TouchableOpacity
             onPress={()=>{
+
                 if(menUno[0].display=='none' && secionIniciada==true){
                     setmenUno([{ display: 'flex',color:'#101043' }]);
                     setMostrarItemMenuUno(true);
@@ -1208,13 +1229,14 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
 
 
-        {mostrarVentana=="flex" && <Perfil setVerAdministrarUsuarios={setVerAdministrarUsuarios} tipoDeSubscripcion={tipoDeSubscripcion} permitirEnviarUbicacion={permitirEnviarUbicacion} secionIniciada={secionIniciada} 
+        {mostrarVentana=="flex" && <Perfil registrarse={registrarse} setEditarPerfil={setEditarPerfil} setCambiarPassword={setCambiarPassword} setVerAdministrarUsuarios={setVerAdministrarUsuarios} tipoDeSubscripcion={tipoDeSubscripcion} permitirEnviarUbicacion={permitirEnviarUbicacion} secionIniciada={secionIniciada} 
             setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setRegistrarse={setRegistrarse} 
             setLoguearse={setLoguearse} tipoDePerfil={[{principal:{width:'100%',height:height-width*0.2,position:'absolute',top:0,left:0,zIndex:200,backgroundColor:'#00000045'}}]} 
             actualizar={serMostrarVentana} activarPrecision={activarPrecision} setActivarPrecision={setActivarPrecision}
             tipoDeUsuario={tipoDeUsuario} permisosEnSegundoPlano={bacgroundPermisos} setPermisosEnSegundoPlano={setBacgroundPermisos}
             todasLasRutasCompetencia={todasLasRutasCompetencia} rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}
-            setTodasLasRutasCompetencia={setTodasLasRutasCompetencia} setRutasSeleccionadasCompetencia={setRutasSeleccionadasCompetencia}></Perfil>}
+            setTodasLasRutasCompetencia={setTodasLasRutasCompetencia} setRutasSeleccionadasCompetencia={setRutasSeleccionadasCompetencia}
+            setMensajeAlerta={setMensajeAlerta} setMostrarAlerte={setMostrarAlerte}></Perfil>}
         
          {<MapView
 
@@ -1236,24 +1258,26 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
         onTouchStart={
             ()=>{
-                refFollowing.current=false;                
-                if (menUno[0].display == 'flex' ) {
-                    setmenUno([{display:'none',color:'#102769'}]);
-                } else if(menDos[0].display == 'flex'){
-                    setmenDos([{display:'none',color:'#102769'}]);
-                }else if(menTres[0].display == 'flex'){
-                    setmenTres([{display:'none',color:'#102769'}]);
-                }else if(menCinco[0].display=='flex'){
-                    setmenCinco([{display:'none',color:'#102769'}])                    
-                }
-                setmenCuatro([{ display: 'flex',color:'#101043' }]);
-                refInputAutoComplete.current.blur();
-                setMostrarBarraSecundariaDeUbicacion(false);
+                if(secionIniciada==true){
+                    refFollowing.current=false;                
+                    if (menUno[0].display == 'flex' ) {
+                        setmenUno([{display:'none',color:'#102769'}]);
+                    } else if(menDos[0].display == 'flex'){
+                        setmenDos([{display:'none',color:'#102769'}]);
+                    }else if(menTres[0].display == 'flex'){
+                        setmenTres([{display:'none',color:'#102769'}]);
+                    }else if(menCinco[0].display=='flex'){
+                        setmenCinco([{display:'none',color:'#102769'}])                    
+                    }
+                    setmenCuatro([{ display: 'flex',color:'#101043' }]);
+                    refInputAutoComplete.current.blur();
+                    setMostrarBarraSecundariaDeUbicacion(false);
+                }                
             }
         }
         >
 
-            {mostrarItemMenuUno==true && verRutasCercanas==false && verCompetencia==false &&
+            {secionIniciada==true && mostrarItemMenuUno==true && verRutasCercanas==false && verCompetencia==false &&
             <View>
                 <Marker onDragEnd={
                     async(coords)=>{
@@ -1310,7 +1334,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                 </Marker>
             </View>}
 
-            {ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true &&
+            {secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true &&
                     iconosTransportes.map((item, i)=>{
                         //latitude:coordenadasDestino.latitude,longitude:coordenadasDestino.longitude}
                         //,{latitude:item.longitudParadaFinal,longitude:item.latitudParadaFinal
@@ -1336,7 +1360,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
                             {<LineasTrayectorias emailState={emailState} tokenState={tokenState} iconoTrayectoItem={item} color={item.color}></LineasTrayectorias>}
 
-                            {iconosTransportes.length==(i+1) && <Marker coordinate={{                            
+                            {/* {iconosTransportes.length==(i+1) && <Marker coordinate={{                             */}
+                            {<Marker coordinate={{                            
                             latitude:item.longitudParadaFinal,
                             longitude:item.latitudParadaFinal,
                             latitudeDelta:0.02,
@@ -1360,7 +1385,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                 })
             }
 
-            {idRutaAMostrar>0 &&
+            {secionIniciada==true && idRutaAMostrar>0 &&
                      <View>
                          {mostrarParadas==true && <DireccionesSegunUbicacion emailState={emailState} tokenState={tokenState} idRuta={idRutaAMostrar}></DireccionesSegunUbicacion>}
                          <LineaDeUnaRuta emailState={emailState} tokenState={tokenState} setCargando={setCargando} setMostrarSniperCargando={setMostrarSniperCargando} idRuta={idRutaAMostrar} ></LineaDeUnaRuta>
@@ -1374,7 +1399,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=='Pasajero' && userLocation.latitude!=0 && verRutasCercanas==true &&  <RutasCercaDelPasajero userLocation ={userLocation}
             rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}></RutasCercaDelPasajero>}
 
-            {verParadasCercanas[0].observar==true && verParadasCercanas.map((item, i)=>{
+            {secionIniciada==true && verParadasCercanas[0].observar==true && verParadasCercanas.map((item, i)=>{
             
             return(
                 <View key={i}>
@@ -1416,7 +1441,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     </View>
                 )
             })}  
-            {idUsuarioIniciado>0 && permitirEnviarUbicacion==true && tipoDeUsuario=="Transportista" && <UsuarioTransportistaLogueado emailState={emailState} tokenState={tokenState} activarPrecision={activarPrecision} direccionesPorUsuario={direccionesPorUsuario}
+            {secionIniciada==true && idUsuarioIniciado>0 && permitirEnviarUbicacion==true && tipoDeUsuario=="Transportista" && <UsuarioTransportistaLogueado emailState={emailState} tokenState={tokenState} activarPrecision={activarPrecision} direccionesPorUsuario={direccionesPorUsuario}
             setDireccionPorUsuario={setDireccionPorUsuario} idUsuarioIniciado={idUsuarioIniciado} userLocation={userLocation}></UsuarioTransportistaLogueado>}
             
         </MapView>}         

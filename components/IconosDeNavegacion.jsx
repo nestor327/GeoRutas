@@ -3,7 +3,7 @@
 //debes actualizar el state de usuariotransporte a los datos necesarios de NUsuarioTransporte
 
 import { useState,useEffect } from "react";
-import { Alert, View } from "react-native"
+import { View } from "react-native"
 import { getPermitirEnvio, setPermitirEnvio } from "../data/asyncStorageData.js";
 import Fab from "./Fab.jsx";
 
@@ -14,7 +14,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
     verTransportistasPorLaDerecha,verTransportistasPorLaIzquierda,idRutaAMostrar,mostrarUsuarios,permitirEnviarUbicacion,
     tipoDeUsuario,mostrarParadas,mostrarItemMenuUno,verTrayectoria,verCompetencia,verRutasCercanas,centrePosition,siguiendoAlUsuario,
     askLocationPermission,followUseLocation, stopFollowUserLocation,permitirSeguirPasajero, setPermitirSeguirPasajero,setVerTrayectoria,
-    ocultarTrayecto,permisos,askLocationPermissionSetting, setUsuarioTransportista,setCargando,emailState, tokenState
+    ocultarTrayecto,permisos,askLocationPermissionSetting, setUsuarioTransportista,setCargando,emailState, tokenState,setMostrarAlerte, setMensajeAlerta
     })=>{
 
         // useEffect(()=>{
@@ -40,7 +40,8 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                     }
                     
                     if(idUsuarioIniciado<0){
-                        alert("Vualva a iniciar secion");
+                        setMensajeAlerta("Vuelve a iniciar sesión");
+                        setMostrarAlerte(true);
                         setCargando(false);
                         return;
                     }
@@ -52,8 +53,9 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         usuarioTransportista={};
                     }
                     
-                    if(usuarioTransportista=={} || usuarioTransportista.id_Ruta==null){                        
-                        alert("Has perdido tu usuario, vuelve a iniciar secion");
+                    if(usuarioTransportista=={} || usuarioTransportista.id_Ruta==null){    
+                        setMensajeAlerta("Has perdido tu usuario, vuelve a iniciar sesión");
+                        setMostrarAlerte(true);                    
                         setCargando(false);
                         return;
                     }
@@ -93,21 +95,25 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                                 }
         
                                 if(json==null){
-                                    alert("Tu conexión a internet es inestable");
+                                    setMensajeAlerta("Tu conexión a internet es inestable");
+                                    setMostrarAlerte(true);
                                     setCargando(false);
                                 }else if(json.id_UsuarioTransporte==0){
-                                    alert("Tu conexión a internet es inestable");
+                                    setMensajeAlerta("Tu conexión a internet es inestable");
+                                    setMostrarAlerte(true);
                                     setCargando(false);
                                 }
                                 
                             }else{
-                                alert("Tu conexión a internet es inestable");
+                                setMensajeAlerta("Tu conexión a internet es inestable");
+                                setMostrarAlerte(true);
                                 setCargando(false);
                             }
         
         
                     }catch{
-                        alert("Tu conexión a internet es inestable");   
+                        setMensajeAlerta("Tu conexión a internet es inestable");
+                        setMostrarAlerte(true);  
                         setCargando(false);                     
                     }
 
@@ -139,7 +145,8 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                     setPermitirEnviarUbicacion(false);
                     setPermitirEnvio("false");
                     if(idUsuarioIniciado<0){
-                        alert("Vualva a iniciar secion");
+                        setMensajeAlerta("Vuelve a iniciar sesión");
+                        setMostrarAlerte(true);
                         setCargando(false);
                         return;
                     }
@@ -190,18 +197,22 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                                 }
         
                                 if(json==null){
-                                    alert("Tu conexión a internet es inestable");
+                                    setMensajeAlerta("Tu conexión a internet es inestable");
+                                    setMostrarAlerte(true);
                                 }else if(json.id_UsuarioTransporte==0){
-                                    alert("Tu conexión a internet es inestable");
+                                    setMensajeAlerta("Tu conexión a internet es inestable");
+                                    setMostrarAlerte(true);
                                 }
                                 
                             }else{
-                                alert("Tu conexión a internet es inestable");
+                                setMensajeAlerta("Tu conexión a internet es inestable");
+                                setMostrarAlerte(true);
                             }
         
         
                     }catch{
-                        alert("Tu conexión a internet es inestable");                        
+                        setMensajeAlerta("Tu conexión a internet es inestable");
+                        setMostrarAlerte(true);
                     }
 
                         
@@ -302,7 +313,8 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         setVerCompetencia(true);
                         setOcultarTrayecto(false);
                         setCargando(false);
-                        alert("Para mayor comodidad elija a su competencia")
+                        setMensajeAlerta("Para mayor comodidad elija a su competencia");
+                        setMostrarAlerte(true);
                     }}
                     imagen={require('../assets/noVerUsuarios.png')}
                 />}
@@ -323,7 +335,8 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         setVerRutasCercanas(true); 
                         setOcultarTrayecto(false);
                         setCargando(false);
-                        alert("Para mejor comodidad elija sus rutas favoritas en ajustes y muestre su ubicacion")
+                        setMensajeAlerta("Para mejor comodidad, elija sus rutas favoritas en ajustes y muestre su ubicación");
+                        setMostrarAlerte(true);
                     }}
                         imagen={require('../assets/noVerUsuarios.png')}
                 />}

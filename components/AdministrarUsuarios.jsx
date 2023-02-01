@@ -1,44 +1,45 @@
 import react, { useEffect, useState } from "react"
-import { ScrollView, StatusBar, Text, View,Image, TouchableOpacity } from "react-native"
+import { ScrollView, StatusBar, Text, View,Image, TouchableOpacity, ActivityIndicator } from "react-native"
 import { useQuery } from "react-query"
 import { getNombre } from "../data/asyncStorageData"
 import getAllRutas from "../data/rutasManagua"
 import imagen from '../assets/x_icon_imagen.png';
+import PerfilesDeUsuarios from "./ComponentesParaAdmins/PerfilesDeUsuarios"
 
 
-const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrarUsuarios})=>{
+const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrarUsuarios,nombre,setEditarInfoDelChofer,setEmailDelChoferEditar,setChoferAEditar
+    ,refrescar,setRefrescar,setMostrarAlerte, setMensajeAlerta})=>{
     
-    let datos=null;
-    const [nombre,setNombre]=useState("");
 
-    useEffect(()=>{
-        getNombre(setNombre);
-    },[])
+    const [data,setData]=useState([]);
+    const [seleccionar, setSeleccionar]=useState(false);
+    
 
-    let idRuta=1;
-    let todasLasRutas=getAllRutas();
+    const obtenerLosDatos=async()=>{
 
-    for(let t=0; t<todasLasRutas.length;t++){        
-        if(nombre.includes(todasLasRutas[t].nombre)){
-            idRuta=(t+1);
+        let todasLasRutas=getAllRutas();
+
+        for(let t=0; t<todasLasRutas.length;t++){        
+            if(nombre.includes(todasLasRutas[t].nombre)){
+                idRuta=(t+1);
+            }
         }
+
+        try{
+            let value=null;
+            value=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosCoperativas?idRuta=1&Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());
+            setData(value);
+            console.log(value);
+           }catch{
+            setData([]);
+           }
     }
-
-
-    const {data,error,isLoading}=useQuery(['obtenerUsuariosCooperativa',idRuta,emailState,tokenState],async({queryKey})=>{
-        return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosCoperativas?idRuta='+queryKey[1]+'&Email='+queryKey[2]+'&Token='+queryKey[3]).then(res=>datos=res.json())
-    },{
-        //staleTime:Infinity,
-        refetchInterval:Infinity,
-        cacheTime:1500
-    })
-
-    if(isLoading==false){
         
+        const[arregloActualizar,setArregloActualizar]=useState([]);        
 
-        
-        const[arregloActualizar,setArregloActualizar]=useState([]);
-        
+        useEffect(()=>{
+            obtenerLosDatos();
+        },[refrescar])
 
         return(
             <View style={{backgroundColor:'#103070',position:'absolute',zIndex:220, height:height+StatusBar.currentHeight, width:width}}>
@@ -48,62 +49,55 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
                 }}>
                     <Image source={imagen} style={{width:30,height:30, tintColor:'#f1f1f1'}}></Image>
                 </View>
-                <View style={{alignItems:'center',marginTop:'20%'}}>
-                    <Text style={{color:'#f1f1f1',fontSize:25}}>Administra tus usuarios</Text>
+                <View style={{alignItems:'center',marginTop:'15%'}}>
+                    <Text style={{color:'#f1f1f1',fontSize:29}}>Administra tus usuarios</Text>
                 </View>
-                <View style={{marginLeft:'0%',height:'60%',marginTop:30,marginLeft:30}}>
-                {data!=undefined && <ScrollView>
-                    {
-                        
+                <View style={{marginLeft:'0%',height:'60%',marginTop:30,marginLeft:20}}>
+                {data!=undefined && data.length>1 && <ScrollView>
+                    {                        
                         data.map((item,i)=>{      
-                            const [acticando,setActivando]=useState(false);
+                             
                                 return(
-                                    <View key={i} style={{alignItems:'center',flexDirection:'row',alignContent:'center'}}>
-                                        {item.tipoSubscripcion!='B' && <View style={{borderWidth:2,borderColor:'red',height:25,width:25,alignItems:'center',marginRight:10}}
-                                            onTouchEnd={()=>{
-                                                if(arregloActualizar.indexOf(i)==-1){
-                                                    arregloActualizar.push(i);
-                                                    console.log("Agregando "+i);
-                                                    console.log(arregloActualizar);
-                                                    setActivando(true);
-                                                }else{
-                                                    arregloActualizar.splice(arregloActualizar.indexOf(i),1);
-                                                    console.log("Eliminando "+i);
-                                                    console.log(arregloActualizar);
-                                                    setActivando(false);
-                                                }
-                                            }}
-                                        >
-                                            <Text>{(acticando)?"✓":""}</Text>
-                                        </View>}
-                                        {item.tipoSubscripcion=='B' && <View style={{height:25,width:25,alignItems:'center',marginRight:10}}>
-                                            
-                                        </View>}
-
-                                        <View style={{height:30,width:180,backgroundColor:"#353454",margin:2}}>
-                                            <Text>{item.userName}</Text>
-                                        </View>
-                                        <View style={[(item.tipoSubscripcion=='B')?{borderColor:'green'}:{borderColor:'red'},{borderWidth:2}]}>
-                                            <Text>{(item.tipoSubscripcion=='B')?"Usuario Activo":"Usuario Inactivo"}</Text>
-                                        </View>
+                                    <View key={i} style={{alignItems:'center',flexDirection:'row',alignContent:'center'}}
+                                    onTouchEnd={()=>{
+                                        setChoferAEditar(item);
+                                    }}
+                                    >
+                                        <PerfilesDeUsuarios setEmailDelChoferEditar={setEmailDelChoferEditar} setEditarInfoDelChofer={setEditarInfoDelChofer} seleccionar={seleccionar} arregloActualizar={arregloActualizar} item={item} i={i}></PerfilesDeUsuarios>
                                     </View>
                                 )  
-                        })                    
+                        })
                     }
                 </ScrollView>}
+                {data==undefined || data==null && <ActivityIndicator size="large" color="#0000ff" />}
                 </View>
 
-                <View style={{flexDirection:'row',marginTop:60,justifyContent:'center'}}>
-                    <TouchableOpacity style={{marginRight:10,height:30,width:'auto',backgroundColor:'blue'}}>
-                        <Text>Activar todos los Inactivos</Text>
+                <View style={{flexDirection:'row',marginTop:40,justifyContent:'center'}}>
+                    <TouchableOpacity style={{marginRight:10,height:40,width:'auto',borderRadius:7,backgroundColor:'blue',justifyContent:'center',paddingHorizontal:5}}>
+                        <Text style={{fontSize:16, color:'white'}}>Activar todos</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={{height:30,width:'auto',backgroundColor:'blue'}}>
-                        <Text>Seleccionar cuales activar</Text>
+                    <TouchableOpacity style={{height:40,width:'auto',backgroundColor:'blue',borderRadius:7,justifyContent:'center',paddingHorizontal:5}}
+                        onPressOut={()=>{
+                            if(seleccionar==false){
+                                setSeleccionar(!seleccionar);
+                            }else if(seleccionar==true && arregloActualizar.length==0){
+                                setMensajeAlerta("Seleccione cuáles usuarios activar");
+                                setMostrarAlerte(true);
+                            }else if(seleccionar==true && arregloActualizar.length>0){                                
+                                setMensajeAlerta("Usuarios activados");
+                                setMostrarAlerte(true);
+                                setRefrescar(!refrescar);
+                                setSeleccionar(!seleccionar);
+                            }
+                            
+                        }}
+                    >
+                        <Text style={{fontSize:16, color:'white'}}>{(seleccionar==false)?"Seleccionar cuales activar":"Activar los seleccionados"}</Text>
                     </TouchableOpacity>
                 </View>
             </View>
         )    
-    }   
+    
 }
 
 export default AdministrarUsuarios;

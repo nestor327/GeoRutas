@@ -12,7 +12,8 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
     setSecionIniciada,setTipoDeUsuario,activarPrecision,
     setActivarPrecision,tipoDeUsuario,permisosEnSegundoPlano,setPermisosEnSegundoPlano,
     todasLasRutasCompetencia, rutasSeleccionadasCompetencia,setTodasLasRutasCompetencia, 
-    setRutasSeleccionadasCompetencia, tipoDeSubscripcion,setVerAdministrarUsuarios})=>{
+    setRutasSeleccionadasCompetencia, tipoDeSubscripcion,setVerAdministrarUsuarios,setCambiarPassword,
+    setEditarPerfil,registrarse,setMostrarAlerte,setMensajeAlerta})=>{
 
 
     const [nombre,setnombre]=useState();
@@ -32,7 +33,7 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
         getRutasFavoritas(setArregloDeValores);
         getRutasFavoritas(setArregloDeParadasFavoritasMomentaneo);
         //console.log(todasLasRutasCompetencia);
-    },[])
+    },[registrarse])
 
     useEffect(()=>{
         if(arregloDeValores==undefined || arregloDeValores.length==0 || arregloDeValores==null){
@@ -82,10 +83,15 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
                 <Text style={[{marginTop:7,color:'white',fontSize:15}]}>{(activarPrecision==false)?"Activar precisión":"Desactivar precisión"}</Text>
             </TouchableOpacity>}
 
-            <TouchableOpacity style={{borderWidth:1.5,borderColor:'#f1f1f1',width:'70%'
-            ,height:40,paddingTop:8,paddingBottom:0,borderRadius:10,marginBottom:8,alignItems:'center'}}>
-                <Text style={{color:'white',fontSize:15,height:20}}>Ver Ubicacion</Text>
-            </TouchableOpacity>
+            {secionIniciada==true && tipoDeSubscripcion!="S" && tipoDeSubscripcion!='K' && <TouchableOpacity style={{borderWidth:1.5,borderColor:'#f1f1f1',width:'70%'
+            ,height:40,paddingTop:8,paddingBottom:0,borderRadius:10,marginBottom:8,alignItems:'center'}}
+            onPressOut={()=>{
+                setRegistrarse(true);
+                setEditarPerfil(true);
+            }}
+            >
+                <Text style={{color:'white',fontSize:15,height:20}}>Editar Perfil</Text>
+            </TouchableOpacity>}
 
             {tipoDeUsuario=='Transportista' && <TouchableOpacity
                 style={{alignContent:'center',flexDirection:'column',alignItems:'center',alignSelf:'center'
@@ -111,7 +117,11 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
             </TouchableOpacity>}
 
             <TouchableOpacity style={{borderWidth:2.2,width:'70%',borderRadius:10
-                ,marginBottom:8,height:40,paddingTop:8,borderColor:'white',alignItems:'center'}}>
+                ,marginBottom:8,height:40,paddingTop:8,borderColor:'white',alignItems:'center'}}
+                onPressOut={()=>{
+                    setCambiarPassword(true);
+                }}
+                >
                 <Text style={{color:'white',fontSize:15}}>Cambiar Contraseña</Text>
             </TouchableOpacity>
 
@@ -195,7 +205,8 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
                 onPress={()=>{
                     if(secionIniciada==true){
                         if(permitirEnviarUbicacion==true){
-                            alert("Antes debes dejar de compartir tu ubicacion")
+                            setMensajeAlerta("Antes debes dejar de compartir tu ubicación");
+                            setMostrarAlerte(true);
                             return;
                         }
                         setSecionIniciada(false);
@@ -211,9 +222,9 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
 
             {secionIniciada==false && <TouchableOpacity
                 style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10
-                ,marginBottom:8,height:40,paddingTop:8,alignItems:'center'}}
+                ,marginBottom:8,height:40,alignItems:'center',justifyContent:'center'}}
                 >
-                <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0,marginBottom:10}} onPress={()=>{
+                <Text style={{color:'white',fontSize:15}} onPress={()=>{
                 setRegistrarse(true);
                 }}>Registrarse</Text>
             </TouchableOpacity>}

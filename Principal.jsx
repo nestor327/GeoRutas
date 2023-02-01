@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ScrollView, StatusBar, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Linking, ScrollView, StatusBar, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Inicio from './components/Inicio.jsx';
 import Login from './components/Login.jsx';
 //import LoginTransportistas from './components/LoginTransportistas.jsx';
@@ -13,14 +13,58 @@ import useTrayectoria from './src/hooks/useTrayectoria.jsx';
 import RutasBarItem from './components/RutasBarItem.jsx';
 import IntercambiosRutas from './components/IntercambiosRutas.jsx';
 import ParadasCercaDelOrigen from './components/ParadasCercaDeUbicacion.jsx';
-import { getRutasFavoritas, getTokenGeoRutasCode, getUsuario, setRutasFavoritas, setTipoDeMenbresiaCode, setTipoDeUsuarioCode, setTokenGeoRutasCode } from './data/asyncStorageData.js';
+import { getNombre, getRutasFavoritas, getTokenGeoRutasCode, getUsuario, setRutasFavoritas, setTipoDeMenbresiaCode, setTipoDeUsuarioCode, setTokenGeoRutasCode } from './data/asyncStorageData.js';
 import ConfirmarCodigo from './components/ConfirmarCodigo.jsx';
 import CambiarPassword from './components/CambiarPassword.jsx';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AdministrarUsuarios from './components/AdministrarUsuarios.jsx';
 
+import SplashScreen from 'react-native-splash-screen';
+import EditarUsuario from './components/ComponentesParaAdmins/EditarUsuario.jsx';
+import AlertComponet from './components/AlertComponent.jsx';
+
 
 export default function App() {
+
+    const [VERSIONDELAPLICACION,SETVERSIONDELAPLICACION]=React.useState(1);
+    const [estadoAplicacion, setEstadoAplicacion]=React.useState(true);
+
+    const verificarVersionDeLaAplicacion=async()=>{
+
+        let datos=null;
+        try{
+            datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/VersionesDeLaAplicacion').then(res => datos=res.json());
+            console.log(datos);
+        }catch{
+            datos=null;
+            console.log("No se logro acceder a los datos");
+        }
+
+        if(datos!=null && datos.id_Version!=0 && datos.id_Version!=-1){            
+
+            let fecha=new Date(datos.fechaDeExpiracion);
+            let fechaNueva=new Date();
+            console.log(fecha);
+            console.log(fechaNueva);
+            if(VERSIONDELAPLICACION!=datos.numeroDeVersion && fechaNueva<fecha){                
+                setMensajeAlerta("Actualiza la aplicacion, esta version caduca el: "+fecha.toLocaleDateString());
+                setMostrarAlerte(true);
+                setTipoDeAlerta('E');
+            }else if(fechaNueva>=fecha && VERSIONDELAPLICACION!=datos.numeroDeVersion){
+                setMensajeAlerta("Actualiza la aplicacion, esta version caduco el: "+fecha.toLocaleDateString());
+                setMostrarAlerte(true);
+                setTipoDeAlerta('F');
+            }
+
+        }        
+    }
+
+    React.useEffect(()=>{
+        if(estadoAplicacion==true){
+            verificarVersionDeLaAplicacion();
+        }
+    },[estadoAplicacion])
+
     const [loguearse,setLoguearse]=React.useState(false);
     const [tipoDeUsuario, setTipoDeUsuario]=React.useState("Ninguno");
 
@@ -132,6 +176,31 @@ export default function App() {
       const [tipoDeSubscripcion,setTipoDeSubscripcion]=React.useState('C');
       const [verAdministrarUsuarios, setVerAdministrarUsuarios]=React.useState(false);
 
+      const [nombreAdmin,setNombreAdmin]=React.useState();//Esto es practicamente forzado
+
+      const [editarPerfil,setEditarPerfil]=React.useState(false);
+      const [emailDelChoferEditar, setEmailDelChoferEditar]=React.useState("");
+      const [editarInfoDelChofer, setEditarInfoDelChofer]=React.useState(false);
+      const [choferAEditar,setChoferAEditar]=React.useState(
+        {
+            idTablaForanea:0,
+            codigoCorreo:0,
+            fechaCodigoCorreo:new Date(),
+            token:"",
+            cuentaRegistrada:1,
+            nombres:"",
+            apellidos:"",
+            telefono:"",
+            tipoSubscripcion:"C",
+            tipoDeUsuario:"T",
+            estado:"I"});
+
+        const [refrescar,setRefrescar]=React.useState(false);
+        const [mostrarAlerta, setMostrarAlerte]=React.useState(false);
+        const [mensajeAlerta, setMensajeAlerta]=React.useState("Ocurrio un error");
+        const [tipoDeAlerta, setTipoDeAlerta]=React.useState('C');
+
+
 
       const obtenerToken=async()=>{
         const tokenValue=await AsyncStorage.getItem('tokenCodeGeoRutas');
@@ -180,17 +249,24 @@ export default function App() {
         }   
       }
 
-      React.useEffect(()=>{
+      React.useEffect(()=>{     
+        SplashScreen.hide();   
         obtenerToken();
         getRutasFavoritas(setRutasSeleccionadasCompetencia);
         getTokenGeoRutasCode(setTokenGeoRutas);
+        getNombre(setNombreAdmin);
       },[])
 
       React.useEffect(()=>{
+        SplashScreen.hide();
         if(rutasSeleccionadasCompetencia==undefined || rutasSeleccionadasCompetencia==null || rutasSeleccionadasCompetencia.length==0){
             let arreglo=[];
             for(let y=0;y<45;y++){
-                arreglo.push("✓")
+                if(y<10){
+                    arreglo.push("✓");
+                }else{
+                    arreglo.push("");
+                }                
             }
             setRutasSeleccionadasCompetencia(arreglo);
         }
@@ -206,6 +282,11 @@ export default function App() {
 
         //%  %  
         //%25 %25
+
+        if(tipoDeSubscripcion=='K'){
+            //alert("Renueve su subscripcion");
+        }
+        
         try{
             let url='http://georutas.us-east-2.elasticbeanstalk.com/api/RefrescarToken?Email='+email+'&Token='+token;
             
@@ -217,12 +298,14 @@ export default function App() {
             console.log(usuario);
             
         }catch{
-            alert("Revisa tu conexión a internet");
+            setMensajeAlerta("Revisa tu conexión a internet");
+            setMostrarAlerte(true);        
             return;
         }   
 
-        if(usuario==null){
-            alert("Revisa tu conexión a internet");
+        if(usuario==null){            
+            setMensajeAlerta("Revisa tu conexión a internet");
+            setMostrarAlerte(true);        
             return;
         }
 
@@ -239,6 +322,7 @@ export default function App() {
     }
 
     React.useEffect(()=>{
+        SplashScreen.hide();
         if(emailState.length>2){
             refrescarToken(emailState,tokenState);
         }
@@ -271,7 +355,9 @@ export default function App() {
         todasLasRutasCompetencia={todasLasRutasCompetencia} rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}
         setTodasLasRutasCompetencia={setTodasLasRutasCompetencia} setRutasSeleccionadasCompetencia={setRutasSeleccionadasCompetencia}
         emailState={emailState} tokenState={tokenState} setTokenState={setTokenState} tipoDeSubscripcion={tipoDeSubscripcion}
-        setVerAdministrarUsuarios={setVerAdministrarUsuarios}
+        setVerAdministrarUsuarios={setVerAdministrarUsuarios} setCambiarPassword={setCambiarPassword} setEditarPerfil={setEditarPerfil}
+        registrarse={registrarse} estadoAplicacion={estadoAplicacion} setEstadoAplicacion={setEstadoAplicacion} setMostrarAlerte={setMostrarAlerte} 
+        setMensajeAlerta={setMensajeAlerta}        
         ></Inicio>
         
         <View style={{height:0,width:width,padding:0}}>
@@ -347,18 +433,20 @@ export default function App() {
         ></MenuBar>
   
         
-        {loguearse==true && <Login setTipoDeSubscripcion={setTipoDeSubscripcion} setCambiarPassword={setCambiarPassword} setTipoDeUsuario={setTipoDeUsuario} setSecionIniciada={setSecionIniciada} setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} setLosguearTransportista={setLosguearTransportista} height={height} width={width} 
+        {loguearse==true && <Login setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} setTipoDeSubscripcion={setTipoDeSubscripcion} setCambiarPassword={setCambiarPassword} setTipoDeUsuario={setTipoDeUsuario} setSecionIniciada={setSecionIniciada} setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} setLosguearTransportista={setLosguearTransportista} height={height} width={width} 
         setIdUsuarioIniciado={setIdUsuarioIniciado} setUsuarioLogueado={setUsuarioLogueado} setTokenGeoRutas={setTokenGeoRutas} setConfirmarCodigo={setConfirmarCodigo} setEmailState={setEmailState} setTokenState={setTokenState}></Login>}
-        {confirmarCodigo==true &&<ConfirmarCodigo height={height} width={width} setConfirmarCodigo={setConfirmarCodigo}></ConfirmarCodigo>}
-        {cambiarPassword==true && <CambiarPassword height={height} width={width} setCambiarPassword={setCambiarPassword}></CambiarPassword>}
+        {confirmarCodigo==true &&<ConfirmarCodigo setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} height={height} width={width} setConfirmarCodigo={setConfirmarCodigo}></ConfirmarCodigo>}
+        {cambiarPassword==true && <CambiarPassword setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} height={height} width={width} setCambiarPassword={setCambiarPassword}></CambiarPassword>}
         {/* {loguearTransportista==true && <LoginTransportistas setLosguearTransportista={setLosguearTransportista} setRegistrarse={setRegistrarse} setSecionIniciada={setSecionIniciada} setLoguearse={setLoguearse} setTipoDeUsuario={setTipoDeUsuario}
         setIdUsuarioIniciado={setIdUsuarioIniciado} setUsuarioLogueado={setUsuarioLogueado} height={height} width={width}></LoginTransportistas>} */}
 
         {/* //DEBES ELIMINAR EL COMPONENTE QUE SE ENCIENTRA EN LA PARTE SUPERIOR */}
 
-        {verAdministrarUsuarios==true && <AdministrarUsuarios setVerAdministrarUsuarios={setVerAdministrarUsuarios} height={height} width={width} emailState={emailState} tokenState={tokenState}></AdministrarUsuarios>}
-        {registrarse==true && <Register setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} 
+        {verAdministrarUsuarios==true && <AdministrarUsuarios setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} refrescar={refrescar}setRefrescar={setRefrescar} setChoferAEditar={setChoferAEditar} setEmailDelChoferEditar={setEmailDelChoferEditar} setEditarInfoDelChofer={setEditarInfoDelChofer} nombre={nombreAdmin} setVerAdministrarUsuarios={setVerAdministrarUsuarios} height={height} width={width} emailState={emailState} tokenState={tokenState}></AdministrarUsuarios>}
+        {editarInfoDelChofer==true && <EditarUsuario setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} refrescar={refrescar}setRefrescar={setRefrescar} emailState={emailState} tokenState={tokenState} choferAEditar={choferAEditar} emailDelChoferEditar={emailDelChoferEditar} setEditarInfoDelChofer={setEditarInfoDelChofer} height={height} width={width} ></EditarUsuario>}
+        {registrarse==true && <Register setConfirmarCodigo={setConfirmarCodigo} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} emailState={emailState} tokenState={tokenState} setEditarPerfil={setEditarPerfil} editarPerfil={editarPerfil} setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} 
         height={height} width={width}></Register>}
+        {mostrarAlerta==true && <AlertComponet setTipoDeAlerta={setTipoDeAlerta} tipoDeAlert={tipoDeAlerta} setMostrarAlerte={setMostrarAlerte} AlerMensaje={mensajeAlerta} height={height}></AlertComponet>}
     </View>
   );
 }
