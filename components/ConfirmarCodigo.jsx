@@ -4,7 +4,7 @@ import { StatusBar, Text, TextInput, View, TouchableOpacity, Image} from 'react-
 import imagen from '../assets/x_icon_imagen.png';
 
 
-const ConfirmarCodigo=({height,width,setConfirmarCodigo})=>{
+const ConfirmarCodigo=({height,width,setConfirmarCodigo,setMostrarAlerte, setMensajeAlerta})=>{
     
     const [codigoEnvio, setCodigoEnvio]=useState("");
     const [tiempoDeEspera,setTiempoDeEspera]=useState(0);
@@ -46,7 +46,8 @@ const ConfirmarCodigo=({height,width,setConfirmarCodigo})=>{
         }
 
         if(email==null || email==""){
-            alert("Reintente ingresar");
+            setMensajeAlerta("Reintente ingresar");
+            setMostrarAlerte(true);
             setConfirmarCodigo(false);
             return;
         }
@@ -72,20 +73,27 @@ const ConfirmarCodigo=({height,width,setConfirmarCodigo})=>{
         }
 
         if(datos==1){
-            alert("Reintente iniciar secion");
+            setMensajeAlerta("Reintente iniciar sesión");
+            setMostrarAlerte(true);
             setConfirmarCodigo(false);
         }else if(datos==2){
-            alert("El codigo no es valido");            
+            setMensajeAlerta("El código no es válido");
+            setMostrarAlerte(true);
+            
         }else if(datos==3){
-            alert("Su codigo ya caduco, solicitelo nuevamente");
+            setMensajeAlerta("Su código ya caduco, solicítelo nuevamente");
+            setMostrarAlerte(true);
         }else if(datos==4){
-            alert("Su cuenta se activo correctamente. Inicie secion");
+            setMensajeAlerta("Su cuenta se activó correctamente. Inicie sesión");
+            setMostrarAlerte(true);
             setConfirmarCodigo(false);
         }else if(datos==5){
-            alert("Su cuenta ya esta confirmada");
+            setMensajeAlerta("Su cuenta ya está confirmada");
+            setMostrarAlerte(true);
             setConfirmarCodigo(false);
         }else{
-            alert("Reintente enviar el codigo");
+            setMensajeAlerta("Reintente enviar el código");
+            setMostrarAlerte(true);
         }
     }
 
@@ -100,7 +108,8 @@ const ConfirmarCodigo=({height,width,setConfirmarCodigo})=>{
         }
 
         if(email==null || email==""){
-            alert("Reintente ingresar");
+            setMensajeAlerta("Reintente ingresar");
+            setMostrarAlerte(true);
             setConfirmarCodigo(false);
             return;
         }
@@ -154,8 +163,9 @@ const ConfirmarCodigo=({height,width,setConfirmarCodigo})=>{
                     <Text style={{ color:'white',fontSize:25,
                         textAlign:'center',textAlignVertical:'center',alignItems:'center'}} 
                     onTouchEnd={()=>{
-                        if(codigoEnvio.length<=3){                           
-                            alert("Su codigo no es valido");
+                        if(codigoEnvio.length<=3){
+                            setMensajeAlerta("Su código no es válido");
+                            setMostrarAlerte(true);
                         }else{
                             confirmacionDeCodigo(codigoEnvio);
                             console.log(codigoEnvio); 

@@ -232,11 +232,10 @@ android {
         }
         release {
             // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            // see https://reactnative.dev/docs/signed-apk-android.            
             minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro" 
+            signingConfig signingConfigs.release           
         }
     }
 
@@ -266,6 +265,8 @@ dependencies {
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 
     implementation "com.facebook.android:facebook-android-sdk:latest.release"
+    
+    implementation project(':react-native-splash-screen')
 
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {

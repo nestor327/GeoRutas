@@ -6,7 +6,7 @@ import imagen from '../assets/x_icon_imagen.png';
 
 
 
-const CambiarPassword=({height,width,setCambiarPassword})=>{
+const CambiarPassword=({height,width,setCambiarPassword,setMostrarAlerte, setMensajeAlerta})=>{
     
     const [codigoEnvio, setCodigoEnvio]=useState("");
     const [tiempoDeEspera,setTiempoDeEspera]=useState(0);
@@ -71,12 +71,14 @@ const CambiarPassword=({height,width,setCambiarPassword})=>{
                 datos=await res.json();
             }else{
                 datos="";
-                alert("Reintente enviar el codigo aqui paso algo");
+                setMensajeAlerta("Reintente enviar el código");
+                setMostrarAlerte(true);
                 return;
             }
         }catch{
             datos="";
-            alert("Reintente enviar el codigo, el pedo fue aqui");
+            setMensajeAlerta("Reintente enviar el código");
+            setMostrarAlerte(true);
             return;
         }
 
@@ -86,16 +88,22 @@ const CambiarPassword=({height,width,setCambiarPassword})=>{
 
         if(datos==1){
             setCambiarPassword(false);
-            alert("Reintente iniciar sesión o registrarse");            
+            setMensajeAlerta("Reintente iniciar sesión o registrarse");
+            setMostrarAlerte(true);
+            
         }else if(datos==2){
-            alert("Este código no es válido, revise su correo");
+            setMensajeAlerta("Este código no es válido, revise su correo");
+            setMostrarAlerte(true);            
         }else if(datos==3){
-            alert("Su código ya caduco, solicítelo nuevamente");
+            setMensajeAlerta("Su código ya caduco, solicítelo nuevamente");
+            setMostrarAlerte(true);
         }else if(datos==4){
-            alert("Su código es correcto, ingrese su nueva contraseña");
+            setMensajeAlerta("Su código es correcto, ingrese su nueva contraseña");
+            setMostrarAlerte(true);            
             setCambiandoPassword(true);
         }else{
-            alert("Reintente enviar el codigo");
+            setMensajeAlerta("Reintente enviar el código");
+            setMostrarAlerte(true);
         }
 
     }
@@ -115,12 +123,14 @@ const CambiarPassword=({height,width,setCambiarPassword})=>{
                 datos=await res.json();
             }else{
                 datos="";
-                alert("Ocurrió un error, vuelva a intentarlo");
+                setMensajeAlerta("Ocurrió un error, vuelva a intentarlo");
+                setMostrarAlerte(true);
                 return;
             }
         }catch{
             datos="";
-            alert("Ocurrió un error, vuelva a intentarlo");
+            setMensajeAlerta("Ocurrió un error, vuelva a intentarlo");
+            setMostrarAlerte(true);
             return;
         }
 
@@ -128,16 +138,19 @@ const CambiarPassword=({height,width,setCambiarPassword})=>{
         console.log(datos);
 
         if(datos=="0"){
-            alert("Ocurrió un error, vuelva a intentarlo");
+            setMensajeAlerta("Ocurrió un error, vuelva a intentarlo");
+            setMostrarAlerte(true);
             return;
         }else if(datos=="1"){
-            alert("Ingrese un correo electrónico válido o regístrese");
+            setMensajeAlerta("Ingrese un correo electrónico válido o regístrese");
+            setMostrarAlerte(true);
             setCambiarPassword(false);
         }else if(datos=="3"){
-            alert("Actualmente, su cuenta está bloqueada, inténtelo más tarde");
+            setMensajeAlerta("Actualmente, su cuenta está bloqueada, inténtelo más tarde");
+            setMostrarAlerte(true);
         }else{
-            alert("Busque su código en su correo");
-            setPidiendoCodigo(false);
+            setMensajeAlerta("Busque su código en su correo");
+            setMostrarAlerte(true);
         }
 
     }
@@ -164,11 +177,13 @@ const CambiarPassword=({height,width,setCambiarPassword})=>{
             if(res.ok){                
                 datos=await res.json();                
             }else{
-                alert("Ocurrió un error, vuelva a intentarlo");
+                setMensajeAlerta("Ocurrió un error, vuelva a intentarlo");
+                setMostrarAlerte(true);
                 return;
             }
         }catch{
-            alert("Ocurrió un error, vuelva a intentarlo");
+            setMensajeAlerta("Ocurrió un error, vuelva a intentarlo");
+            setMostrarAlerte(true);
             return;
         }
 
@@ -177,12 +192,15 @@ const CambiarPassword=({height,width,setCambiarPassword})=>{
         console.log(typeof(datos.token));
 
         if(datos==null || datos.token=="0"){
-            alert("Ocurrió un error, vuelva a intentarlo");
+            setMensajeAlerta("Ocurrió un error, vuelva a intentarlo");
+            setMostrarAlerte(true);
         }else if(datos.token=="1"){
-            alert("Ocurrió un error");
+            setMensajeAlerta("Ocurrió un error, vuelva a intentarlo");
+            setMostrarAlerte(true);
             setCambiarPassword(false);
         }else if(datos.token.length>2){
-            alert("La contraseña se guardó correctamente");
+            setMensajeAlerta("La contraseña se guardó correctamente");
+            setMostrarAlerte(true);
             setCambiarPassword(false);
         }
 
@@ -239,7 +257,8 @@ const CambiarPassword=({height,width,setCambiarPassword})=>{
                         textAlign:'center',textAlignVertical:'center',alignItems:'center'}} 
                     onTouchEnd={()=>{
                         if(pidiendoCodigo==true && !codigoEnvio.includes("@")){
-                            alert("Ingresa un correo válido");
+                            setMensajeAlerta("Ingresa un correo válido");
+                            setMostrarAlerte(true);
                         }else if(pidiendoCodigo==true){     
                             setCorreo(codigoEnvio.toLowerCase());
                             setEmailLocal(codigoEnvio.toLowerCase());
@@ -248,7 +267,8 @@ const CambiarPassword=({height,width,setCambiarPassword})=>{
                         }
 
                         if(pidiendoCodigo==false && codigoEnvio.length<=3 && cambiandoPassword==false){
-                            alert("Su codigo no es valido");
+                            setMensajeAlerta("Su código no es válido");
+                            setMostrarAlerte(true);
                         }else if(pidiendoCodigo==false && cambiandoPassword==false){
                             confirmacionDeCodigo(codigoEnvio,emailLocal);                            
                             //setCambiandoPassword(true);
@@ -258,9 +278,11 @@ const CambiarPassword=({height,width,setCambiarPassword})=>{
                         if(cambiandoPassword==true && newPassword==codigoEnvio && codigoEnvio.length>=8){
                             envarCambios(newPassword,codigoEnvio);
                         }else if(cambiandoPassword==true && newPassword!=codigoEnvio && codigoEnvio.length>=8){
-                            alert("Las contraseñas no coinciden");
+                            setMensajeAlerta("Las contraseñas no coinciden");
+                            setMostrarAlerte(true);
                         }else if(cambiandoPassword==true && codigoEnvio.length<8){
-                            alert("La contraseña debe de tener más de 8 caracteres");                            
+                            setMensajeAlerta("La contraseña debe de tener más de 8 caracteres");
+                            setMostrarAlerte(true);
                         }
 
                     }}>{(pidiendoCodigo)?"Enviar correo":(cambiandoPassword==false)?"Enviar código":"Confirmar"}</Text>

@@ -1,7 +1,7 @@
 import * as react from 'react'
 import { Keyboard,View,Text, TextInput,Image,StatusBar, TouchableOpacity,ActivityIndicator, Button} from 'react-native'
 import imagen from '../assets/x_icon_imagen.png';
-import {setUsuario,getUsuario,setContraseña,getContraseña, setTokenGeoRutasCode, setTipoDeMenbresiaCode, getTipoDeMenbresia, setCorreo, setTipoDeUsuarioCode, setIdUsuarioIniciadoCode, setNombre} from '../data/asyncStorageData.js'
+import {setUsuario,getUsuario,setContraseña,getContraseña, setTokenGeoRutasCode, setTipoDeMenbresiaCode, getTipoDeMenbresia, setCorreo, setTipoDeUsuarioCode, setIdUsuarioIniciadoCode, setNombre, setApellidos, setTelefono} from '../data/asyncStorageData.js'
 import MD5 from 'md5'
 import { useQuery } from 'react-query';
 import { AccessToken, LoginButton } from 'react-native-fbsdk';
@@ -17,7 +17,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransportista
         ,setTipoDeUsuario,height,width,setIdUsuarioIniciado,setUsuarioLogueado,setTokenGeoRutas
-        ,setConfirmarCodigo,setCambiarPassword,setEmailState, setTokenState,setTipoDeSubscripcion})=>{
+        ,setConfirmarCodigo,setCambiarPassword,setEmailState, setTokenState,setTipoDeSubscripcion,setMostrarAlerte,setMensajeAlerta})=>{
  
     const [usuarioState,setUsuarioState]=react.useState("");
     const [contrasenia, setContrasenia]=react.useState("");
@@ -126,31 +126,40 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
             // console.log(menbre);
             
             if(json==null){
-                alert("Revisa tu conexión a internet");
+                setMensajeAlerta("Revisa tu conexión a internet");
+                setMostrarAlerte(true);
             }else if(json.token=="0"){
-                alert("Ocurrió un error, vuelve a intentarlo");
+                setMensajeAlerta("Ocurrió un error, vuelve a intentarlo");
+                setMostrarAlerte(true);
             }else if(json.token=="1"){
-                alert("Regístrese con su correo antes de intentar acceder");
+                setMensajeAlerta("Regístrese con su correo antes de intentar acceder");
+                setMostrarAlerte(true);
             }else if(json.token=="2"){
-                alert("Su cuenta ha sido bloqueada, reintente más tarde");
+                setMensajeAlerta("Su cuenta ha sido bloqueada, reintente más tarde");
+                setMostrarAlerte(true);
             }else if(json.token=="3"){
-                alert("Use el código que se le envió a su correo para activar su cuenta");
+                setMensajeAlerta("Use el código que se le envió a su correo para activar su cuenta");
+                setMostrarAlerte(true);
                 setConfirmarCodigo(true);
             }else if(json.token=="4"){
-                alert("Su contraseña es incorrecta");
+                setMensajeAlerta("Su contraseña es incorrecta");
+                setMostrarAlerte(true);
             }else if(json.token.length>1){
-                if(json.tipoSubscripcion=='K'){
+                if(json.tipoSubscripcion=='B'){
                     setTipoDeMenbresiaCode(json.tipoSubscripcion);
-                    alert("Renueve su subscripción para poder acceder");
+                    setMensajeAlerta("Solicite una subscripción para poder acceder");
+                    setMostrarAlerte(true);
                     return;
                 }
-                setNombre(json.nombres)
+                setNombre(json.nombres);
+                setApellidos(json.apellidos);                
                 setTokenState(json.token);
                 setTokenGeoRutasCode(json.token);
                 setTokenGeoRutas(json.token);
                 setTipoDeMenbresiaCode(json.tipoSubscripcion);
                 setTipoDeSubscripcion(json.tipoSubscripcion);
-                alert("Has iniciado sesión");
+                setMensajeAlerta("Has iniciado sesión");
+                setMostrarAlerte(true);
                 setLoguearse(false);
                 setSecionIniciada(true);
                 if(json.tipoDeUsuario=='T'){
@@ -171,7 +180,8 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
             }
 
         }else{
-            alert("Revisa tu conexión a internet");
+            setMensajeAlerta("Revisa tu conexión a internet");
+            setMostrarAlerte(true);
         }        
     }
 
@@ -221,7 +231,8 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
             let respuestaLeida=true;
 
             if(json==null || json.respuesta=="0"){
-                alert("Ocurrió un error, reintente ingresar");
+                setMensajeAlerta("Ocurrió un error, reintente ingresar");
+                setMostrarAlerte(true);
                 return;
             }
 
@@ -244,18 +255,21 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                 console.log("Los datos nuevos traidos desde el servidor son: ");
                 console.log(json);
             }else if(respuestaLeida==false || !datos.ok){
-                alert("Reintenta ingresar");
+                setMensajeAlerta("Reintenta ingresar");
+                setMostrarAlerte(true);
                 return;
             }
 
             if(json==null || json.respuesta=="0" || json.respuesta!="1"){
-                alert("Ocurrió un error, reintente ingresar");
+                setMensajeAlerta("Ocurrió un error, reintente ingresar");
+                setMostrarAlerte(true);
                 return;
             }
             
             if(json.tipoSubscripcion=='K'){
                 setTipoDeMenbresiaCode(json.tipoSubscripcion);
-                alert("Renueve su subscripción para poder acceder");
+                setMensajeAlerta("Renueve su subscripción para poder acceder");
+                setMostrarAlerte(true);
                 return;
             }
             setNombre(json.nombres)
@@ -269,7 +283,8 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
             setTokenGeoRutas(json.token);
             setTipoDeMenbresiaCode(json.tipoSubscripcion);      
             setTipoDeSubscripcion(json.tipoSubscripcion);
-            alert("Has iniciado sesión con Google");
+            setMensajeAlerta("Has iniciado sesión con Google");
+            setMostrarAlerte(true);
             setLoguearse(false);
             setSecionIniciada(true);
             if(json.tipoDeUsuario=='T'){
@@ -286,7 +301,8 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
             return;
 
         }else{
-            alert("Ocurrió un error, reintente ingresar");
+            setMensajeAlerta("Ocurrió un error, reintente ingresar");
+            setMostrarAlerte(true);
         }
 
     }
@@ -337,7 +353,8 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
             let respuestaLeida=true;
 
             if(json==null || json.respuesta=="0"){
-                alert("Ocurrió un error, reintente ingresar");
+                setMensajeAlerta("Ocurrió un error, reintente ingresar");
+                setMostrarAlerte(true);
                 return;
             }
 
@@ -361,18 +378,21 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                 console.log("Los datos nuevos traidos desde el servidor son: ");
                 console.log(json);
             }else if(respuestaLeida==false || !datos.ok){
-                alert("Reintenta ingresar");
+                setMensajeAlerta("Reintenta ingresar");
+                setMostrarAlerte(true);
                 return;
             }
 
             if(json==null || json.respuesta=="0" || json.respuesta!="1"){
-                alert("Ocurrió un error, reintente ingresar");
+                setMensajeAlerta("Ocurrió un error, reintente ingresar");
+                setMostrarAlerte(true);
                 return;
             }
             
             if(json.tipoSubscripcion=='K'){
                 setTipoDeMenbresiaCode(json.tipoSubscripcion);
-                alert("Renueve su subscripción para poder acceder");
+                setMensajeAlerta("Renueve su subscripción para poder acceder");
+                setMostrarAlerte(true);
                 return;
             }
 
@@ -387,7 +407,8 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
             setTokenGeoRutas(json.token);
             setTipoDeMenbresiaCode(json.tipoSubscripcion);   
             setTipoDeSubscripcion(json.tipoSubscripcion);
-            alert("Has iniciado sesión con Facebook");
+            setMensajeAlerta("Has iniciado sesión con Facebook");
+            setMostrarAlerte(true);
             setLoguearse(false);
             setSecionIniciada(true);
             if(json.tipoDeUsuario=='T'){
@@ -403,7 +424,8 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
             console.log("El token de iniciar sesion es: "+json.token);
             return;
         }else{
-            alert("Ocurrió un error, reintente ingresar");
+            setMensajeAlerta("Ocurrió un error, reintente ingresar");
+            setMostrarAlerte(true);
         }
 
     }
@@ -456,10 +478,12 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                 <TouchableOpacity style={{backgroundColor:'#2060A5', height:55,width:'60%',marginTop:30,marginLeft:'auto', marginRight:'auto',alignItems:'center', justifyContent:'center', borderRadius:10}}
                     onPressOut={()=>{
                         if(usuarioState.length==0 || !usuarioState.includes("@")){
-                            alert("El usuario no es valido");
+                            setMensajeAlerta("El usuario no es válido");
+                            setMostrarAlerte(true);
                             return;
                         }else if(contrasenia==null || contrasenia.length==0){
-                            alert("Ingrese una contraseña");
+                            setMensajeAlerta("Ingrese una contraseña");
+                            setMostrarAlerte(true);
                             return;
                         }
 
@@ -525,7 +549,8 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                                 }).catch((e) => {
                                     console.log("ERROR IS: " + JSON.stringify(e));
                                     if(e.message=="NETWORK_ERROR"){
-                                        alert("Revise su conexión a internet");
+                                        setMensajeAlerta("Revise su conexión a internet");
+                                        setMostrarAlerte(true);
                                     }
                                 })
                             }
