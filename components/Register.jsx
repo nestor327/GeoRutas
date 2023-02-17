@@ -2,7 +2,6 @@ import * as react from 'react';
 import { View,Text, TextInput,Image, ScrollView,Keyboard,TouchableOpacity, Platform, AppState } from 'react-native';
 import imagen from '../assets/x_icon_imagen.png';
 //import * as Location from 'expo-location';
-import MD5 from 'md5';
 import { useQuery } from 'react-query';
 import { setNombre,setCorreo, getApellidos, getTelefono, setTelefonoAsync } from '../data/asyncStorageData.js';
 import { StatusBar } from 'react-native';
@@ -135,7 +134,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
         let datos="";
 
         try{
-            let res=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/Registro',options);
+            let res=await fetch('https://www.georutas.lat/api/Registro',options);
             if(res.ok){                
                 datos=await res.json();                
             }else{
@@ -190,7 +189,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
                 body: JSON.stringify(objeto)
             };
 
-            let datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/EditarPerfil?Token='+tokenState,options);
+            let datos=await fetch('https://www.georutas.lat/api/EditarPerfil?Token='+tokenState,options);
 
             if(datos.ok){
                 let json=await datos.json();

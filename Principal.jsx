@@ -1,8 +1,7 @@
-import * as React from 'react';
+import {useState,useEffect,useRef} from 'react';
 import { Linking, ScrollView, StatusBar, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Inicio from './components/Inicio.jsx';
 import Login from './components/Login.jsx';
-//import LoginTransportistas from './components/LoginTransportistas.jsx';
 import { useQuery, queryKey } from 'react-query';
 import MenuBar from './components/MenuBar.jsx';
 import Register from './components/Register.jsx';
@@ -13,7 +12,7 @@ import useTrayectoria from './src/hooks/useTrayectoria.jsx';
 import RutasBarItem from './components/RutasBarItem.jsx';
 import IntercambiosRutas from './components/IntercambiosRutas.jsx';
 import ParadasCercaDelOrigen from './components/ParadasCercaDeUbicacion.jsx';
-import { getNombre, getRutasFavoritas, getTokenGeoRutasCode, getUsuario, setRutasFavoritas, setTipoDeMenbresiaCode, setTipoDeUsuarioCode, setTokenGeoRutasCode } from './data/asyncStorageData.js';
+import { getNombre, getRutasFavoritas, getTokenGeoRutasCode, getUsuario, setApellidos, setIdUsuarioIniciadoCode, setNombre, setRutasFavoritas, setTipoDeMenbresiaCode, setTipoDeUsuarioCode, setTokenGeoRutasCode } from './data/asyncStorageData.js';
 import ConfirmarCodigo from './components/ConfirmarCodigo.jsx';
 import CambiarPassword from './components/CambiarPassword.jsx';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -22,22 +21,62 @@ import AdministrarUsuarios from './components/AdministrarUsuarios.jsx';
 import SplashScreen from 'react-native-splash-screen';
 import EditarUsuario from './components/ComponentesParaAdmins/EditarUsuario.jsx';
 import AlertComponet from './components/AlertComponent.jsx';
+import ItemsTrayectos from './components/ItemsTrayectos.jsx';
+import BVAplicacion from './components/BVAplicacion.jsx';
+import JustificarUbicacion from './components/JustificarUbicacion.jsx';
+import BGPermisos from './components/BGpermisos.jsx';
 
 
-export default function App() {
+const App=()=>{
 
-    const [VERSIONDELAPLICACION,SETVERSIONDELAPLICACION]=React.useState(1);
-    const [estadoAplicacion, setEstadoAplicacion]=React.useState(true);
+    const [VERSIONDELAPLICACION,SETVERSIONDELAPLICACION]=useState(1);
+    const [estadoAplicacion, setEstadoAplicacion]=useState(true);
+    const [urlDeLaAplicacion, setUrlDeLaAplicacion]=useState('');
+    const [darBienvenida, setDarBienvenida]=useState(false);
+    const [justificarUbicacion,setJustificarUbicacion]=useState(false);
+    const [pedirUbicacion, setPedirUbicacion]=useState(false);
+    const [pedirUbicacionSegundoPlano, setPedirUbicacionSegundoPlano]=useState(1);
 
     const verificarVersionDeLaAplicacion=async()=>{
 
+        let bienvenida=null;
+        try{
+            bienvenida=await AsyncStorage.getItem('bienvenida');
+        }catch{
+            bienvenida=null
+        }
+
+        if(bienvenida==null){
+            let respuesta=await AsyncStorage.setItem('bienvenida','bienvenida');
+            setDarBienvenida(true);
+        }
+
+        let justificarU=null;
+        try{
+            justificarU=await AsyncStorage.getItem('justificarU');
+        }catch{
+            justificarU=null
+        }
+
+        if(justificarU==null){
+            let respuesta=await AsyncStorage.setItem('justificarU','justificarU');
+            setJustificarUbicacion(true);
+            setPedirUbicacion(false);
+            setPedirUbicacionSegundoPlano(1);
+        }
+
+
         let datos=null;
         try{
-            datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/VersionesDeLaAplicacion').then(res => datos=res.json());
+            datos=await fetch('https://www.georutas.lat/api/VersionesDeLaAplicacion').then(res => datos=res.json());
             console.log(datos);
+            if(datos!=null && datos!=undefined){
+                setUrlDeLaAplicacion(datos.descripcionDeLaVersion);
+            }
         }catch{
             datos=null;
             console.log("No se logro acceder a los datos");
+            setUrlDeLaAplicacion('');
         }
 
         if(datos!=null && datos.id_Version!=0 && datos.id_Version!=-1){            
@@ -56,94 +95,69 @@ export default function App() {
                 setTipoDeAlerta('F');
             }
 
-        }        
+        }
+        
+        
     }
 
-    React.useEffect(()=>{
+    useEffect(()=>{
         if(estadoAplicacion==true){
             verificarVersionDeLaAplicacion();
         }
     },[estadoAplicacion])
 
-    const [loguearse,setLoguearse]=React.useState(false);
-    const [tipoDeUsuario, setTipoDeUsuario]=React.useState("Ninguno");
+    const [loguearse,setLoguearse]=useState(false);
+    const [tipoDeUsuario, setTipoDeUsuario]=useState("Ninguno");
 
-    const [secionIniciada, setSecionIniciada]=React.useState(false);
+    const [secionIniciada, setSecionIniciada]=useState(false);
       
-    const [registrarse,setRegistrarse]=React.useState(false);
+    const [registrarse,setRegistrarse]=useState(false);
 
-    const [loguearTransportista, setLosguearTransportista]=React.useState(false);
+    const [loguearTransportista, setLosguearTransportista]=useState(false);
 
-    const [idUsuarioIniciado, setIdUsuarioIniciado]=React.useState(-1);
+    const [idUsuarioIniciado, setIdUsuarioIniciado]=useState(-1);
 
-    const [usuarioLogueado, setUsuarioLogueado]=React.useState({});
+    const [usuarioLogueado, setUsuarioLogueado]=useState({});
 
-    const [permitirEnviarUbicacion, setPermitirEnviarUbicacion]=React.useState(false);
-    
-/** {"latitude": , "longitude": }
- LOG  Las coordenas del destino son:
- LOG  {"latitude": , "longitude": } */
-
-    const [coordenadasOrigen, setCoordenadasOrigen]=React.useState({latitude:12.153800313208755,longitude:-86.30149193108082});
-    const [coordenadasDestino, setCoordenadasDestino]=React.useState({latitude:12.134261,longitude:-86.269897});
-    //const [coordenadasOrigen, setCoordenadasOrigen]=React.useState({latitude:12.147148643476557,longitude:-86.21404554694891});
-    //const [coordenadasDestino, setCoordenadasDestino]=React.useState({latitude:12.155924,longitude:-86.302363});
-
-    const [idUsuariosDeTrayectoria, setIdUsuariosDeTrayectoria]=React.useState([]);
-
-
-    // const Gets=async ({queryKey}) =>{
-  
-    //     let url='https://georutas.somee.com/api/SP_PCalcularMenorRutaEnFuncionDelTiempoModificado/'+queryKey[1].latitude
-    //     +','+queryKey[1].longitude+','+queryKey[2].latitude+','+queryKey[2].longitude;
-  
-    //     try{
-    //       data=await fetch(url).then(res =>
-    //         res.json()
-    //       )        
-    //     }catch(e){          
-    //       data=[]
-    //     }
-    //     return data;
-    //   }
-      
-    // let {data, error, isLoading,isError, isSuccess,status}=useQuery(["gets",coordenadasOrigen,coordenadasDestino],Gets,{
-    //     refetchInterval:2000,
-    //     cacheTime:2000
-    // });
-
-
+    const [permitirEnviarUbicacion, setPermitirEnviarUbicacion]=useState(false);
     
 
-    const [rutasTrayectoria,setRutasTrayectoria]=React.useState([]);
-    const [visualizarRutas,setVisualizarRutas]=React.useState(1);
-    const verRutasTrayecto=React.useRef(false);
-
-    const [tiemposRutasTrayectorias,setTiemposRutasTrayectorias]=React.useState([]);
-    const [iconosTransportes,setIconosTransportes]=React.useState([]);
+    const [coordenadasOrigen, setCoordenadasOrigen]=useState({latitude:12.153800313208755,longitude:-86.30149193108082});
+    const [coordenadasDestino, setCoordenadasDestino]=useState({latitude:12.134261,longitude:-86.269897});
     
-    const identificadorKey=React.useRef(0);
-    const refCambiarLupa=React.useRef(false);
-  
-      const [verTrayectoria,setVerTrayectoria]=React.useState(true);
-      const [ocultarMenu, setOcultarMenu]=React.useState(true);
-      const [mostrarItemMenuUno, setMostrarItemMenuUno]=React.useState(true);
-      const [verParadasCercanas,setVerParadasCercanas]=React.useState([{observar:false,latitude:12.155924,longitude:-86.302363,direccion:'K',id_Ruta:1}]);
-      const [coordenadasOrigenSecundario, setCoordenadasOrigenSecundario]=React.useState({latitude:12.135744,longitude:-86.261872});
-      const [ocultarTercerMenu, setOcultarTercerMenu]=React.useState(false);
-      const [direccionesPorUsuario, setDireccionPorUsuario]=React.useState('K');
-      const [idRutaAMostrar, setIdRutaAMostrar]=React.useState(-1);
-      const [mostrarSniperCargando, setMostrarSniperCargando]=React.useState(false);
 
-      const [verTransportistasPorLaDerecha, setVerTransportistasPorLaDerecha]=React.useState(false);
-      const [verTransportistasPorLaIzquierda, setVerTransportistasPorLaIzquierda]=React.useState(false);
-      const [verCompetencia, setVerCompetencia]=React.useState(false);
-      const [verRutasCercanas, setVerRutasCercanas]=React.useState(false);
-      const [ocultarTrayecto, setOcultarTrayecto]=React.useState(false);
+    const [idUsuariosDeTrayectoria, setIdUsuariosDeTrayectoria]=useState([]);
+
+
+    const [rutasTrayectoria,setRutasTrayectoria]=useState([]);
+    const [visualizarRutas,setVisualizarRutas]=useState(1);
+    const verRutasTrayecto=useRef(false);
+
+    const [tiemposRutasTrayectorias,setTiemposRutasTrayectorias]=useState([]);
+    const [iconosTransportes,setIconosTransportes]=useState([]);
+    
+    const identificadorKey=useRef(0);
+    const refCambiarLupa=useRef(false);
+  
+      const [verTrayectoria,setVerTrayectoria]=useState(true);
+      const [ocultarMenu, setOcultarMenu]=useState(true);
+      const [mostrarItemMenuUno, setMostrarItemMenuUno]=useState(true);
+      const [verParadasCercanas,setVerParadasCercanas]=useState([{observar:false,latitude:12.155924,longitude:-86.302363,direccion:'K',id_Ruta:1}]);
+      const [coordenadasOrigenSecundario, setCoordenadasOrigenSecundario]=useState({latitude:12.135744,longitude:-86.261872});
+      const [ocultarTercerMenu, setOcultarTercerMenu]=useState(false);
+      const [direccionesPorUsuario, setDireccionPorUsuario]=useState('K');
+      const [idRutaAMostrar, setIdRutaAMostrar]=useState(-1);
+      const [mostrarSniperCargando, setMostrarSniperCargando]=useState(false);
+
+      const [verTransportistasPorLaDerecha, setVerTransportistasPorLaDerecha]=useState(false);
+      const [verTransportistasPorLaIzquierda, setVerTransportistasPorLaIzquierda]=useState(false);
+      const [verCompetencia, setVerCompetencia]=useState(false);
+      const [verRutasCercanas, setVerRutasCercanas]=useState(false);
+      const [ocultarTrayecto, setOcultarTrayecto]=useState(false);
 
       
-      const [emailState, setEmailState]=React.useState("");
-      const [tokenState, setTokenState]=React.useState("");
+      const [emailState, setEmailState]=useState("");
+      const [tokenState, setTokenState]=useState("");
 
       const {height,width}=useWindowDimensions();
 
@@ -152,36 +166,36 @@ export default function App() {
       const {data,obtenerRutas} = useTrayectoria(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,setVisualizarRutas,
       setTiemposRutasTrayectorias,setIconosTransportes,setIdUsuariosDeTrayectoria,verRutasTrayecto,identificadorKey,emailState,tokenState);
 
-      const [menUno, setmenUno] = React.useState([{ display: 'none',color:'#102769' }]);
-      const [menDos, setmenDos] = React.useState([{ display: 'none',color:'#102769' }]);
-      const [menTres, setmenTres] = React.useState([{ display: 'none',color:'#102769' }]);
-      const [menCuatro, setmenCuatro] = React.useState([{ display: 'flex',color:'#101043' }]);
-      const [menCinco, setmenCinco] = React.useState([{ display: 'none',color:'#102769' }]);
+      const [menUno, setmenUno] = useState([{ display: 'none',color:'#102769' }]);
+      const [menDos, setmenDos] = useState([{ display: 'none',color:'#102769' }]);
+      const [menTres, setmenTres] = useState([{ display: 'none',color:'#102769' }]);
+      const [menCuatro, setmenCuatro] = useState([{ display: 'flex',color:'#101043' }]);
+      const [menCinco, setmenCinco] = useState([{ display: 'none',color:'#102769' }]);
 
-      const [userLocation,setUserLocatio]=React.useState({latitude:0,longitude:0});    
+      const [userLocation,setUserLocatio]=useState({latitude:0,longitude:0});    
 
-      const [mostrarBarraSecundariaDeUbicacion, setMostrarBarraSecundariaDeUbicacion]=React.useState(false);
-      const [activarPrecision, setActivarPrecision]=React.useState(true);
-      const [mostrarVentana,serMostrarVentana]=React.useState('none');
+      const [mostrarBarraSecundariaDeUbicacion, setMostrarBarraSecundariaDeUbicacion]=useState(false);
+      const [activarPrecision, setActivarPrecision]=useState(true);
+      const [mostrarVentana,serMostrarVentana]=useState('none');
 
-      const [cargando, setCargando]=React.useState(false);
+      const [cargando, setCargando]=useState(false);
 
       let todasLasRutasData=getAllRutas();
-      const [todasLasRutasCompetencia, setTodasLasRutasCompetencia]=React.useState(getAllRutas());
-      const [rutasSeleccionadasCompetencia, setRutasSeleccionadasCompetencia]=React.useState([]);
+      const [todasLasRutasCompetencia, setTodasLasRutasCompetencia]=useState(getAllRutas());
+      const [rutasSeleccionadasCompetencia, setRutasSeleccionadasCompetencia]=useState([]);
 
-      const [tokenGeoRutas,setTokenGeoRutas]=React.useState("");
-      const [confirmarCodigo,setConfirmarCodigo]=React.useState(false);
-      const [cambiarPassword,setCambiarPassword]=React.useState(false);
-      const [tipoDeSubscripcion,setTipoDeSubscripcion]=React.useState('C');
-      const [verAdministrarUsuarios, setVerAdministrarUsuarios]=React.useState(false);
+      const [tokenGeoRutas,setTokenGeoRutas]=useState("");
+      const [confirmarCodigo,setConfirmarCodigo]=useState(false);
+      const [cambiarPassword,setCambiarPassword]=useState(false);
+      const [tipoDeSubscripcion,setTipoDeSubscripcion]=useState('C');
+      const [verAdministrarUsuarios, setVerAdministrarUsuarios]=useState(false);
 
-      const [nombreAdmin,setNombreAdmin]=React.useState();//Esto es practicamente forzado
+      const [nombreAdmin,setNombreAdmin]=useState();//Esto es practicamente forzado
 
-      const [editarPerfil,setEditarPerfil]=React.useState(false);
-      const [emailDelChoferEditar, setEmailDelChoferEditar]=React.useState("");
-      const [editarInfoDelChofer, setEditarInfoDelChofer]=React.useState(false);
-      const [choferAEditar,setChoferAEditar]=React.useState(
+      const [editarPerfil,setEditarPerfil]=useState(false);
+      const [emailDelChoferEditar, setEmailDelChoferEditar]=useState("");
+      const [editarInfoDelChofer, setEditarInfoDelChofer]=useState(false);
+      const [choferAEditar,setChoferAEditar]=useState(
         {
             idTablaForanea:0,
             codigoCorreo:0,
@@ -195,10 +209,11 @@ export default function App() {
             tipoDeUsuario:"T",
             estado:"I"});
 
-        const [refrescar,setRefrescar]=React.useState(false);
-        const [mostrarAlerta, setMostrarAlerte]=React.useState(false);
-        const [mensajeAlerta, setMensajeAlerta]=React.useState("Ocurrio un error");
-        const [tipoDeAlerta, setTipoDeAlerta]=React.useState('C');
+        const [refrescar,setRefrescar]=useState(false);
+        const [mostrarAlerta, setMostrarAlerte]=useState(false);
+        const [mensajeAlerta, setMensajeAlerta]=useState("Ocurrio un error");
+        const [tipoDeAlerta, setTipoDeAlerta]=useState('C');
+        const [sesionIniciadaConGoogle, setSesionIniciadaConGoogle]=useState(false);
 
 
 
@@ -249,7 +264,7 @@ export default function App() {
         }   
       }
 
-      React.useEffect(()=>{     
+      useEffect(()=>{     
         SplashScreen.hide();   
         obtenerToken();
         getRutasFavoritas(setRutasSeleccionadasCompetencia);
@@ -257,7 +272,7 @@ export default function App() {
         getNombre(setNombreAdmin);
       },[])
 
-      React.useEffect(()=>{
+      useEffect(()=>{
         SplashScreen.hide();
         if(rutasSeleccionadasCompetencia==undefined || rutasSeleccionadasCompetencia==null || rutasSeleccionadasCompetencia.length==0){
             let arreglo=[];
@@ -276,22 +291,15 @@ export default function App() {
 
     const refrescarToken=async(email,token)=>{
         let usuario=null;
-        // console.log("El token que envias es: "+token);
-        // console.log("El correo que envias es: "+email);
-        // console.log("El id que envias es: "+idUsuarioIniciado);
-
-        //%  %  
-        //%25 %25
-
+        
         if(tipoDeSubscripcion=='K'){
             //alert("Renueve su subscripcion");
         }
         
         try{
-            let url='http://georutas.us-east-2.elasticbeanstalk.com/api/RefrescarToken?Email='+email+'&Token='+token;
+            let url='https://www.georutas.lat/api/RefrescarToken?Email='+email+'&Token='+token;
             
-            //Al momento de guardarlo en la base de datos, no debes de guardarlo con la misma estructura
-
+            
             usuario=await fetch(url).then(res=>usuario=res.json());
             //usuario=await fetch(url);
             console.log("El usuario es: ");
@@ -321,20 +329,18 @@ export default function App() {
         }
     }
 
-    React.useEffect(()=>{
+    useEffect(()=>{
         SplashScreen.hide();
         if(emailState.length>2){
             refrescarToken(emailState,tokenState);
         }
     },[idRutaAMostrar,visualizarRutas])
 
+    const [mostrarMenusBuenEstado,setMostrarMenusBuenEstado]=useState(false);
+    const [ocultarLasMierdasDelPrimerMenu,setOcultarLasMierdasDelPrimerMenu]=useState(true);
+
   return (
      <View style={{height:alturaTotal, width:width}}>
-    {/* //<View style={{flex:1}}> */}
-      
-        {/* <StatusBar barStyle={'dark-content'} backgroundColor={"#00000045"} translucent={true}></StatusBar>       */}
-
-
         
         <Inicio setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} setCoordenadasOrigen={setCoordenadasOrigen} tipoDeUsuario={tipoDeUsuario}
         setVerTrayectoria={setVerTrayectoria} setOcultarMenu={setOcultarMenu} coordenadasOrigen={coordenadasOrigen} coordenadasDestino={coordenadasDestino}
@@ -357,10 +363,31 @@ export default function App() {
         emailState={emailState} tokenState={tokenState} setTokenState={setTokenState} tipoDeSubscripcion={tipoDeSubscripcion}
         setVerAdministrarUsuarios={setVerAdministrarUsuarios} setCambiarPassword={setCambiarPassword} setEditarPerfil={setEditarPerfil}
         registrarse={registrarse} estadoAplicacion={estadoAplicacion} setEstadoAplicacion={setEstadoAplicacion} setMostrarAlerte={setMostrarAlerte} 
-        setMensajeAlerta={setMensajeAlerta}        
+        setMensajeAlerta={setMensajeAlerta} setMostrarMenusBuenEstado={setMostrarMenusBuenEstado} sesionIniciadaConGoogle={sesionIniciadaConGoogle}
+        pedirUbicacion={pedirUbicacion} pedirUbicacionSegundoPlano={pedirUbicacionSegundoPlano} setPedirUbicacionSegundoPlano={setPedirUbicacionSegundoPlano}
         ></Inicio>
-        
-        <View style={{height:0,width:width,padding:0}}>
+
+        {mostrarMenusBuenEstado==true && <ItemsTrayectos setOcultarLasMierdasDelPrimerMenu={setOcultarLasMierdasDelPrimerMenu} ocultarMenu={ocultarMenu} setIdRutaAMostrar={setIdRutaAMostrar} 
+        height={height} width={width} todasLasRutasData={todasLasRutasData} 
+        menDos={menDos}
+        menUno={menUno}
+        menTres={menTres}
+        setmenCuatro={setmenCuatro}
+        data={data} rutasTrayectoria={rutasTrayectoria} visualizarRutas={visualizarRutas} verRutasTrayecto={verRutasTrayecto}
+        obtenerRutas={obtenerRutas} setVerTrayectoria={setVerTrayectoria}
+        setVerRutasCercanas={setVerRutasCercanas} setVerCompetencia={setVerCompetencia} setOcultarTrayecto={setOcultarTrayecto}
+        identificadorKey={identificadorKey} refCambiarLupa={refCambiarLupa} setCargando={setCargando}
+        ocultarTercerMenu={ocultarTercerMenu}
+        emailState={emailState} tokenState={tokenState} latitude={coordenadasOrigenSecundario.latitude} 
+        longitude={coordenadasOrigenSecundario.longitude} setVerParadasCercanas={setVerParadasCercanas}
+        setMostrarMenusBuenEstado={setMostrarMenusBuenEstado} setmenUno={setmenUno} setmenDos={setmenDos} setmenTres={setmenTres}
+        setmenCinco={setmenCinco}
+        menCinco={menCinco}
+        >
+
+        </ItemsTrayectos>}
+
+        {/* <View style={{height:0,width:width,padding:0}}>
                 <View style={[menDos, { left:(height<width)?width*0.2+(width*0.2-height*0.2)/2:width*0.2, 
                 width: (height>width)?width*0.2:height*0.2,zIndex:1000,  position: 'absolute', 
                 top:-width*0.6, backgroundColor: '#102769',height:width*0.6 }]}
@@ -412,7 +439,7 @@ export default function App() {
 
 
 
-        </View>
+        </View> */}
 
         
 
@@ -430,28 +457,30 @@ export default function App() {
         permitirEnviarUbicacion={permitirEnviarUbicacion} setMostrarBarraSecundariaDeUbicacion={setMostrarBarraSecundariaDeUbicacion} refCambiarLupa={refCambiarLupa}
         activarPrecision={activarPrecision} setActivarPrecision={setActivarPrecision} tipoDeUsuario={tipoDeUsuario} 
         serMostrarVentana={serMostrarVentana} cargando={cargando} setCargando={setCargando} idRutaAMostrar={idRutaAMostrar}        
+        setMostrarMenusBuenEstado={setMostrarMenusBuenEstado}
         ></MenuBar>
   
         
-        {loguearse==true && <Login setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} setTipoDeSubscripcion={setTipoDeSubscripcion} setCambiarPassword={setCambiarPassword} setTipoDeUsuario={setTipoDeUsuario} setSecionIniciada={setSecionIniciada} setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} setLosguearTransportista={setLosguearTransportista} height={height} width={width} 
+        {loguearse==true && <Login setSesionIniciadaConGoogle={setSesionIniciadaConGoogle} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} setTipoDeSubscripcion={setTipoDeSubscripcion} setCambiarPassword={setCambiarPassword} setTipoDeUsuario={setTipoDeUsuario} setSecionIniciada={setSecionIniciada} setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} setLosguearTransportista={setLosguearTransportista} height={height} width={width} 
         setIdUsuarioIniciado={setIdUsuarioIniciado} setUsuarioLogueado={setUsuarioLogueado} setTokenGeoRutas={setTokenGeoRutas} setConfirmarCodigo={setConfirmarCodigo} setEmailState={setEmailState} setTokenState={setTokenState}></Login>}
         {confirmarCodigo==true &&<ConfirmarCodigo setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} height={height} width={width} setConfirmarCodigo={setConfirmarCodigo}></ConfirmarCodigo>}
         {cambiarPassword==true && <CambiarPassword setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} height={height} width={width} setCambiarPassword={setCambiarPassword}></CambiarPassword>}
-        {/* {loguearTransportista==true && <LoginTransportistas setLosguearTransportista={setLosguearTransportista} setRegistrarse={setRegistrarse} setSecionIniciada={setSecionIniciada} setLoguearse={setLoguearse} setTipoDeUsuario={setTipoDeUsuario}
-        setIdUsuarioIniciado={setIdUsuarioIniciado} setUsuarioLogueado={setUsuarioLogueado} height={height} width={width}></LoginTransportistas>} */}
+        
 
-        {/* //DEBES ELIMINAR EL COMPONENTE QUE SE ENCIENTRA EN LA PARTE SUPERIOR */}
-
-        {verAdministrarUsuarios==true && <AdministrarUsuarios setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} refrescar={refrescar}setRefrescar={setRefrescar} setChoferAEditar={setChoferAEditar} setEmailDelChoferEditar={setEmailDelChoferEditar} setEditarInfoDelChofer={setEditarInfoDelChofer} nombre={nombreAdmin} setVerAdministrarUsuarios={setVerAdministrarUsuarios} height={height} width={width} emailState={emailState} tokenState={tokenState}></AdministrarUsuarios>}
+        {verAdministrarUsuarios==true && <AdministrarUsuarios setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setLoguearse={setLoguearse} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} refrescar={refrescar}setRefrescar={setRefrescar} setChoferAEditar={setChoferAEditar} setEmailDelChoferEditar={setEmailDelChoferEditar} setEditarInfoDelChofer={setEditarInfoDelChofer} 
+        nombre={nombreAdmin} setVerAdministrarUsuarios={setVerAdministrarUsuarios} 
+        height={height} width={width} emailState={emailState} tokenState={tokenState}></AdministrarUsuarios>}
         {editarInfoDelChofer==true && <EditarUsuario setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} refrescar={refrescar}setRefrescar={setRefrescar} emailState={emailState} tokenState={tokenState} choferAEditar={choferAEditar} emailDelChoferEditar={emailDelChoferEditar} setEditarInfoDelChofer={setEditarInfoDelChofer} height={height} width={width} ></EditarUsuario>}
         {registrarse==true && <Register setConfirmarCodigo={setConfirmarCodigo} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} emailState={emailState} tokenState={tokenState} setEditarPerfil={setEditarPerfil} editarPerfil={editarPerfil} setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} 
         height={height} width={width}></Register>}
-        {mostrarAlerta==true && <AlertComponet setTipoDeAlerta={setTipoDeAlerta} tipoDeAlert={tipoDeAlerta} setMostrarAlerte={setMostrarAlerte} AlerMensaje={mensajeAlerta} height={height}></AlertComponet>}
+        {mostrarAlerta==true && <AlertComponet width={width} urlDeLaAplicacion={urlDeLaAplicacion} setTipoDeAlerta={setTipoDeAlerta} tipoDeAlert={tipoDeAlerta} setMostrarAlerte={setMostrarAlerte} AlerMensaje={mensajeAlerta} height={height}></AlertComponet>}
+
+        {darBienvenida==true && <BVAplicacion setDarBienvenida={setDarBienvenida} height={height} width={width}></BVAplicacion>}
+        {secionIniciada==true && justificarUbicacion==true && <JustificarUbicacion setPedirUbicacionSegundoPlano={setPedirUbicacionSegundoPlano} setMensajeAlerta={setMensajeAlerta} setMostrarAlerte={setMostrarAlerte} setPedirUbicacion={setPedirUbicacion} tipoDeUsuario={tipoDeUsuario} setJustificarUbicacion={setJustificarUbicacion} height={height} width={width}></JustificarUbicacion>}
+        {pedirUbicacionSegundoPlano==2 && <BGPermisos setMostrarAlerte={setMostrarAlerte} setPedirUbicacionSegundoPlano={setPedirUbicacionSegundoPlano} height={height} width={width}></BGPermisos>}
     </View>
+
   );
 }
 
-
-
-
-//Restringe la puto distancia minima entre paradas
+export default App;

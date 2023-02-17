@@ -13,12 +13,11 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
     
 
 
-    const CompetenciaTransportistas=({tipoDeUsuario,idUsuarioIniciado,setCargando,rutasSeleccionadasCompetencia,emailState, tokenState})=>{
+const CompetenciaTransportistas=({tipoDeUsuario,idUsuarioIniciado,setCargando,rutasSeleccionadasCompetencia,emailState, tokenState})=>{
 
-        
-
+try{        
     const {data,error,isLoading,isSuccess}=useQuery(['obtenerUsuariosCompetencia',emailState,tokenState],async({queryKey})=>{
-        return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/NUsuariosTransporte?Email='+queryKey[1]+'&Token='+queryKey[2]).then(res=>datos=res.json())
+        return await fetch('https://www.georutas.lat/api/NUsuariosTransporte?Email='+queryKey[1]+'&Token='+queryKey[2]).then(res=>datos=res.json())
     },{
         //staleTime:Infinity,
         refetchInterval:4000,
@@ -83,35 +82,40 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
 
 
         return(
-            <View>
-                {
-                    arregloFinal.map((item, i)=>{                       
+                arregloFinal.map((item, i)=>{                       
+                if(((item.id_UsuarioTransporte)!=idUsuarioIniciado) && item.estado=='A' && arregloFinal[posicionUsuario].direccion==item.direccion){
                     return(
-                    <View key={i}>
-                        {((item.id_UsuarioTransporte)!=idUsuarioIniciado) && item.estado=='A' && arregloFinal[posicionUsuario].direccion==item.direccion && <Marker coordinate={{latitude:item.longitude,
-                            longitude:item.latitude}}>
-                                
-                                {item.direccion=='D' && <Text style={{color:'black'}}>{"⇛"+rutasDeManagua[item.id_Ruta-1].nombre}</Text>}
-                                {item.direccion=='I' && <Text style={{color:'black'}}>{"⇚"+rutasDeManagua[item.id_Ruta-1].nombre}</Text>}
-                                
-                                <Image source={urlDeLasImagenes[item.id_Ruta-1]} style={{width:25,height:25}}/>
-            
-                        </Marker>}
-                    </View>
-                    )
-                    })}
-
-            </View>         
+                        <Marker key={i} coordinate={{latitude:item.longitude,
+                            longitude:item.latitude}}>                                
+                                <Text style={{color:'black'}}>{(item.direccion=='D')?"⇛"+rutasDeManagua[item.id_Ruta-1].nombre:"⇚"+rutasDeManagua[item.id_Ruta-1].nombre}</Text>                                
+                                <Image source={urlDeLasImagenes[item.id_Ruta-1]} style={{width:25,height:25}}/>            
+                        </Marker>
+                    ) 
+                }                    
+                }) 
         )
 
     }
     
     return(
         
-     <View></View>
+        <Marker coordinate={{latitude:0,
+            longitude:0}}>                                
+                
+        </Marker>
         
     )
+}catch{
+    return(
+        
+        <Marker coordinate={{latitude:0,
+            longitude:0}}>                                
+                
+        </Marker>
+        
+    )
+}
 
-    }
+}
 
-    export default CompetenciaTransportistas
+export default CompetenciaTransportistas

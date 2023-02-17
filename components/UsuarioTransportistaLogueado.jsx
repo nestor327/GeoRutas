@@ -11,12 +11,12 @@ import getAllRutas from '../data/rutasManagua.js'
 //Este componente posee errores, revisalo luego
 
     const UsuarioTransportistaLogueado=({emailState,tokenState,usuario,direccionesPorUsuario,setDireccionPorUsuario,idUsuarioIniciado,userLocation,activarPrecision})=>{
-
-        let direccionesPorUsuarioDos='K';
+        try{
+            let direccionesPorUsuarioDos='K';
 
         const {data,error,isLoading}=useQuery(['obtenerTodosLosUsuarioComunes',idUsuarioIniciado,emailState,tokenState],async({queryKey})=>{
             //return await fetch('https://georutas.somee.com/api/UsuariosTransporte').then(res=>datos=res.json())
-            return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/NUsuariosTransporte/'+queryKey[1]+'?Email='+queryKey[2]+'&Token='+queryKey[3]).then(res=>datos=res.json())
+            return await fetch('https://www.georutas.lat/api/NUsuariosTransporte/'+queryKey[1]+'?Email='+queryKey[2]+'&Token='+queryKey[3]).then(res=>datos=res.json())
             
         },{
             refetchInterval:4000,
@@ -107,26 +107,33 @@ import getAllRutas from '../data/rutasManagua.js'
             //     }                
             // }
 
-
-        return(
-            <View>
-                {data!=undefined &&
-                    <Marker coordinate={{latitude:(activarPrecision==true)?data.longitude:userLocation.latitude, longitude:(activarPrecision==true)?data.latitude:userLocation.longitude}}>
-                        {direccionesPorUsuarioDos=='D' && <Text style={{color:'black'}}>{"⇛"+nombresEnElArregloFinal[0]}</Text>}
-                        {direccionesPorUsuarioDos=='I' && <Text style={{color:'black'}}>{"⇚"+nombresEnElArregloFinal[0]}</Text>}
-
-                        <Image style={{width:30,height:30}} source={require("../assets/transportistaAzul.png")}></Image>
-                    </Marker>
-                }
-                
-            </View>
-        )}
+            if(data!=undefined){             
+                return(          
+                              
+                        <Marker coordinate={{latitude:(activarPrecision==true)?data.longitude:userLocation.latitude, longitude:(activarPrecision==true)?data.latitude:userLocation.longitude}}>
+                            <Text style={{color:'black'}}>{(direccionesPorUsuarioDos=='D')?"⇛"+nombresEnElArregloFinal[0]:"⇚"+nombresEnElArregloFinal[0]}</Text>
+                            <Image style={{width:30,height:30}} source={require("../assets/transportistaAzul.png")}></Image>
+                        </Marker>
+                    
+                )    
+            }
+        
+        }
      }
 
     return(
-        <View></View>
+        <Marker coordinate={{latitude:0, longitude:0}}>
+        
+        </Marker>
     )
-
+    }catch{
+        return(
+            <Marker coordinate={{latitude:0, longitude:0}}>
+            
+            </Marker>
+        )
+    }
+        
     }
 
     export default UsuarioTransportistaLogueado

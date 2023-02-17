@@ -8,7 +8,8 @@
 
     const LineaDeUnaRuta=({idRuta,setMostrarSniperCargando,setCargando,emailState, tokenState})=>{
 
-         let color="red";
+        try{
+            let color="red";
         // if(idRuta==1)
         // {
         //     color="green";
@@ -28,10 +29,10 @@
 
         
         //console.log(getAllRutas().filter(elemento => elemento.id_Ruta=idRuta)[0]);
-
+    
     const {data,error,isLoading}=useQuery(['obtenerIndividual',idRuta,emailState,tokenState],async({queryKey})=>{
         //return await fetch('https://georutas.somee.com/api/Coordenadas/'+queryKey[1]).then(res=>datos=res.json())
-        return await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/Coordenadas/'+queryKey[1]+'?email='+queryKey[2]+'&token='+queryKey[3]).then(res=>datos=res.json())
+        return await fetch('https://www.georutas.lat/api/Coordenadas/'+queryKey[1]+'?email='+queryKey[2]+'&token='+queryKey[3]).then(res=>datos=res.json())
     },{
         staleTime:Infinity,
         cacheTime:20000,
@@ -81,9 +82,14 @@
     }
 
     return(
-        <View></View>
+        <Polyline strokeColor={'black'} strokeWidth={2} coordinates={[{latitude:12.1212,longitude:-86.34534},{latitude:12.12123,longitude:-86.345343}]}></Polyline>
     )
-
+    
+    }catch{
+        return(
+            <Polyline strokeColor={'black'} strokeWidth={2} coordinates={[{latitude:12.1212,longitude:-86.34534},{latitude:12.12123,longitude:-86.345343}]}></Polyline>
+        )
     }
+}
 
     export default LineaDeUnaRuta

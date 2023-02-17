@@ -13,7 +13,7 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                 ,menUno,setmenUno,menDos, setmenDos,menTres, setmenTres,menCuatro, setmenCuatro,menCinco, setmenCinco
                 ,verParadasCercanas,userLocation,setCoordenadasOrigenSecundario,setSecionIniciada, setTipoDeUsuario
                 ,permitirEnviarUbicacion, setMostrarBarraSecundariaDeUbicacion,refCambiarLupa,activarPrecision,setActivarPrecision
-                ,tipoDeUsuario,serMostrarVentana,cargando,setCargando,idRutaAMostrar
+                ,tipoDeUsuario,serMostrarVentana,cargando,setCargando,idRutaAMostrar,setMostrarMenusBuenEstado
             })=>{
     
 
@@ -63,7 +63,8 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                     <TouchableOpacity style={[{height:'60%',width:(height>width)?width*0.2*0.8:height*0.2*0.8,backgroundColor: menUno[0].color,
                      borderRadius:15,alignItems:'center',justifyContent:'center'}]}
                         onPress={() => {
-                            if(secionIniciada==true){                                
+                            if(secionIniciada==true){      
+                                setMostrarMenusBuenEstado(true);                                                          
                                 if (menUno[0].display == 'none' && resultado() == false) {
                                     setmenUno([{ display: 'flex',color:'#101043' }]);
                                     setMostrarItemMenuUno(true);
@@ -78,7 +79,9 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                                 setVerParadasCercanas([{observar:false,latitude:coordenadasOrigenSecundario.latitude,longitude:coordenadasOrigenSecundario.longitude,direccion:'K',id_Ruta:1}]);
                                 //console.log(userLocation);
                                 setMostrarBarraSecundariaDeUbicacion(true);
+                                setMostrarMenusBuenEstado(true);
                                 //obtenerRutas(2);
+                                
                             }else{
                                 setLoguearse(true);
                             }
@@ -107,6 +110,7 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                                 setOcultarTrayecto(false);
                                 setVerParadasCercanas([{observar:false,latitude:coordenadasOrigenSecundario.latitude,longitude:coordenadasOrigenSecundario.longitude,direccion:'K',id_Ruta:1}]);                                
                                 setMostrarBarraSecundariaDeUbicacion(false);
+                                setMostrarMenusBuenEstado(true);
                             }else{
                                 setLoguearse(true);
                             }
@@ -130,7 +134,8 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                                     setMostrarItemMenuUno(false);  
                                     setIdRutaAMostrar(-1);
                                 }   
-                                setOcultarTrayecto(false);                                                                
+                                setOcultarTrayecto(false);    
+                                setMostrarMenusBuenEstado(false);
                             }else{
                                 setLoguearse(true);
                             }                 
@@ -166,7 +171,8 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                             //setVerParadasCercanas(...{...{observar:false}})
                             setVerParadasCercanas([{observar:true,latitude:verParadasCercanas[0].latitude,longitude:verParadasCercanas[0].longitude,direccion:verParadasCercanas[0].direccion,id_Ruta:verParadasCercanas[0].id_Ruta}]);
                             setOcultarTercerMenu(true);    
-                            setMostrarBarraSecundariaDeUbicacion(false);      
+                            setMostrarBarraSecundariaDeUbicacion(false);
+                            setMostrarMenusBuenEstado(true);
                         }else{
                             setLoguearse(true);
                         }
@@ -192,6 +198,7 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                         }
                         
                         if(secionIniciada==true){
+                            setOcultarTrayecto(false);
                             if (menCinco[0].display == 'none' && resultado() == false) {
                                 setmenCinco([{ display: 'flex',color:'#101043'}]);
                                 setMostrarItemMenuUno(false);
@@ -200,8 +207,9 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                                 setmenCinco([{ display: 'none',color:'#102769'}]);
                                 setmenCuatro([{ display: 'flex',color:'#101043'}]);   
                             }
-                            setOcultarTrayecto(false);
+                            
                             setVerParadasCercanas([{observar:false,latitude:coordenadasOrigenSecundario.latitude,longitude:coordenadasOrigenSecundario.longitude,direccion:'K',id_Ruta:1}]);                            
+                            setMostrarMenusBuenEstado(false);
                         }
     
                     }}>

@@ -46,20 +46,32 @@ const EditarUsuario=({height,width,setEditarInfoDelChofer,emailDelChoferEditar,c
                 body: JSON.stringify(objeto)
                 };
 
-            let datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosCoperativas?Email='+emailState+'&Token='+tokenState,options);
+            let datos=await fetch('https://www.georutas.lat/api/UsuariosCoperativas?Email='+emailState+'&Token='+tokenState,options);
 
             if(datos.ok){
-                setMensajeAlerta("La actualización se realizó con éxito");
-                setMostrarAlerte(true);
-                setRefrescar(!refrescar);
-                setEditarInfoDelChofer(false);
-                
                 let json=await datos.json();
                 console.log(json);
+                if(json=='4'){
+                    setMensajeAlerta("La actualización se realizó con éxito");
+                    setMostrarAlerte(true);
+                    setRefrescar(!refrescar);
+                    setEditarInfoDelChofer(false);                    
+                }
+                if(json=='5'){
+                    setMensajeAlerta("El correo ya tiene dueño, no se logró actualizar");
+
+                    setMostrarAlerte(true);                    
+                }else if(json=='0'){
+                    setMensajeAlerta("No se logró actualizar al usuario");
+                    setMostrarAlerte(true);
+                }
+                setRefrescar(!refrescar);
+                setEditarInfoDelChofer(false);
             }
 
         }catch{
             setMensajeAlerta("No se logró actualizar al usuario");
+
             setMostrarAlerte(true);
         }
     }

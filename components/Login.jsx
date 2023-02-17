@@ -1,8 +1,7 @@
 import * as react from 'react'
-import { Keyboard,View,Text, TextInput,Image,StatusBar, TouchableOpacity,ActivityIndicator, Button} from 'react-native'
+import { Keyboard,View,Text, TextInput,Image,StatusBar, TouchableOpacity,ActivityIndicator, Button, Linking} from 'react-native'
 import imagen from '../assets/x_icon_imagen.png';
 import {setUsuario,getUsuario,setContraseña,getContraseña, setTokenGeoRutasCode, setTipoDeMenbresiaCode, getTipoDeMenbresia, setCorreo, setTipoDeUsuarioCode, setIdUsuarioIniciadoCode, setNombre, setApellidos, setTelefono} from '../data/asyncStorageData.js'
-import MD5 from 'md5'
 import { useQuery } from 'react-query';
 import { AccessToken, LoginButton } from 'react-native-fbsdk';
 import { LogBox } from 'react-native';
@@ -17,7 +16,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransportista
         ,setTipoDeUsuario,height,width,setIdUsuarioIniciado,setUsuarioLogueado,setTokenGeoRutas
-        ,setConfirmarCodigo,setCambiarPassword,setEmailState, setTokenState,setTipoDeSubscripcion,setMostrarAlerte,setMensajeAlerta})=>{
+        ,setConfirmarCodigo,setCambiarPassword,setEmailState, setTokenState,setTipoDeSubscripcion,setMostrarAlerte,setMensajeAlerta
+        ,setSesionIniciadaConGoogle})=>{
  
     const [usuarioState,setUsuarioState]=react.useState("");
     const [contrasenia, setContrasenia]=react.useState("");
@@ -97,8 +97,8 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
         let datos=null;
         
         try{            
-            datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/Acceso',options);            
-        }catch{
+            datos=await fetch('https://www.georutas.lat/api/Acceso',options);            
+        }catch (e){
             datos=null;
         }
 
@@ -112,9 +112,7 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                 json=await datos.json();            
             }catch{
                 json=null;
-            }
-            
-            
+            }            
             console.log(json);
 
             // let menbre=null;
@@ -145,7 +143,7 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                 setMensajeAlerta("Su contraseña es incorrecta");
                 setMostrarAlerte(true);
             }else if(json.token.length>1){
-                if(json.tipoSubscripcion=='B'){
+                if(json.tipoSubscripcion=='B'  || json.tipoSubscripcion=='K'){
                     setTipoDeMenbresiaCode(json.tipoSubscripcion);
                     setMensajeAlerta("Solicite una subscripción para poder acceder");
                     setMostrarAlerte(true);
@@ -159,9 +157,9 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                 setTipoDeMenbresiaCode(json.tipoSubscripcion);
                 setTipoDeSubscripcion(json.tipoSubscripcion);
                 setMensajeAlerta("Has iniciado sesión");
-                setMostrarAlerte(true);
+                //setMostrarAlerte(true);
                 setLoguearse(false);
-                setSecionIniciada(true);
+                setSecionIniciada(true);                
                 if(json.tipoDeUsuario=='T'){
                     setTipoDeUsuario("Transportista");
                     setIdUsuarioIniciado(parseInt(json.idTablaForanea));  
@@ -181,7 +179,7 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
 
         }else{
             setMensajeAlerta("Revisa tu conexión a internet");
-            setMostrarAlerte(true);
+            setMostrarAlerte(true);            
         }        
     }
 
@@ -207,8 +205,8 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
 
         let datos=null;
         try{
-            datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/RegistrosExternos',options);
-        }catch{
+            datos=await fetch('https://www.georutas.lat/api/RegistrosExternos',options);
+        }catch (er){
             datos=null;
         }
         console.log("Llega hasta aqui y obtienes");
@@ -238,9 +236,9 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
 
             if(json.respuesta!="1"){
                 try{
-                    datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/RegistrosExternos',options);
+                    datos=await fetch('https://www.georutas.lat/api/RegistrosExternos',options);
                     respuestaLeida=false;
-                }catch{
+                }catch (er){
                     datos=null;
                 }
             }
@@ -266,7 +264,7 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                 return;
             }
             
-            if(json.tipoSubscripcion=='K'){
+            if(json.tipoSubscripcion=='K' || json.tipoSubscripcion=='B'){
                 setTipoDeMenbresiaCode(json.tipoSubscripcion);
                 setMensajeAlerta("Renueve su subscripción para poder acceder");
                 setMostrarAlerte(true);
@@ -284,9 +282,10 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
             setTipoDeMenbresiaCode(json.tipoSubscripcion);      
             setTipoDeSubscripcion(json.tipoSubscripcion);
             setMensajeAlerta("Has iniciado sesión con Google");
-            setMostrarAlerte(true);
+            //setMostrarAlerte(true);
             setLoguearse(false);
             setSecionIniciada(true);
+            setSesionIniciadaConGoogle(true);
             if(json.tipoDeUsuario=='T'){
                 setTipoDeUsuario("Transportista");
                 setIdUsuarioIniciado(parseInt(json.idTablaForanea));
@@ -331,8 +330,8 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
 
         let datos=null;
         try{
-            datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/RegistrosExternos',options);
-        }catch{
+            datos=await fetch('https://www.georutas.lat/api/RegistrosExternos',options);
+        }catch (er){
             datos=null;
         }
 
@@ -360,9 +359,9 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
 
             if(json.respuesta!="1"){
                 try{
-                    datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/RegistrosExternos',options);
+                    datos=await fetch('https://www.georutas.lat/api/RegistrosExternos',options);
                     respuestaLeida=false;
-                }catch{
+                }catch (er){
                     datos=null;
                 }
             }
@@ -371,8 +370,8 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
 
                 try{
                     json=await datos.json();
-                }catch{
-                    json=null;
+                }catch (er){
+                    json=null;              
                 }
 
                 console.log("Los datos nuevos traidos desde el servidor son: ");
@@ -389,7 +388,7 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                 return;
             }
             
-            if(json.tipoSubscripcion=='K'){
+            if(json.tipoSubscripcion=='K'  || json.tipoSubscripcion=='B'){
                 setTipoDeMenbresiaCode(json.tipoSubscripcion);
                 setMensajeAlerta("Renueve su subscripción para poder acceder");
                 setMostrarAlerte(true);
@@ -408,7 +407,7 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
             setTipoDeMenbresiaCode(json.tipoSubscripcion);   
             setTipoDeSubscripcion(json.tipoSubscripcion);
             setMensajeAlerta("Has iniciado sesión con Facebook");
-            setMostrarAlerte(true);
+            //setMostrarAlerte(true);
             setLoguearse(false);
             setSecionIniciada(true);
             if(json.tipoDeUsuario=='T'){
@@ -444,6 +443,10 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
           hideSubscription.remove();
         };
       }, []);
+
+    const verPoliticasDePrivacidad=async()=>{
+        await Linking.openURL('https://georutasn.blogspot.com/p/politicas-de-privacidad-de-la.html');
+    }
 
 
     return(
@@ -564,7 +567,14 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                         <Text style={{color:'white',fontWeight:'600',fontSize:13,marginRight:18}}>Continuar con Google</Text>
                     </TouchableOpacity>
                 </View>
-                <View style={{color:'white',marginLeft:'auto', marginRight:'auto',marginTop:10,width:'100%',marginLeft:'20%'}}>
+                <TouchableOpacity style={{width:'60%',marginLeft:'auto',marginRight:'auto',alignItems:'center',marginTop:10}}
+                    onPressOut={()=>{
+                        verPoliticasDePrivacidad();
+                    }}
+                    >
+                    <Text style={{color:'white',fontSize:13.5,textDecorationLine:'underline'}}>Politicas de Privacidad</Text>
+                </TouchableOpacity>
+                {/* <View style={{color:'white',marginLeft:'auto', marginRight:'auto',marginTop:10,width:'100%',marginLeft:'20%'}}>
                     <LoginButton
                         style={{height:32,width:'60%',justifyContent:'center',paddingTop:10}}
                         onLoginFinished={
@@ -588,7 +598,7 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                         }
 
                         onLogoutFinished={() => console.log("logout.")}/>
-                </View>
+                </View> */}
             </View>
         </View>
     )

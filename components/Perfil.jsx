@@ -7,13 +7,14 @@ import { check, openSettings, PERMISSIONS, request } from 'react-native-permissi
 import RutasBarItem from './RutasBarItem';
 import ParadasFavoritas from './ParadasFavoritas';
 import { getRutasFavoritas,setRutasFavoritas } from '../data/asyncStorageData.js';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,setLoguearse,setRegistrarse,
     setSecionIniciada,setTipoDeUsuario,activarPrecision,
     setActivarPrecision,tipoDeUsuario,permisosEnSegundoPlano,setPermisosEnSegundoPlano,
     todasLasRutasCompetencia, rutasSeleccionadasCompetencia,setTodasLasRutasCompetencia, 
     setRutasSeleccionadasCompetencia, tipoDeSubscripcion,setVerAdministrarUsuarios,setCambiarPassword,
-    setEditarPerfil,registrarse,setMostrarAlerte,setMensajeAlerta})=>{
+    setEditarPerfil,registrarse,setMostrarAlerte,setMensajeAlerta,sesionIniciadaConGoogle})=>{
 
 
     const [nombre,setnombre]=useState();
@@ -49,6 +50,14 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
         }
         
     },[arregloDeValores])
+
+    const signOut = async () => {
+        try {
+            await GoogleSignin.signOut();
+        } catch (error) {
+          console.error(error);
+        }
+    };
     
     return(
         <View style={[tipoDePerfil[0].principal]}>
@@ -213,6 +222,9 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
                         setTipoDeUsuario("Ninguno");
                         setTokenGeoRutasCode("");
                         setLoguearse(true);
+                        if(sesionIniciadaConGoogle){
+                            signOut();
+                        }
                     }else{
                         setLoguearse(true);
                     }

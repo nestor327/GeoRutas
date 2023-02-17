@@ -62,7 +62,7 @@ const ConfirmarCodigo=({height,width,setConfirmarCodigo,setMostrarAlerte, setMen
 
         let datos=null;
         try{
-            let res=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/ConfirmarCorreo/'+codigoEnvio+','+email,options);
+            let res=await fetch('https://www.georutas.lat/api/ConfirmarCorreo/'+codigoEnvio+','+email,options);
             if(res.ok){
                 datos=await res.json();
             }else{
@@ -123,7 +123,7 @@ const ConfirmarCodigo=({height,width,setConfirmarCodigo,setMostrarAlerte, setMen
 
         let datos=null;
         try{
-            let res=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/ConfirmarCorreo/'+email,options);
+            let res=await fetch('https://www.georutas.lat/api/ConfirmarCorreo/'+email,options);
             if(res.ok){
                 datos=await res.json();
             }else{
