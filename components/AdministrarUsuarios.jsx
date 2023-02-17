@@ -1,19 +1,35 @@
 import react, { useEffect, useState } from "react"
-import { ScrollView, StatusBar, Text, View,Image, TouchableOpacity, ActivityIndicator } from "react-native"
+import { ScrollView, StatusBar, Text, View,Image, TouchableOpacity, ActivityIndicator,Platform } from "react-native"
 import { useQuery } from "react-query"
 import { getNombre } from "../data/asyncStorageData"
 import getAllRutas from "../data/rutasManagua"
 import imagen from '../assets/x_icon_imagen.png';
-import PerfilesDeUsuarios from "./ComponentesParaAdmins/PerfilesDeUsuarios"
+import PerfilesDeUsuarios from "./ComponentesParaAdmins/PerfilesDeUsuarios";
+import LinearGradient from 'react-native-linear-gradient';
 
 
 const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrarUsuarios,nombre,setEditarInfoDelChofer,setEmailDelChoferEditar,setChoferAEditar
-    ,refrescar,setRefrescar,setMostrarAlerte, setMensajeAlerta})=>{
+    ,refrescar,setRefrescar,setMostrarAlerte, setMensajeAlerta,setSecionIniciada,setTipoDeUsuario,setLoguearse})=>{
     
 
     const [data,setData]=useState([]);
     const [seleccionar, setSeleccionar]=useState(false);
     
+    const[arregloActualizar,setArregloActualizar]=useState([]);    
+
+    const [buyIsLoading,setBuyIsLoading]=useState(false);
+    const [error,setError]=useState('');
+    const[productId,setProductId]=useState();
+
+    // const {isFullAppPurchased,
+    //     connectionErrorMsg,
+    //     purchaseFullApp,
+    //     }= useInAppPurchase();
+    
+    const itemSubs = Platform.select({
+        ios: ['productosubcripcionchoferes'],     
+        android: ['productosubcripcionchoferes'],     
+    });
 
     const obtenerLosDatos=async()=>{
 
@@ -27,21 +43,89 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
 
         try{
             let value=null;
-            value=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuariosCoperativas?idRuta=1&Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());
-            setData(value);
-            console.log(value);
+            value=await fetch('https://www.georutas.lat/api/UsuariosCoperativas?idRuta=1&Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());
+            setData(value);            
+            if(value.length==1 && value.idTablaForanea==-2){
+                setMensajeAlerta("Inicie sesión");
+                setMostrarAlerte(true);
+                setSecionIniciada(false);            
+                setTipoDeUsuario("Ninguno");
+                setLoguearse(true);
+            }
            }catch{
             setData([]);
            }
     }
+
+    const actualizarUsuario=async()=>{
+        try{
+            console.log("Entraste aqui");
+            let emails=[];
+            for(let y=0;y<arregloActualizar.length;y++){
+                emails.push(data[arregloActualizar[y]].email);
+            }
+
+            let objeto=
+                {
+                    emailActualizar: emails
+                }
+              
+    
+              const options= {
+                method: 'PUT',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(objeto)
+                };
+                let month=(new Date()).getMonth();
+                let fechaHoy=new Date();
+                fechaHoy.setMonth(month+1);
+            let tiempo=Date.parse(fechaHoy).toString();
+            console.log("La cantidad de segundos es: "+tiempo);
+            console.log("La cantidad de segundos es: "+Date.parse(new Date()));
+
+
+            let datos=await fetch('https://www.georutas.lat/api/ActualizarMenbresia?Email='+emailState+'&Token='+tokenState+'&tiempo='+tiempo,options);
         
-        const[arregloActualizar,setArregloActualizar]=useState([]);        
+                if(datos.ok){
+                    console.log(datos);
+                    console.log("Se lograron actualizar todos los usuarios");
+                    let json=await datos.json();
+                    console.log("El json es: "+json);
+                    if(json==4){
+                        setMensajeAlerta("Usuarios activados");
+                        setMostrarAlerte(true);                            
+                        setRefrescar(!refrescar);
+                        setSeleccionar(!seleccionar);
+                    }else if(json==2){
+                        setMensajeAlerta("Inicie sesión");
+                        setMostrarAlerte(true);
+                        setSecionIniciada(false);            
+                        setTipoDeUsuario("Ninguno");
+                        setLoguearse(true);
+                    }else if(json==0){
+                        setMensajeAlerta("Ocurrió un error, revise su conexión");
+                        setMostrarAlerte(true);
+                    }
+                    
+
+                }else{
+                    console.log(datos);
+                }
+                
+
+        }catch{
+            console.log("Ocurrio un error, no se logro realizar la actualizacion");
+        }
+    }
 
         useEffect(()=>{
             obtenerLosDatos();
         },[refrescar])
 
         return(
+            
             <View style={{backgroundColor:'#103070',position:'absolute',zIndex:220, height:height+StatusBar.currentHeight, width:width}}>
                 
                 <View style={{position:'absolute',top:7,left:'90%',zIndex:221}} onTouchEnd={()=>{
@@ -84,8 +168,9 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
                                 setMensajeAlerta("Seleccione cuáles usuarios activar");
                                 setMostrarAlerte(true);
                             }else if(seleccionar==true && arregloActualizar.length>0){                                
-                                setMensajeAlerta("Usuarios activados");
-                                setMostrarAlerte(true);
+                                console.log("Mierda")
+                                actualizarUsuario();
+                                console.log("Mierda")
                                 setRefrescar(!refrescar);
                                 setSeleccionar(!seleccionar);
                             }
@@ -95,6 +180,10 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
                         <Text style={{fontSize:16, color:'white'}}>{(seleccionar==false)?"Seleccionar cuales activar":"Activar los seleccionados"}</Text>
                     </TouchableOpacity>
                 </View>
+
+                {/* <TouchableOpacity onPressOut={purchaseFullApp}>
+                    <Text>Paga las suscriociones</Text>
+                </TouchableOpacity> */}
             </View>
         )    
     

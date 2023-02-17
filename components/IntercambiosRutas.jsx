@@ -40,7 +40,8 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
         return(
             rutasTrayectoria.map((ruta, i)=>{
                 return(
-                    <View style={{alignItems:'center',marginHorizontal:2.5}} key={(i)}>
+                    <View style={{alignItems:'center',marginHorizontal:2.5}} key={(i)}                    
+                    >
                         {/* <Image source={require("../assets/Citycons_bus_icon-icons.com_67914.png")} style={{height:50,width:50, borderRadius:25}}/> */}
                         
                         <RutasBarItem color={coloresEnLasRutas[i]} numeroDeRuta={nombreDeLasRutas[i]}
@@ -85,7 +86,7 @@ return(
                             setVerCompetencia(false);    
                             setOcultarTrayecto(true); 
                             refCambiarLupa.current=false;
-                            setCargando(false);                            
+                            setCargando(false);     
                         }
                         }>
                             <Animated.View style={visualizarRutas==(i+1) && {opacity:fadeAnim.current, backgroundColor:'#1e81ce', padding:5, borderRadius:10}}

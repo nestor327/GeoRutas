@@ -180,7 +180,7 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
             }
 
         try{
-            let datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/NUsuariosTransporte?Email='+emailState+'&Token='+tokenState,
+            let datos=await fetch('https://www.georutas.lat/api/NUsuariosTransporte?Email='+emailState+'&Token='+tokenState,
             {
                 method:"PUT",
                 headers:{
@@ -243,7 +243,34 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
         let userLocationReal=(await new Promise(async (resolve) => {
             Geolocation.getCurrentPosition(
                 ({coords})=>{
-                    resolve({latitude:coords.latitude,longitude:coords.longitude});
+                    resolve({latitude:coords.latitude,longitude:coords.longitude});                    
+                    // console.log("La latitude es :"+coords.latitude);
+                    // console.log("La longitude es :"+coords.longitude);
+                    // let fechaG= new Date();
+                    // if(fechaG.getSeconds()%60<6){                     
+                    //     resolve({latitude: 12.148238,longitude:-86.265838});
+                    // }else if(fechaG.getSeconds()%60<12){
+                    //     resolve({latitude: 12.148155,longitude:-86.260540});
+                    // }else if(fechaG.getSeconds()%60<18){
+                    //     resolve({latitude: 12.148572,longitude:-86.254814});
+                    // }else if(fechaG.getSeconds()%60<24){
+                    //     resolve({latitude: 12.147569,longitude:-86.248405});
+                    // }else if(fechaG.getSeconds()%60<30){
+                    //     resolve({latitude: 12.147569,longitude:-86.241568});
+                    // }else if(fechaG.getSeconds()%60<36){
+                    //     resolve({latitude: 12.146982,longitude:-86.226354});
+                    // }else if(fechaG.getSeconds()%60<42){
+                    //     resolve({latitude: 12.148572,longitude:-86.254814});
+                    // }else if(fechaG.getSeconds()%60<48){
+                    //     resolve({latitude: 12.147569,longitude:-86.248405});
+                    // }else if(fechaG.getSeconds()%60<54){
+                    //     resolve({latitude: 12.147569,longitude:-86.241568});
+                    // }else if(fechaG.getSeconds()%60<59){
+                    //     resolve({latitude: 12.146982,longitude:-86.226354});
+                    // }
+                    // if(activarPrecision==false){
+                    //     setUserLocation({longitude:coords.latitude,latitude:coords.longitude});
+                    // }
                 }
             )
         }))
@@ -256,13 +283,15 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
         }
 
         //let userLocation={latitude:0,longitude:0}
-        //console.log(coordenadasDeLaRuta);
+        console.log("La informacion es: ")
+        console.log(userLocationReal);
+        console.log("La informacion es: ")
 
         let datos=null;
         try{
-            datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/ActualizacionDelBackendParadas?latitude='+userLocationReal.latitude+'&longitude='+userLocationReal.longitude+'&Email='+emailState+'&Token='+tokenState,
+            datos=await fetch('https://www.georutas.lat/api/ActualizacionDelBackendParadas?latitude='+userLocationReal.latitude+'&longitude='+userLocationReal.longitude+'&Email='+emailState+'&Token='+tokenState,
             {
-                method:"PUT",
+                method:"GET",
                 headers:{
                     "Content-Type":"application/json",
                     }
@@ -371,7 +400,7 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
         // //let usuarioTransportista= await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json());        
         // let usuarioTransportista={};
         //             try{
-        //                 usuarioTransportista= await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/NUsuariosTransporte/'+idUsuarioIniciado.toString()+'?Email='+emailState+'&Token='+tokenState).then(res=>dat=res.json());
+        //                 usuarioTransportista= await fetch('https://www.georutas.lat/api/NUsuariosTransporte/'+idUsuarioIniciado.toString()+'?Email='+emailState+'&Token='+tokenState).then(res=>dat=res.json());
         //             }catch{
         //                 usuarioTransportista={};
         //             }
@@ -449,7 +478,7 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
         //     //let tiempoAnterior=await fetch('https://georutas.somee.com/api/UsuarioTransporteParada/'+primerDato).then(res=>datos=res.json());
         //     let tiempoAnterior={ultimaActualizacion:null}
         //     try{
-        //         tiempoAnterior=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/ActualizarUsuarioTransporteParada/'+primerDato+'?Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());
+        //         tiempoAnterior=await fetch('https://www.georutas.lat/api/ActualizarUsuarioTransporteParada/'+primerDato+'?Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());
         //         console.log("Tu tiempo anterior es: ");
         //         console.log(tiempoAnterior);
         //     }catch{
@@ -475,7 +504,7 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
         //     try{
 
         //             //let datos=await fetch('https://georutas.somee.com/api/UsuarioTransporteParada',{
-        //             let datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/UsuarioTransporteParada?Email='+emailState+'&Token='+tokenState,{
+        //             let datos=await fetch('https://www.georutas.lat/api/UsuarioTransporteParada?Email='+emailState+'&Token='+tokenState,{
         //                 method:"PUT",
         //                 headers:{
         //                     "Content-Type":"application/json",
@@ -628,7 +657,7 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
     const actualizarTiemposDeLasParadas= async(id_Ruta,emailState,tokenState)=>{
         let datos=null;
         try{
-            datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/NActualizacionDeTiempos/'+id_Ruta+'?Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());
+            datos=await fetch('https://www.georutas.lat/api/NActualizacionDeTiempos/'+id_Ruta+'?Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());
             console.log(datos);
             console.log("Los datos son los anteriosres");
         }catch{

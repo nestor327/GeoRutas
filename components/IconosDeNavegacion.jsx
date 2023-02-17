@@ -48,7 +48,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                     //let usuarioTransportista= await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json());
                     let usuarioTransportista={};
                     try{
-                        usuarioTransportista= await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/NUsuariosTransporte/'+idUsuarioIniciado.toString()+'?Email='+emailState+'&Token='+tokenState).then(res=>dat=res.json());
+                        usuarioTransportista= await fetch('https://www.georutas.lat/api/NUsuariosTransporte/'+idUsuarioIniciado.toString()+'?Email='+emailState+'&Token='+tokenState).then(res=>dat=res.json());
                     }catch{
                         usuarioTransportista={};
                     }
@@ -65,7 +65,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
 
                 //let datos=await fetch('https://georutas.somee.com/api/UsuariosTransporte',{
                     try{
-                        let datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/NUsuariosTransporte?Email='+emailState+'&Token='+tokenState,
+                        let datos=await fetch('https://www.georutas.lat/api/NUsuariosTransporte?Email='+emailState+'&Token='+tokenState,
                         {
                             method:"PUT",
                             headers:{
@@ -153,7 +153,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                     //let usuarioTransportista= await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json())
                     let usuarioTransportista={};
                     try{
-                        usuarioTransportista= await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/NUsuariosTransporte/'+idUsuarioIniciado.toString()+'?Email='+emailState+'&Token='+tokenState).then(res=>dat=res.json());
+                        usuarioTransportista= await fetch('https://www.georutas.lat/api/NUsuariosTransporte/'+idUsuarioIniciado.toString()+'?Email='+emailState+'&Token='+tokenState).then(res=>dat=res.json());
                     }catch{
                         usuarioTransportista={};
                     }
@@ -167,7 +167,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                     //let datos=await fetch('https://georutas.somee.com/api/UsuariosTransporte',{
 
                     try{
-                        let datos=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/NUsuariosTransporte?Email='+emailState+'&Token='+tokenState,
+                        let datos=await fetch('https://www.georutas.lat/api/NUsuariosTransporte?Email='+emailState+'&Token='+tokenState,
                         {
                             method:"PUT",
                             headers:{

@@ -66,7 +66,7 @@ const CambiarPassword=({height,width,setCambiarPassword,setMostrarAlerte, setMen
 
         let datos=null;
         try{
-            let res=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/CambiarPassword/'+codigoEnvio+','+email,options);
+            let res=await fetch('https://www.georutas.lat/api/CambiarPassword/'+codigoEnvio+','+email.toLowerCase(),options);
             if(res.ok){
                 datos=await res.json();
             }else{
@@ -108,7 +108,7 @@ const CambiarPassword=({height,width,setCambiarPassword,setMostrarAlerte, setMen
 
     }
 
-    const enviardoCodigoAlCorreo=async(email)=>{        
+    const enviardoCodigoAlCorreo=async(email)=>{                
         const options= {
             method: 'GET',
             headers: {
@@ -118,7 +118,7 @@ const CambiarPassword=({height,width,setCambiarPassword,setMostrarAlerte, setMen
 
         let datos=null;
         try{
-            let res=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/CambiarPassword/'+email,options);
+            let res=await fetch('https://www.georutas.lat/api/CambiarPassword/'+email.toLowerCase(),options);
             if(res.ok){
                 datos=await res.json();
             }else{
@@ -151,6 +151,8 @@ const CambiarPassword=({height,width,setCambiarPassword,setMostrarAlerte, setMen
         }else{
             setMensajeAlerta("Busque su código en su correo");
             setMostrarAlerte(true);
+            setPidiendoCodigo(false);
+            setCambiandoPassword(false);
         }
 
     }
@@ -173,7 +175,7 @@ const CambiarPassword=({height,width,setCambiarPassword,setMostrarAlerte, setMen
         let datos="";
 
         try{
-            let res=await fetch('http://georutas.us-east-2.elasticbeanstalk.com/api/CambiarPassword',options);
+            let res=await fetch('https://www.georutas.lat/api/CambiarPassword',options);
             if(res.ok){                
                 datos=await res.json();                
             }else{
