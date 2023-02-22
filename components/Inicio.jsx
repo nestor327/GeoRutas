@@ -44,7 +44,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     todasLasRutasCompetencia,rutasSeleccionadasCompetencia,setTodasLasRutasCompetencia,setRutasSeleccionadasCompetencia
     ,emailState, tokenState,setTokenState,tipoDeSubscripcion,setVerAdministrarUsuarios,setCambiarPassword,setEditarPerfil
     ,registrarse,estadoAplicacion, setEstadoAplicacion,setMostrarAlerte,setMensajeAlerta,setMostrarMenusBuenEstado,sesionIniciadaConGoogle
-    ,pedirUbicacion,pedirUbicacionSegundoPlano,setPedirUbicacionSegundoPlano
+    ,pedirUbicacion,pedirUbicacionSegundoPlano,setPedirUbicacionSegundoPlano,verificarMenbresia,setMostrarAnuncioCompleto
+    ,tiempoDesdeUltimoAnuncio,setMostrarAnuncioRewarded,obtenerTiempoDesdeElUltimoAnucio,setMostrarComprasPasajeros
     })=>{
     
 
@@ -565,8 +566,10 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         // Example of an infinite loop task
         const { delay } = taskDataArguments;
         await new Promise( async (resolve) => {
+            console.log("La mierda se mando a llamar");
 
             for (let i = 0; BackgroundService.isRunning(); i++) {
+                
 
                 //let rutasParadasSegundoPlano=getRutasParadasValue();
                 let permisosSegundoPlano=await check(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION);
@@ -627,17 +630,23 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     
         const permisosState=AppState.addEventListener('change',async(state)=>{
     
-            if(state!=='active'){
-                activarTarea();
+            if(state!=='active' && secionIniciada==true){
+                if(tipoDeUsuario=='Transportista'){                    
+                    activarTarea();
+                }
                 setEstadoAplicacion(false);
                 console.log("La tarea se activo");
                 return;
             } 
             
-            if(state=='active'){
-                desactivarTarea();
+            if(state=='active' && secionIniciada==true){                
                 setEstadoAplicacion(true);                
                 console.log("La tarea se desactivo");
+                if(tipoDeUsuario=='Transportista'){
+                    verificarMenbresia(emailState,tokenState);
+                    desactivarTarea();
+                    obtenerTiempoDesdeElUltimoAnucio();
+                }
             }
 
         })
@@ -646,7 +655,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         return ()=>{
             permisosState.remove();
         }
-    },[permitirEnviarUbicacion])
+    },[permitirEnviarUbicacion,secionIniciada,emailState,tokenState,tipoDeUsuario])
 
 
     useEffect(()=>{
@@ -675,7 +684,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         stopFollowUserLocation={stopFollowUserLocation} permitirSeguirPasajero={permitirSeguirPasajero} setPermitirSeguirPasajero={setPermitirSeguirPasajero}
         setVerTrayectoria={setVerTrayectoria} ocultarTrayecto={ocultarTrayecto} permisos={permisos}
         askLocationPermissionSetting={askLocationPermissionSetting} setUsuarioTransportista={setUsuarioTransportista} setCargando={setCargando}
-        emailState={emailState} tokenState={tokenState} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta}
+        emailState={emailState} tokenState={tokenState} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} 
+        setMostrarComprasPasajeros={setMostrarComprasPasajeros} tipoDeSubscripcion={tipoDeSubscripcion}
         ></IconosDeNavegacion>
 
 
@@ -1253,7 +1263,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             tipoDeUsuario={tipoDeUsuario} permisosEnSegundoPlano={bacgroundPermisos} setPermisosEnSegundoPlano={setBacgroundPermisos}
             todasLasRutasCompetencia={todasLasRutasCompetencia} rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}
             setTodasLasRutasCompetencia={setTodasLasRutasCompetencia} setRutasSeleccionadasCompetencia={setRutasSeleccionadasCompetencia}
-            setMensajeAlerta={setMensajeAlerta} setMostrarAlerte={setMostrarAlerte}></Perfil>}
+            setMensajeAlerta={setMensajeAlerta} setMostrarAlerte={setMostrarAlerte} setMostrarAnuncioCompleto={setMostrarAnuncioCompleto}></Perfil>}
         
          {<MapView
 
@@ -1291,6 +1301,19 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     console.log("mostrarItemMenuUno es:" + mostrarItemMenuUno);
                     console.log("verTrayectoria es:" + verTrayectoria);
 
+                    if(tipoDeUsuario=='Pasajero' && tipoDeSubscripcion=='C'){
+                        let fechaAlPresionar=new Date();
+                        let tiempoTotalAlPresionar=fechaAlPresionar.getHours()*3600 + fechaAlPresionar.getMinutes()*60 + fechaAlPresionar.getSeconds();
+    
+                        if(Math.abs(tiempoTotalAlPresionar - parseInt(tiempoDesdeUltimoAnuncio))>=3600){                        
+                            setMostrarAnuncioRewarded(true);
+                        }else if(Math.abs(tiempoTotalAlPresionar - parseInt(tiempoDesdeUltimoAnuncio))>=180){
+                            setMostrarAnuncioCompleto(true);
+                        }
+                    
+                    console.log("El tiempo total es: "+tiempoTotalAlPresionar);
+                    console.log("El tiempo anterior es: "+tiempoDesdeUltimoAnuncio);
+                    }
                     refInputAutoComplete.current.blur();
                     setMostrarBarraSecundariaDeUbicacion(false);
                 }                

@@ -12,7 +12,7 @@ import useTrayectoria from './src/hooks/useTrayectoria.jsx';
 import RutasBarItem from './components/RutasBarItem.jsx';
 import IntercambiosRutas from './components/IntercambiosRutas.jsx';
 import ParadasCercaDelOrigen from './components/ParadasCercaDeUbicacion.jsx';
-import { getNombre, getRutasFavoritas, getTokenGeoRutasCode, getUsuario, setApellidos, setIdUsuarioIniciadoCode, setNombre, setRutasFavoritas, setTipoDeMenbresiaCode, setTipoDeUsuarioCode, setTokenGeoRutasCode } from './data/asyncStorageData.js';
+import { getNombre, getRutasFavoritas, getTokenGeoRutasCode, getUsuario, setApellidos, setIdUsuarioIniciadoCode, setNombre, setPermitirEnvio, setRutasFavoritas, setTipoDeMenbresiaCode, setTipoDeUsuarioCode, setTokenGeoRutasCode } from './data/asyncStorageData.js';
 import ConfirmarCodigo from './components/ConfirmarCodigo.jsx';
 import CambiarPassword from './components/CambiarPassword.jsx';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -25,7 +25,12 @@ import ItemsTrayectos from './components/ItemsTrayectos.jsx';
 import BVAplicacion from './components/BVAplicacion.jsx';
 import JustificarUbicacion from './components/JustificarUbicacion.jsx';
 import BGPermisos from './components/BGpermisos.jsx';
-
+import Compras from './components/Tienda/Compras.jsx';
+import { BannerAdSize,BannerAd,AppOpenAd, TestIds, AdEventType,InterstitialAd } from 'react-native-google-mobile-ads';
+import InterstitialADS from './components/Anuncios/InterstitialADS.jsx';
+import mobileAds from 'react-native-google-mobile-ads';
+import RewardedADS from './components/Anuncios/RewardedADS.jsx';
+import ComprasUsuariosPasajeros from './components/Tienda/CompraUsuariosPasajeros.jsx';
 
 const App=()=>{
 
@@ -213,7 +218,6 @@ const App=()=>{
         const [mostrarAlerta, setMostrarAlerte]=useState(false);
         const [mensajeAlerta, setMensajeAlerta]=useState("Ocurrio un error");
         const [tipoDeAlerta, setTipoDeAlerta]=useState('C');
-        const [sesionIniciadaConGoogle, setSesionIniciadaConGoogle]=useState(false);
 
 
 
@@ -253,7 +257,7 @@ const App=()=>{
                     setSecionIniciada(false);
                 }
 
-                setTipoDeUsuarioCode("Transportista");                  
+                setTipoDeUsuarioCode("Transportista");                
             }else{
                 setTipoDeUsuario("Pasajero");
                 setTipoDeUsuarioCode("Pasajero");
@@ -264,12 +268,46 @@ const App=()=>{
         }   
       }
 
+    const [tiempoDesdeUltimoAnuncio, setTiempoDesdeUltimoAnuncio]=useState("0");
+
+    const obtenerTiempoDesdeElUltimoAnucio=async()=>{
+        try{
+            let value=await AsyncStorage.getItem('tiempoDesdeUltimoAnuncio');
+            if(value!=null && value!=undefined){
+                setTiempoDesdeUltimoAnuncio(value);
+            }else{
+                let fechaActual=new Date();
+                let tiempoTotal=fechaActual.getHours()*3600 + fechaActual.getMinutes()*60 + fechaActual.getSeconds();
+                setTiempoDesdeUltimoAnuncio(tiempoTotal.toString());
+            }
+        }catch{
+            let fechaActual=new Date();
+            let tiempoTotal=fechaActual.getHours()*3600 + fechaActual.getMinutes()*60 + fechaActual.getSeconds();
+            setTiempoDesdeUltimoAnuncio(tiempoTotal.toString());
+        }
+    }
+
+    const enviarTiempoDesdeElUltimoAnuncio=async()=>{
+        try{
+            let fechaActual=new Date();
+            let tiempoTotal=fechaActual.getHours()*3600 + fechaActual.getMinutes()*60 + fechaActual.getSeconds();
+            setTiempoDesdeUltimoAnuncio(tiempoTotal.toString());
+            let value=await AsyncStorage.setItem('tiempoDesdeUltimoAnuncio',tiempoTotal.toString());
+        }catch{
+            let fechaActual=new Date();
+            let tiempoTotal=fechaActual.getHours()*3600 + fechaActual.getMinutes()*60 + fechaActual.getSeconds();
+            setTiempoDesdeUltimoAnuncio(tiempoTotal.toString());
+        }
+    }
+
+
       useEffect(()=>{     
         SplashScreen.hide();   
         obtenerToken();
         getRutasFavoritas(setRutasSeleccionadasCompetencia);
         getTokenGeoRutasCode(setTokenGeoRutas);
         getNombre(setNombreAdmin);
+        obtenerTiempoDesdeElUltimoAnucio();
       },[])
 
       useEffect(()=>{
@@ -303,6 +341,7 @@ const App=()=>{
             usuario=await fetch(url).then(res=>usuario=res.json());
             //usuario=await fetch(url);
             console.log("El usuario es: ");
+            console.log("La url es: "+url);
             console.log(usuario);
             
         }catch{
@@ -329,15 +368,82 @@ const App=()=>{
         }
     }
 
+    const [datosDelUsuarioSinSuscripcion, setDatosDelUsuarioSinSuscripcion]=useState(
+        {apellidos: "", idTablaForanea: 0, nombres: "", tipoDeUsuario: "P",
+            tipoSubscripcion: "B", token: ""});
+    const [mostrarComprasPasajeros, setMostrarComprasPasajeros]=useState(false);
+    
     useEffect(()=>{
         SplashScreen.hide();
-        if(emailState.length>2){
+        if(emailState.length>2 && secionIniciada==true){
             refrescarToken(emailState,tokenState);
+            console.log("ESTAS HACIENDO UNA PETICION AL TOKEN");
+            if(idRutaAMostrar>0 && tipoDeUsuario=='Pasajero' && tipoDeSubscripcion=='C'){
+
+                setDatosDelUsuarioSinSuscripcion({apellidos: "Des", idTablaForanea: 0, nombres: "Des", tipoDeUsuario: "P",
+                tipoSubscripcion: "C", token: tokenState, email:emailState});
+                
+                // let fechaActual= new Date();
+                // let tiempoTotal=fechaActual.getHours()*3600 + fechaActual.getMinutes()*60 + fechaActual.getSeconds();
+                // if(Math.abs(tiempoTotal-(parseInt(tiempoDesdeUltimoAnuncio)))>=120){
+                    setMostrarComprasPasajeros(true);
+                //}
+
+            }
         }
-    },[idRutaAMostrar,visualizarRutas])
+    },[idRutaAMostrar,visualizarRutas,emailState,secionIniciada,tokenState,tipoDeUsuario,tipoDeSubscripcion])
+
+    const verificarMenbresia=async(email,token)=>{
+        try{
+            let urlUsuarioT='https://www.georutas.lat/api/VerificarTiempoDeMenbresia?Email='+email+'&Token='+token;
+            let datos=await fetch(urlUsuarioT).then(res=>datos=res.json());
+
+            if(datos!=undefined && datos!=null && datos.emailUsuario.length>10){
+                let fecha=new Date(Date.parse(datos.tiempo));
+                console.log("La fecha obtenida es: ");
+                console.log(fecha);
+                let fechaHoy=new Date();
+                console.log("La otra fecha es: ");
+                console.log(fechaHoy);
+
+                let cantidadDeTiempo=fecha-fechaHoy;
+
+                if(cantidadDeTiempo<=0){
+                    setMensajeAlerta("Renueve su subscripción para poder acceder");
+                    setMostrarAlerte(true);                    
+                    setSecionIniciada(false);
+                    setLoguearse(true);
+                    setPermitirEnvio("false");
+                    setPermitirEnviarUbicacion(false);
+                    let valor=await AsyncStorage.setItem('tokenCodeGeoRutas','');
+                }else if(cantidadDeTiempo>0 && cantidadDeTiempo<86400000){
+                    setMensajeAlerta("Su suscripción caduca en "+((int)(cantidadDeTiempo/3600000))+" horas");
+                    setMostrarAlerte(true);                           
+                }else if(cantidadDeTiempo>=86400000 && cantidadDeTiempo<172800000){
+                    setMensajeAlerta("Su suscripción caduca en 2 días");
+                    setMostrarAlerte(true);
+                }else if(cantidadDeTiempo>=172800000 && cantidadDeTiempo<259200000){
+                    setMensajeAlerta("Su suscripción caduca en 3 días");
+                    setMostrarAlerte(true);
+                }else if(cantidadDeTiempo>=259200000 && cantidadDeTiempo<345600000){
+                    setMensajeAlerta("Su suscripción caduca en 4 días");
+                    setMostrarAlerte(true);
+                }
+            }
+
+        }catch{
+            console.log("No se que carajos paso");
+        }
+    }
+
 
     const [mostrarMenusBuenEstado,setMostrarMenusBuenEstado]=useState(false);
     const [ocultarLasMierdasDelPrimerMenu,setOcultarLasMierdasDelPrimerMenu]=useState(true);
+    const [comprarSuscripcionT, setComprarSuscripcionT]=useState(false);
+
+    const [mostrarAnuncioCompleto, setMostrarAnuncioCompleto]=useState(false);
+    const [mostrarAnuncioRewarded, setMostrarAnuncioRewarded]=useState(false);
+
 
   return (
      <View style={{height:alturaTotal, width:width}}>
@@ -363,8 +469,10 @@ const App=()=>{
         emailState={emailState} tokenState={tokenState} setTokenState={setTokenState} tipoDeSubscripcion={tipoDeSubscripcion}
         setVerAdministrarUsuarios={setVerAdministrarUsuarios} setCambiarPassword={setCambiarPassword} setEditarPerfil={setEditarPerfil}
         registrarse={registrarse} estadoAplicacion={estadoAplicacion} setEstadoAplicacion={setEstadoAplicacion} setMostrarAlerte={setMostrarAlerte} 
-        setMensajeAlerta={setMensajeAlerta} setMostrarMenusBuenEstado={setMostrarMenusBuenEstado} sesionIniciadaConGoogle={sesionIniciadaConGoogle}
+        setMensajeAlerta={setMensajeAlerta} setMostrarMenusBuenEstado={setMostrarMenusBuenEstado}
         pedirUbicacion={pedirUbicacion} pedirUbicacionSegundoPlano={pedirUbicacionSegundoPlano} setPedirUbicacionSegundoPlano={setPedirUbicacionSegundoPlano}
+        verificarMenbresia={verificarMenbresia} setMostrarAnuncioCompleto={setMostrarAnuncioCompleto} obtenerTiempoDesdeElUltimoAnucio={obtenerTiempoDesdeElUltimoAnucio}
+        tiempoDesdeUltimoAnuncio={tiempoDesdeUltimoAnuncio} setMostrarAnuncioRewarded={setMostrarAnuncioRewarded} setMostrarComprasPasajeros={setMostrarComprasPasajeros}
         ></Inicio>
 
         {mostrarMenusBuenEstado==true && <ItemsTrayectos setOcultarLasMierdasDelPrimerMenu={setOcultarLasMierdasDelPrimerMenu} ocultarMenu={ocultarMenu} setIdRutaAMostrar={setIdRutaAMostrar} 
@@ -387,64 +495,6 @@ const App=()=>{
 
         </ItemsTrayectos>}
 
-        {/* <View style={{height:0,width:width,padding:0}}>
-                <View style={[menDos, { left:(height<width)?width*0.2+(width*0.2-height*0.2)/2:width*0.2, 
-                width: (height>width)?width*0.2:height*0.2,zIndex:1000,  position: 'absolute', 
-                top:-width*0.6, backgroundColor: '#102769',height:width*0.6 }]}
-                >
-                <ScrollView
-                >
-                {
-                    todasLasRutasData.map((item,i)=>{
-                        return(                            
-                            <View key={i} onTouchEnd={()=>{                                
-                                setIdRutaAMostrar(i+1);
-                                //setMostrarSniperCargando(false);
-                            }}                            
-                            >
-                            { i>=0 && <RutasBarItem color={item.color} numeroDeRuta={item.nombre}
-                                tiempoDeLlegada={'1231'}>
-                                </RutasBarItem>            }           
-
-                            </View>
-                        )})}
-                </ScrollView>
-            </View>
-
-            {ocultarMenu==true && <View style={[menUno, {left:(height<width)?(width*0.2-height*0.2)/2:0, 
-          width: (height>width)?width*0.2:height*0.2, height: width*0.6, position: 'absolute', 
-          bottom: 0, backgroundColor: '#102769' }]}>
-                  <ScrollView>
-                      
-                      <IntercambiosRutas rutasEnElMapa={data} rutasTrayectoria={rutasTrayectoria} visualizarRutas={visualizarRutas} 
-                      verRutasTrayecto={verRutasTrayecto} obtenerRutas={obtenerRutas}
-                      setVerTrayectoria={setVerTrayectoria}
-                      setVerRutasCercanas={setVerRutasCercanas} setVerCompetencia={setVerCompetencia} setOcultarTrayecto={setOcultarTrayecto}
-                      identificadorKey={identificadorKey} refCambiarLupa={refCambiarLupa} setCargando={setCargando}
-                      ></IntercambiosRutas>
-
-                  </ScrollView>
-          </View>}
-
-
-          {ocultarTercerMenu==true && <View style={[menTres, { left:(height<width)?3*width*0.2+(width*0.2-height*0.2)/2:3*width*0.2, 
-          width: (height>width)?width*0.2:height*0.2, 
-          height: width*0.6, position: 'absolute', bottom:0, backgroundColor: '#102769' }]}>
-                <ScrollView>
-                {
-                    <ParadasCercaDelOrigen emailState={emailState} tokenState={tokenState} lalitude={coordenadasOrigenSecundario.latitude} longitude={coordenadasOrigenSecundario.longitude} setVerParadasCercanas={setVerParadasCercanas}></ParadasCercaDelOrigen>
-                }
-                </ScrollView>
-            </View>}
-
-
-
-        </View> */}
-
-        
-
-        
-
         <MenuBar setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} ocultarMenu={ocultarMenu} rutasEnElMapa={data} rutasTrayectoria={rutasTrayectoria}
         visualizarRutas={visualizarRutas} verRutasTrayecto={verRutasTrayecto} setVerTrayectoria={setVerTrayectoria}
         setIdRutaAMostrar={setIdRutaAMostrar} ocultarTercerMenu={ocultarTercerMenu} coordenadasOrigenSecundario={coordenadasOrigenSecundario} setVerParadasCercanas={setVerParadasCercanas} secionIniciada={secionIniciada}
@@ -461,8 +511,8 @@ const App=()=>{
         ></MenuBar>
   
         
-        {loguearse==true && <Login setSesionIniciadaConGoogle={setSesionIniciadaConGoogle} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} setTipoDeSubscripcion={setTipoDeSubscripcion} setCambiarPassword={setCambiarPassword} setTipoDeUsuario={setTipoDeUsuario} setSecionIniciada={setSecionIniciada} setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} setLosguearTransportista={setLosguearTransportista} height={height} width={width} 
-        setIdUsuarioIniciado={setIdUsuarioIniciado} setUsuarioLogueado={setUsuarioLogueado} setTokenGeoRutas={setTokenGeoRutas} setConfirmarCodigo={setConfirmarCodigo} setEmailState={setEmailState} setTokenState={setTokenState}></Login>}
+        {loguearse==true && <Login setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} setTipoDeSubscripcion={setTipoDeSubscripcion} setCambiarPassword={setCambiarPassword} setTipoDeUsuario={setTipoDeUsuario} setSecionIniciada={setSecionIniciada} setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} setLosguearTransportista={setLosguearTransportista} height={height} width={width} 
+        setIdUsuarioIniciado={setIdUsuarioIniciado} setUsuarioLogueado={setUsuarioLogueado} setTokenGeoRutas={setTokenGeoRutas} setConfirmarCodigo={setConfirmarCodigo} setEmailState={setEmailState} setTokenState={setTokenState} setComprarSuscripcionT={setComprarSuscripcionT} setDatosDelUsuarioSinSuscripcion={setDatosDelUsuarioSinSuscripcion}></Login>}
         {confirmarCodigo==true &&<ConfirmarCodigo setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} height={height} width={width} setConfirmarCodigo={setConfirmarCodigo}></ConfirmarCodigo>}
         {cambiarPassword==true && <CambiarPassword setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} height={height} width={width} setCambiarPassword={setCambiarPassword}></CambiarPassword>}
         
@@ -478,6 +528,13 @@ const App=()=>{
         {darBienvenida==true && <BVAplicacion setDarBienvenida={setDarBienvenida} height={height} width={width}></BVAplicacion>}
         {secionIniciada==true && justificarUbicacion==true && <JustificarUbicacion setPedirUbicacionSegundoPlano={setPedirUbicacionSegundoPlano} setMensajeAlerta={setMensajeAlerta} setMostrarAlerte={setMostrarAlerte} setPedirUbicacion={setPedirUbicacion} tipoDeUsuario={tipoDeUsuario} setJustificarUbicacion={setJustificarUbicacion} height={height} width={width}></JustificarUbicacion>}
         {pedirUbicacionSegundoPlano==2 && <BGPermisos setMostrarAlerte={setMostrarAlerte} setPedirUbicacionSegundoPlano={setPedirUbicacionSegundoPlano} height={height} width={width}></BGPermisos>}
+        {comprarSuscripcionT==true && <Compras setTipoDeSubscripcion={setTipoDeSubscripcion} setTokenGeoRutas={setTokenGeoRutas} setTokenState={setTokenState} setEmailState={setEmailState} datosDelUsuarioSinSuscripcion={datosDelUsuarioSinSuscripcion} setComprarSuscripcionT={setComprarSuscripcionT} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} 
+                                        height={height} width={width} setLoguearse={setLoguearse} setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setIdUsuarioIniciado={setIdUsuarioIniciado} setIdUsuarioIniciadoCode={setIdUsuarioIniciadoCode}></Compras>}
+        {mostrarAnuncioCompleto==true && <InterstitialADS enviarTiempoDesdeElUltimoAnuncio={enviarTiempoDesdeElUltimoAnuncio} setMostrarAnuncioCompleto={setMostrarAnuncioCompleto}></InterstitialADS>}
+        {mostrarAnuncioRewarded==true && <RewardedADS setMostrarComprasPasajeros={setMostrarComprasPasajeros} enviarTiempoDesdeElUltimoAnuncio={enviarTiempoDesdeElUltimoAnuncio} setMostrarAnuncioRewarded={setMostrarAnuncioRewarded}></RewardedADS>}
+        {mostrarComprasPasajeros==true && mostrarAlerta==false && <ComprasUsuariosPasajeros setMostrarComprasPasajeros={setMostrarComprasPasajeros} setMostrarAlerte={setMostrarAlerte} height={height} width={width} setMensajeAlerta={setMensajeAlerta} setLoguearse={setLoguearse} setSecionIniciada={setSecionIniciada} setTipoDeSubscripcion={setTipoDeSubscripcion}
+                                            setTipoDeUsuario={setTipoDeUsuario} setMostrarAnuncioRewarded={setMostrarAnuncioRewarded} setmenDos={setmenDos} setMostrarItemMenuUno={setMostrarItemMenuUno} setIdRutaAMostrar={setIdRutaAMostrar} setOcultarTrayecto={setOcultarTrayecto} setVerRutasCercanas={setVerRutasCercanas}
+                                            ></ComprasUsuariosPasajeros>}
     </View>
 
   );

@@ -16,8 +16,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransportista
         ,setTipoDeUsuario,height,width,setIdUsuarioIniciado,setUsuarioLogueado,setTokenGeoRutas
-        ,setConfirmarCodigo,setCambiarPassword,setEmailState, setTokenState,setTipoDeSubscripcion,setMostrarAlerte,setMensajeAlerta
-        ,setSesionIniciadaConGoogle})=>{
+        ,setConfirmarCodigo,setCambiarPassword,setEmailState, setTokenState,setTipoDeSubscripcion
+        ,setMostrarAlerte,setMensajeAlerta,setComprarSuscripcionT,setDatosDelUsuarioSinSuscripcion
+        })=>{
  
     const [usuarioState,setUsuarioState]=react.useState("");
     const [contrasenia, setContrasenia]=react.useState("");
@@ -145,8 +146,12 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
             }else if(json.token.length>1){
                 if(json.tipoSubscripcion=='B'  || json.tipoSubscripcion=='K'){
                     setTipoDeMenbresiaCode(json.tipoSubscripcion);
-                    setMensajeAlerta("Solicite una subscripción para poder acceder");
+                    setMensajeAlerta("Renueve su subscripción para poder acceder");
                     setMostrarAlerte(true);
+                    setComprarSuscripcionT(true);
+                    setDatosDelUsuarioSinSuscripcion({apellidos: json.apellidos, idTablaForanea: json.idTablaForanea, 
+                                                       nombres: json.nombres, tipoDeUsuario: json.tipoDeUsuario, 
+                                                       tipoSubscripcion: json.tipoSubscripcion, token: json.token,email:correoUsuario.toString().toLowerCase()});
                     return;
                 }
                 setNombre(json.nombres);
@@ -185,6 +190,13 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
 
     const registrarseConGoogle=async(userIfno)=>{
         
+        
+        try {
+            await GoogleSignin.signOut();
+        } catch (error) {
+          console.error(error);
+        }
+
         let objeto={            
             idUser: userIfno.email,
             token: "s",
@@ -267,7 +279,11 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
             if(json.tipoSubscripcion=='K' || json.tipoSubscripcion=='B'){
                 setTipoDeMenbresiaCode(json.tipoSubscripcion);
                 setMensajeAlerta("Renueve su subscripción para poder acceder");
-                setMostrarAlerte(true);
+                setMostrarAlerte(true);                
+                setComprarSuscripcionT(true);
+                setDatosDelUsuarioSinSuscripcion({apellidos: json.apellidos, idTablaForanea: json.idTablaForanea, 
+                    nombres: json.nombres, tipoDeUsuario: json.tipoDeUsuario, 
+                    tipoSubscripcion: json.tipoSubscripcion, token: json.token,email:userIfno.email.toString().toLowerCase()});
                 return;
             }
             setNombre(json.nombres)
@@ -285,7 +301,6 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
             //setMostrarAlerte(true);
             setLoguearse(false);
             setSecionIniciada(true);
-            setSesionIniciadaConGoogle(true);
             if(json.tipoDeUsuario=='T'){
                 setTipoDeUsuario("Transportista");
                 setIdUsuarioIniciado(parseInt(json.idTablaForanea));
@@ -388,10 +403,14 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                 return;
             }
             
-            if(json.tipoSubscripcion=='K'  || json.tipoSubscripcion=='B'){
+            if(json.tipoSubscripcion=='K' || json.tipoSubscripcion=='B'){
                 setTipoDeMenbresiaCode(json.tipoSubscripcion);
                 setMensajeAlerta("Renueve su subscripción para poder acceder");
                 setMostrarAlerte(true);
+                setComprarSuscripcionT(true);
+                setDatosDelUsuarioSinSuscripcion({apellidos: json.apellidos, idTablaForanea: json.idTablaForanea, 
+                    nombres: json.nombres, tipoDeUsuario: json.tipoDeUsuario, 
+                    tipoSubscripcion: json.tipoSubscripcion, token: json.token,email:userIfno.userID});
                 return;
             }
 
@@ -399,7 +418,7 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
             setUsuario(json.email);
             setCorreo(json.email);
 
-            setEmailState(json.email);
+            setEmailState(json.email.toString().toLowerCase());
             setTokenState(json.token);
 
             setTokenGeoRutasCode(json.token);

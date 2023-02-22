@@ -1,12 +1,20 @@
 import react, { useEffect, useState } from "react"
-import { ScrollView, StatusBar, Text, View,Image, TouchableOpacity, ActivityIndicator,Platform } from "react-native"
+import { ScrollView, StatusBar, Text, View,Image, TouchableOpacity, ActivityIndicator } from "react-native"
 import { useQuery } from "react-query"
 import { getNombre } from "../data/asyncStorageData"
 import getAllRutas from "../data/rutasManagua"
 import imagen from '../assets/x_icon_imagen.png';
 import PerfilesDeUsuarios from "./ComponentesParaAdmins/PerfilesDeUsuarios";
-import LinearGradient from 'react-native-linear-gradient';
+import * as IAP from 'react-native-iap'
+import { Platform,Alert } from 'react-native';
 
+const items=Platform.select({
+    ios:[],
+    android:['productosubcripcionchoferes']
+});
+
+let purchaseUpdateSuscription=null;
+let purchaseErrorSuscription=null;
 
 const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrarUsuarios,nombre,setEditarInfoDelChofer,setEmailDelChoferEditar,setChoferAEditar
     ,refrescar,setRefrescar,setMostrarAlerte, setMensajeAlerta,setSecionIniciada,setTipoDeUsuario,setLoguearse})=>{
@@ -16,20 +24,9 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
     const [seleccionar, setSeleccionar]=useState(false);
     
     const[arregloActualizar,setArregloActualizar]=useState([]);    
-
-    const [buyIsLoading,setBuyIsLoading]=useState(false);
-    const [error,setError]=useState('');
-    const[productId,setProductId]=useState();
-
-    // const {isFullAppPurchased,
-    //     connectionErrorMsg,
-    //     purchaseFullApp,
-    //     }= useInAppPurchase();
     
-    const itemSubs = Platform.select({
-        ios: ['productosubcripcionchoferes'],     
-        android: ['productosubcripcionchoferes'],     
-    });
+    const [purchase, setPurchase]=useState(false);
+    const [productos, setProductos]=useState({});
 
     const obtenerLosDatos=async()=>{
 
@@ -120,9 +117,82 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
         }
     }
 
+
+        
         useEffect(()=>{
             obtenerLosDatos();
         },[refrescar])
+
+        useEffect(()=>{
+
+            try{
+                IAP.initConnection().catch(()=>{
+                    console.log("Ocurrio un error");
+                }).then((res)=>{
+                    console.log("Los datos de la tienda son: ");
+                    console.log(res);
+                    IAP.getProducts({skus:items}).catch(()=>{
+                        console.log("Ocurrio un error obteniendo los productos");
+                    }).then(res=>{
+                        console.log(res);
+                        setProductos(res);
+                    });
+                });
+            }catch{
+
+            }
+            
+            purchaseErrorSuscription=IAP.purchaseErrorListener((error)=>{
+                if(!(error.responseCode=="1" || error.responseCode=="7" || error.responseCode=="2")){
+                    setMensajeAlerta("Ocurrió un error con la transacción");
+                    setMostrarAlerte(true);
+                }
+            });
+    
+            purchaseUpdateSuscription=IAP.purchaseUpdatedListener((purchase)=>{
+                const reciep=purchase.transactionReceipt;
+                if(reciep){
+                    console.log(reciep);
+                    setPurchase(true);
+                    IAP.finishTransaction({purchase:purchase, isConsumable: false, developerPayloadAndroid: "" });
+                }
+            });
+    
+            return ()=>{
+                try{
+                    purchaseErrorSuscription.remove();
+                }catch{
+                    
+                }
+    
+                try{
+                    purchaseUpdateSuscription.remove();
+                }catch{
+    
+                }
+    
+                try{
+                    IAP.endConnection();
+                }catch{
+    
+                }
+            }
+        },[]);
+
+        useEffect(()=>{
+            if(purchase==true){
+                setMensajeAlerta("Se logro realizar la compra");
+                setMostrarAlerte(true);
+                console.log("Mierda")
+                actualizarUsuario();
+                console.log("Mierda")
+                setRefrescar(!refrescar);
+                setSeleccionar(!seleccionar);
+                arregloActualizar([]);
+                setPurchase(false);
+            }
+
+        },[purchase])
 
         return(
             
@@ -134,9 +204,10 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
                     <Image source={imagen} style={{width:30,height:30, tintColor:'#f1f1f1'}}></Image>
                 </View>
                 <View style={{alignItems:'center',marginTop:'15%'}}>
-                    <Text style={{color:'#f1f1f1',fontSize:29}}>Administra tus usuarios</Text>
+                    <Text style={{color:'#f1f1f1',fontSize:29,marginBottom:20}}>Administra tus usuarios</Text>
+                    {seleccionar==false && <Text style={{color:'#f1f1f1',fontSize:15,marginBottom:10}}>Has click para editar los datos del chofer</Text>}
                 </View>
-                <View style={{marginLeft:'0%',height:'60%',marginTop:30,marginLeft:20}}>
+                <View style={{marginLeft:'0%',height:'60%',marginLeft:20}}>
                 {data!=undefined && data.length>1 && <ScrollView>
                     {                        
                         data.map((item,i)=>{      
@@ -144,10 +215,10 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
                                 return(
                                     <View key={i} style={{alignItems:'center',flexDirection:'row',alignContent:'center'}}
                                     onTouchEnd={()=>{
-                                        setChoferAEditar(item);
+                                            setChoferAEditar(item);
                                     }}
                                     >
-                                        <PerfilesDeUsuarios setEmailDelChoferEditar={setEmailDelChoferEditar} setEditarInfoDelChofer={setEditarInfoDelChofer} seleccionar={seleccionar} arregloActualizar={arregloActualizar} item={item} i={i}></PerfilesDeUsuarios>
+                                        <PerfilesDeUsuarios setArregloActualizar={setArregloActualizar} setEmailDelChoferEditar={setEmailDelChoferEditar} setEditarInfoDelChofer={setEditarInfoDelChofer} seleccionar={seleccionar} arregloActualizar={arregloActualizar} item={item} i={i}></PerfilesDeUsuarios>
                                     </View>
                                 )  
                         })
@@ -157,28 +228,33 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
                 </View>
 
                 <View style={{flexDirection:'row',marginTop:40,justifyContent:'center'}}>
-                    <TouchableOpacity style={{marginRight:10,height:40,width:'auto',borderRadius:7,backgroundColor:'blue',justifyContent:'center',paddingHorizontal:5}}>
-                        <Text style={{fontSize:16, color:'white'}}>Activar todos</Text>
-                    </TouchableOpacity>
                     <TouchableOpacity style={{height:40,width:'auto',backgroundColor:'blue',borderRadius:7,justifyContent:'center',paddingHorizontal:5}}
                         onPressOut={()=>{
                             if(seleccionar==false){
                                 setSeleccionar(!seleccionar);
                             }else if(seleccionar==true && arregloActualizar.length==0){
-                                setMensajeAlerta("Seleccione cuáles usuarios activar");
+                                setMensajeAlerta("Seleccione cuál usuario activar");
                                 setMostrarAlerte(true);
-                            }else if(seleccionar==true && arregloActualizar.length>0){                                
-                                console.log("Mierda")
-                                actualizarUsuario();
-                                console.log("Mierda")
-                                setRefrescar(!refrescar);
-                                setSeleccionar(!seleccionar);
+                            }else if(seleccionar==true && arregloActualizar.length>0){                                                                
+                                try{
+                                    IAP.requestPurchase({sku:'productosubcripcionchoferes'});
+                                }catch{
+                                    console.log("OCURRIO un error en la compra");
+                                }
                             }
                             
                         }}
                     >
-                        <Text style={{fontSize:16, color:'white'}}>{(seleccionar==false)?"Seleccionar cuales activar":"Activar los seleccionados"}</Text>
+                        <Text style={{fontSize:16, color:'white'}}>{(seleccionar==false)?"Selecciona cual activar":"Comprar suscripción"}</Text>
                     </TouchableOpacity>
+                    {seleccionar==true && <TouchableOpacity style={{marginLeft:10,height:40,width:'auto',borderRadius:7,backgroundColor:'blue',justifyContent:'center',paddingHorizontal:5}}
+                        onPressOut={()=>{
+                            setSeleccionar(false);
+                            setArregloActualizar([]);                            
+                        }}
+                    >
+                        <Text style={{fontSize:16, color:'white'}}>Cancelar</Text>
+                    </TouchableOpacity>}
                 </View>
 
                 {/* <TouchableOpacity onPressOut={purchaseFullApp}>
