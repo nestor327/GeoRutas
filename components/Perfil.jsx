@@ -7,14 +7,15 @@ import { check, openSettings, PERMISSIONS, request } from 'react-native-permissi
 import RutasBarItem from './RutasBarItem';
 import ParadasFavoritas from './ParadasFavoritas';
 import { getRutasFavoritas,setRutasFavoritas } from '../data/asyncStorageData.js';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+// import { useInterstitialAd,InterstitialAd } from '@react-native-admob/admob';
 
 const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,setLoguearse,setRegistrarse,
     setSecionIniciada,setTipoDeUsuario,activarPrecision,
     setActivarPrecision,tipoDeUsuario,permisosEnSegundoPlano,setPermisosEnSegundoPlano,
     todasLasRutasCompetencia, rutasSeleccionadasCompetencia,setTodasLasRutasCompetencia, 
     setRutasSeleccionadasCompetencia, tipoDeSubscripcion,setVerAdministrarUsuarios,setCambiarPassword,
-    setEditarPerfil,registrarse,setMostrarAlerte,setMensajeAlerta,sesionIniciadaConGoogle})=>{
+    setEditarPerfil,registrarse,setMostrarAlerte,setMensajeAlerta,setMostrarAnuncioCompleto={setMostrarAnuncioCompleto}})=>{
 
 
     const [nombre,setnombre]=useState();
@@ -51,14 +52,67 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
         
     },[arregloDeValores])
 
-    const signOut = async () => {
-        try {
-            await GoogleSignin.signOut();
-        } catch (error) {
-          console.error(error);
-        }
-    };
+
+    // const { adLoaded, adDismissed, show } = useInterstitialAd(
+    //     TestIds.REWARDED_INTERSTITIAL
+    //   );
     
+    //   useEffect(() => {
+    //     if (adDismissed) {
+    //       //navigation.navigate('NextScreen');
+    //       console.log("AQUI SE VA A LA VERGA EN TEORIA");
+    //     }
+    //   }, [adDismissed]);
+
+    // const [interstitialAd, setInterstitialAd] = useState(
+    //     null
+    //   );
+
+    // const [adLoaded, setAdLoaded] = useState(false);
+    // const [adDismissed, setAdDismissed] = useState(false);
+    
+    // useEffect(() => {
+    //     const interstitial = InterstitialAd.createAd(TestIds.INTERSTITIAL);
+    //     setInterstitialAd(interstitial);
+    
+    //     const subscriptions = [
+    //       interstitial.addEventListener('onAdLoaded', () => {
+    //         setAdLoaded(true);
+    //       }),
+    //       interstitial.addEventListener('onAdDismissed', () => {
+    //         setAdDismissed(true);
+    //       }),
+    //     ];
+    
+    //     return () => {subscriptions[0].remove();subscriptions[1].remove();};
+    //   }, []);
+
+
+    //   useEffect(() => {
+    //     if (adDismissed) {
+    //       //navigation.navigate('NextScreen');
+    //       console.log("En teoria aqui esta navegando");
+    //     }
+    //   }, [adDismissed]);
+
+    // const { adLoaded, adDismissed, show } = useInterstitialAd(
+    //     TestIds.REWARDED_INTERSTITIAL,
+    //     {
+    //       requestOptions: {
+    //         requestNonPersonalizedAdsOnly: true,
+    //       },
+    //     }
+    //   );
+
+    //   useEffect(() => {
+    //     if (adDismissed) {
+    //       //navigation.navigate('NextScreen');
+    //     }else{
+    //         console.log("No se que pedo");
+    //         show();
+    //     }
+    //   }, [adDismissed]);
+
     return(
         <View style={[tipoDePerfil[0].principal]}>
 
@@ -68,7 +122,7 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
                 
             }}>
              <Image source={imagen} style={{width:35,height:35, tintColor:'#f1f1f1'}}></Image>
-            </View>
+            </View>            
             <View style={{alignItems:'center'}}>
                 <Text style={{color:'white',marginTop:'10%',fontSize:25}}>Ajustes</Text>
                 <View style={{flexDirection:'column',height:100,alignItems:'center'}}>
@@ -221,10 +275,7 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
                         setSecionIniciada(false);
                         setTipoDeUsuario("Ninguno");
                         setTokenGeoRutasCode("");
-                        setLoguearse(true);
-                        if(sesionIniciadaConGoogle){
-                            signOut();
-                        }
+                        setLoguearse(true);                        
                     }else{
                         setLoguearse(true);
                     }
@@ -241,10 +292,44 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
                 }}>Registrarse</Text>
             </TouchableOpacity>}
 
-            <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0,marginBottom:20}}>______________________________________</Text>            
+            <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0,marginBottom:0}}>______________________________________</Text>            
 
             </View>
-            
+            <TouchableOpacity onPressOut={()=>{
+                // if (adLoaded) {
+                //     show();
+                //   } else {
+                //     //navigation.navigate('NextScreen');
+                //     console.log("INTENTASTE ELIMMINAR EL ANUNCIO");
+                //     console.log(adLoaded);
+                //   }
+
+                // if (adLoaded) {
+                //     interstitialAd?.show();
+                //   } else {
+                //     //navigation.navigate('NextScreen');
+                //     console.log("INTENTASTE ELIMMINAR EL ANUNCIO");
+                //   }
+
+                // if (adLoaded) {
+                //     show();
+                //   } else {
+                //     //navigation.navigate('NextScreen');
+                // }
+                setMostrarAnuncioCompleto(true);
+                console.log("Aqui se ca");
+            }}>
+                <Text>Mostrar anuncio</Text>
+            </TouchableOpacity>
+            {(tipoDeSubscripcion=='C' || tipoDeSubscripcion=='B') && <View style={{alignItems:'center',justifyContent:'center'}}>
+                <BannerAd 
+                size={BannerAdSize.BANNER} 
+                unitId={TestIds.BANNER} 
+                requestOptions={{
+                    requestNonPersonalizedAdsOnly:true
+                }}
+                />
+            </View>}
         </View>
         </View>
     )

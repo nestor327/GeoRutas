@@ -1,4 +1,8 @@
 {
   "name": "georutas",
-  "displayName": "georutas"
+  "displayName": "georutas",
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-1889500700036964~4713534344",
+    "ios_app_id": "ca-app-pub-xxxxxxxx~xxxxxxxx"
+  }
 }

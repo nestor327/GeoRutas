@@ -14,7 +14,8 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
     verTransportistasPorLaDerecha,verTransportistasPorLaIzquierda,idRutaAMostrar,mostrarUsuarios,permitirEnviarUbicacion,
     tipoDeUsuario,mostrarParadas,mostrarItemMenuUno,verTrayectoria,verCompetencia,verRutasCercanas,centrePosition,siguiendoAlUsuario,
     askLocationPermission,followUseLocation, stopFollowUserLocation,permitirSeguirPasajero, setPermitirSeguirPasajero,setVerTrayectoria,
-    ocultarTrayecto,permisos,askLocationPermissionSetting, setUsuarioTransportista,setCargando,emailState, tokenState,setMostrarAlerte, setMensajeAlerta
+    ocultarTrayecto,permisos,askLocationPermissionSetting, setUsuarioTransportista,setCargando,emailState, tokenState,setMostrarAlerte, 
+    setMensajeAlerta,setMostrarComprasPasajeros,tipoDeSubscripcion
     })=>{
 
         // useEffect(()=>{
@@ -336,7 +337,10 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         setOcultarTrayecto(false);
                         setCargando(false);
                         setMensajeAlerta("Para mejor comodidad, elija sus rutas favoritas en ajustes y muestre su ubicación");
-                        setMostrarAlerte(true);
+                        setMostrarAlerte(true); 
+                        if(tipoDeSubscripcion=='C'){
+                            setMostrarComprasPasajeros(true);
+                        }
                     }}
                         imagen={require('../assets/noVerUsuarios.png')}
                 />}

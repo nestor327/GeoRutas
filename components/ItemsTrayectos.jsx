@@ -42,7 +42,7 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
                     todasLasRutasData.map((item,i)=>{
                         return(                            
                             <View key={i} onTouchEnd={()=>{                                
-                                setIdRutaAMostrar(i+1);        
+                                setIdRutaAMostrar(i+1);
                                 console.log("Si lo cambiaste");
                                 //setMostrarSniperCargando(false);
                             }}                            
