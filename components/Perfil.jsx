@@ -15,7 +15,8 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
     setActivarPrecision,tipoDeUsuario,permisosEnSegundoPlano,setPermisosEnSegundoPlano,
     todasLasRutasCompetencia, rutasSeleccionadasCompetencia,setTodasLasRutasCompetencia, 
     setRutasSeleccionadasCompetencia, tipoDeSubscripcion,setVerAdministrarUsuarios,setCambiarPassword,
-    setEditarPerfil,registrarse,setMostrarAlerte,setMensajeAlerta,setMostrarAnuncioCompleto={setMostrarAnuncioCompleto}})=>{
+    setEditarPerfil,registrarse,setMostrarAlerte,setMensajeAlerta,setMostrarAnuncioCompleto,
+    setMostrarAnuncioRewarded,width,setEliminarAnuncios,height,setMostrarComprasPasajeros})=>{
 
 
     const [nombre,setnombre]=useState();
@@ -116,27 +117,30 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
     return(
         <View style={[tipoDePerfil[0].principal]}>
 
-        <View style={{backgroundColor:'#101038',height:'87%',width:'90%',position:'absolute',top:'5%',left:'5%',zIndex:190}}>
+        <View style={{backgroundColor:'#101038',height:'90%',width:'90%',position:'absolute',top:'5%',left:'5%',zIndex:190}}>
             <View style={{position:'absolute',zIndex:250,height:50,width:50,left:'85%',top:'3%'}} onTouchEnd={()=>{
-                actualizar('none');                         
-                
+                actualizar('none');
             }}>
              <Image source={imagen} style={{width:35,height:35, tintColor:'#f1f1f1'}}></Image>
             </View>            
-            <View style={{alignItems:'center'}}>
-                <Text style={{color:'white',marginTop:'10%',fontSize:25}}>Ajustes</Text>
+            <View style={{alignItems:'center',height:(height>width)?'35%':width*0.35}}>
+                <Text style={{color:'white',marginTop:(height>width)?'10%':'5%',fontSize:25}}>Ajustes</Text>
                 <View style={{flexDirection:'column',height:100,alignItems:'center'}}>
                     {/* <Image source={require('../assets/Sukuna.jpg')} style={{width:76,height:76,borderRadius:38}}/> */}
-                    <Image source={require('../assets/ajustes.png')} style={{width:76,height:76,borderRadius:38}}/>
+                    <Image source={require('../assets/ajustes.png')} style={{width:(height>width)?width*0.2:height*0.2,
+                        height:(height>width)?width*0.2:height*0.2,borderRadius:(height>width)?width*0.1:height*0.1}}/>
                     <View style={{alignItems:'center'}}>
                         <Text style={{color:'white',fontSize:20,marginTop:0}}>{(nombre!='Desconocido')?nombre:"Nombre desconocido"}</Text>
-                        {mostrarMenu==false && <Text style={{color:'white',fontSize:15,marginTop:0}}>{(correo!=undefined && !correo.toString().toLowerCase().includes("@gmail.comfb"))?correo:""}</Text>}
+                        {mostrarMenu==false && <Text style={{color:'white',fontSize:15,marginTop:0,marginBottom:10}}>{(correo!=undefined && !correo.toString().toLowerCase().includes("@gmail.comfb"))?correo:""}</Text>}
+                        <Text style={{color:'white',marginTop:0,fontSize:15,marginBottom:10}}>______________________________________</Text>
                     </View>
 
-                </View>                
+                </View>
             </View>
+
+            <View style={{flex:1}}>            
             <View style={{alignItems:'center'}}>
-            <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:'5%',marginBottom:10}}>______________________________________</Text>
+            
 
             {tipoDeUsuario=='Transportista' && <TouchableOpacity style={{flexDirection:'row',borderWidth:1.5,borderColor:'#f1f1f1',width:'70%'
             ,height:40,paddingBottom:0,borderRadius:10,marginBottom:8}}
@@ -291,11 +295,28 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
                 setRegistrarse(true);
                 }}>Registrarse</Text>
             </TouchableOpacity>}
-
-            <Text style={{color:'white',marginTop:'10%',fontSize:15,marginTop:0,marginBottom:0}}>______________________________________</Text>            
-
+            {tipoDeSubscripcion=='C' && tipoDeUsuario=='Pasajero' && <TouchableOpacity
+                style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10
+                ,height:40,alignItems:'center',justifyContent:'center'}}
+                >
+                <Text style={{color:'white',fontSize:15}} onPress={()=>{
+                setEliminarAnuncios(true);
+                setMostrarComprasPasajeros(true);
+                }}>Eliminar Anuncios</Text>
+            </TouchableOpacity>}
+            <Text style={{color:'white',fontSize:15,marginTop:0,marginBottom:8}}>______________________________________</Text>
+            {((tipoDeSubscripcion=='C' || tipoDeSubscripcion=='B') && tipoDeUsuario=='Pasajero') && <View style={{alignItems:'center',justifyContent:'center'}}>
+                <BannerAd 
+                size={BannerAdSize.BANNER} 
+                unitId={TestIds.BANNER} 
+                requestOptions={{
+                    requestNonPersonalizedAdsOnly:true
+                }}
+                />
+            </View>}
             </View>
-            <TouchableOpacity onPressOut={()=>{
+            </View>
+            {/* <TouchableOpacity onPressOut={()=>{
                 // if (adLoaded) {
                 //     show();
                 //   } else {
@@ -316,20 +337,13 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
                 //   } else {
                 //     //navigation.navigate('NextScreen');
                 // }
-                setMostrarAnuncioCompleto(true);
+                //setMostrarAnuncioCompleto(true);
+                setMostrarAnuncioRewarded(true);
                 console.log("Aqui se ca");
             }}>
                 <Text>Mostrar anuncio</Text>
-            </TouchableOpacity>
-            {(tipoDeSubscripcion=='C' || tipoDeSubscripcion=='B') && <View style={{alignItems:'center',justifyContent:'center'}}>
-                <BannerAd 
-                size={BannerAdSize.BANNER} 
-                unitId={TestIds.BANNER} 
-                requestOptions={{
-                    requestNonPersonalizedAdsOnly:true
-                }}
-                />
-            </View>}
+            </TouchableOpacity> */}
+            
         </View>
         </View>
     )

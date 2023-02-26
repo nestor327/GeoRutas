@@ -317,7 +317,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         setMensajeAlerta("Para mayor comodidad elija a su competencia");
                         setMostrarAlerte(true);
                     }}
-                    imagen={require('../assets/noVerUsuarios.png')}
+                    imagen={require('../assets/noVerUsuariosblue.png')}
                 />}
 
                 
@@ -327,7 +327,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         setVerCompetencia(false);
                         setCargando(false);
                     }}
-                    imagen={require('../assets/verUsuarios.png')}
+                    imagen={require('../assets/verUsuariosblue.png')}
                 />}
                 
                 {tipoDeUsuario=='Pasajero' && mostrarItemMenuUno==true && verRutasCercanas==false && <Fab 
@@ -342,7 +342,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                             setMostrarComprasPasajeros(true);
                         }
                     }}
-                        imagen={require('../assets/noVerUsuarios.png')}
+                        imagen={require('../assets/noVerUsuariosblue.png')}
                 />}
 
                 

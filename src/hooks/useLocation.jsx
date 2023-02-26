@@ -208,7 +208,7 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
     }
 
     //const actualizarUbicacionEnElBackEnd=async(paradasCompletas,rutasParadas,coordenadasDeLaRuta,emailState, tokenState,id_Ruta)=>{
-    const actualizarUbicacionEnElBackEnd=async(emailState, tokenState)=>{
+    const actualizarUbicacionEnElBackEnd=async(emailState, tokenState,tipoDeEnvio)=>{
         
         let value=await AsyncStorage.getItem('actualizando');
         //
@@ -289,7 +289,7 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
 
         let datos=null;
         try{
-            datos=await fetch('https://www.georutas.lat/api/ActualizacionDelBackendParadas?latitude='+userLocationReal.latitude+'&longitude='+userLocationReal.longitude+'&Email='+emailState+'&Token='+tokenState,
+            datos=await fetch('https://www.georutas.lat/api/ActualizacionDelBackendParadas?latitude='+userLocationReal.latitude+'&longitude='+userLocationReal.longitude+'&Email='+emailState+'&Token='+tokenState+'&tipoEnvio='+tipoDeEnvio,
             {
                 method:"GET",
                 headers:{

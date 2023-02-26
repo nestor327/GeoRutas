@@ -1,5 +1,5 @@
 import * as react from 'react';
-import { View,Image,Text, TouchableHighlightBase, TouchableOpacity} from 'react-native';
+import { View,Image,Text, TouchableHighlightBase, TouchableOpacity, StatusBar} from 'react-native';
 import styles from '../componentStyles/menuBarStyles.js';
 import { useEffect } from 'react';
 import { setTokenGeoRutasCode } from '../data/asyncStorageData.js';
@@ -41,8 +41,8 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
     
 
   return (
-    <View style={[{height:(height>width)?width*0.2:height*0.2,backgroundColor:'blue'}]}>
-        {(cargando==true && (menUno[0].display == 'flex' || menDos[0].display == 'flex' || menTres[0].display == 'flex')) 
+    <View style={[{height:(height>width)?width*0.2:(height)*0.2,backgroundColor:'blue'}]}>
+        {/* {(cargando==true && (menUno[0].display == 'flex' || menDos[0].display == 'flex' || menTres[0].display == 'flex')) 
         && <View style={[{position:'absolute', zIndex:240
                 ,backgroundColor:'#103070',opacity:0.7, height:'300%', width: (height>width)?width*0.2:height*0.2,top:'-300%'},
                 menUno[0].display == 'flex' && {left:(height<width)?(width*0.2-height*0.2)/2:0}
@@ -51,7 +51,7 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
         </View>}
         {cargando==true && <View style={{position:'absolute', zIndex:240
                 ,backgroundColor:'#103070',opacity:0.7, height:'100%', width:'100%',top:0}}>
-        </View>}
+        </View>} */}
 
         {/* {verPerfil=='flex' && <Perfil tipoDeUsuario={tipoDeUsuario} activarPrecision={activarPrecision} setActivarPrecision={setActivarPrecision} permitirEnviarUbicacion={permitirEnviarUbicacion} secionIniciada={secionIniciada} setSecionIniciada={setSecionIniciada} 
         setTipoDeUsuario={setTipoDeUsuario} tipoDePerfil={[{principal:{width:'100%',height:height+StatusBar.currentHeight-width*0.2,position:'absolute',top:-1*(height-width*0.2),left:0,zIndex:200,backgroundColor:'#00000045'}

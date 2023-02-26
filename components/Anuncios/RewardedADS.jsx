@@ -19,9 +19,9 @@ import {
   
     const [anuncioCargado, setAnuncioCargado]=useState(false);
     useEffect(() => {
-
         const unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
-            setAnuncioCargado(true);            
+            setAnuncioCargado(true);          
+            setMostrarComprasPasajeros(false);  
             //rewarded.show();
         });
         const unsubscribeEarned = rewarded.addAdEventListener(
@@ -46,9 +46,11 @@ import {
 
       if(anuncioCargado==false){
         //setMostrarAnuncioRewarded(false);
-        return null;
+        console.log("No se puede cargar la mierda");
+        return (
+          <View></View>
+        );
       }else{
-        setMostrarComprasPasajeros(false);
         rewarded.show();
       }
   };

@@ -45,7 +45,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     ,emailState, tokenState,setTokenState,tipoDeSubscripcion,setVerAdministrarUsuarios,setCambiarPassword,setEditarPerfil
     ,registrarse,estadoAplicacion, setEstadoAplicacion,setMostrarAlerte,setMensajeAlerta,setMostrarMenusBuenEstado,sesionIniciadaConGoogle
     ,pedirUbicacion,pedirUbicacionSegundoPlano,setPedirUbicacionSegundoPlano,verificarMenbresia,setMostrarAnuncioCompleto
-    ,tiempoDesdeUltimoAnuncio,setMostrarAnuncioRewarded,obtenerTiempoDesdeElUltimoAnucio,setMostrarComprasPasajeros
+    ,tiempoDesdeUltimoAnuncio,setMostrarAnuncioRewarded,obtenerTiempoDesdeElUltimoAnucio,setMostrarComprasPasajeros,setEliminarAnuncios
     })=>{
     
 
@@ -382,7 +382,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                 // console.log("Pedo");
 
                 //actualizarUbicacionEnElBackEnd(paradasCompletas,rutasParadas,coordenadasDeLaRuta,emailState, tokenState);
-                actualizarUbicacionEnElBackEnd(emailState, tokenState);
+                actualizarUbicacionEnElBackEnd(emailState, tokenState,(activarPrecision)?"1":"2");
                 
                 // //console.log(userLocation);
                 //let fecha= new Date();
@@ -581,7 +581,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     
                     if(tipoDeUsuario=='Transportista' && permitirEnviarUbicacion==true){
                         //actualizarUbicacionEnElBackEnd(paradasCompletas,rutasParadas,coordenadasDeLaRuta,emailState, tokenState);
-                        actualizarUbicacionEnElBackEnd(emailState, tokenState);
+                        actualizarUbicacionEnElBackEnd(emailState, tokenState,(activarPrecision)?"1":"2");
                         console.log("Mira en el fondo pasa esto"+usuarioTransportista.id_Ruta);
                         let fecha=new Date();
                         if(usuarioTransportista.id_Ruta!=null && usuarioTransportista.id_Ruta!=undefined && ((fecha.getMinutes()) + usuarioTransportista.id_Ruta)%30==0 && idUsuarioIniciado%33<15){
@@ -643,8 +643,10 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                 setEstadoAplicacion(true);                
                 console.log("La tarea se desactivo");
                 if(tipoDeUsuario=='Transportista'){
-                    verificarMenbresia(emailState,tokenState);
+                    verificarMenbresia(emailState,tokenState,tipoDeUsuario);
                     desactivarTarea();
+                }else if(tipoDeUsuario=='Pasajero'){
+                    verificarMenbresia(emailState,tokenState,tipoDeUsuario);
                     obtenerTiempoDesdeElUltimoAnucio();
                 }
             }
@@ -667,7 +669,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
 
   return(
-    <View style={{height:(height>width)?(height-width*0.2-StatusBar.currentHeight):(height-StatusBar.currentHeight)*0.8-StatusBar.currentHeight,
+    <View style={{height:(height>width)?(height-width*0.2-StatusBar.currentHeight):(height-2*StatusBar.currentHeight)*0.8,
     width:'100%', backgroundColor:'#2060A5'}}>
         
         {cargando==true && <Cargando height={height}></Cargando>}        
@@ -1256,7 +1258,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
 
 
-        {mostrarVentana=="flex" && <Perfil sesionIniciadaConGoogle={sesionIniciadaConGoogle} registrarse={registrarse} setEditarPerfil={setEditarPerfil} setCambiarPassword={setCambiarPassword} setVerAdministrarUsuarios={setVerAdministrarUsuarios} tipoDeSubscripcion={tipoDeSubscripcion} permitirEnviarUbicacion={permitirEnviarUbicacion} secionIniciada={secionIniciada} 
+        {mostrarVentana=="flex" && <Perfil setMostrarComprasPasajeros={setMostrarComprasPasajeros} height={height} setEliminarAnuncios={setEliminarAnuncios} width={width} setMostrarAnuncioRewarded={setMostrarAnuncioRewarded} sesionIniciadaConGoogle={sesionIniciadaConGoogle} registrarse={registrarse} setEditarPerfil={setEditarPerfil} setCambiarPassword={setCambiarPassword} setVerAdministrarUsuarios={setVerAdministrarUsuarios} tipoDeSubscripcion={tipoDeSubscripcion} permitirEnviarUbicacion={permitirEnviarUbicacion} secionIniciada={secionIniciada} 
             setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setRegistrarse={setRegistrarse} 
             setLoguearse={setLoguearse} tipoDePerfil={[{principal:{width:'100%',height:(height>width)?height-width*0.2:height*0.8-StatusBar.currentHeight,position:'absolute',top:0,left:0,zIndex:200,backgroundColor:'#00000045'}}]} 
             actualizar={serMostrarVentana} activarPrecision={activarPrecision} setActivarPrecision={setActivarPrecision}
@@ -1308,7 +1310,12 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         if(Math.abs(tiempoTotalAlPresionar - parseInt(tiempoDesdeUltimoAnuncio))>=3600){                        
                             setMostrarAnuncioRewarded(true);
                         }else if(Math.abs(tiempoTotalAlPresionar - parseInt(tiempoDesdeUltimoAnuncio))>=180){
-                            setMostrarAnuncioCompleto(true);
+                            let random=Math.random()*100;
+                            if(random<50){
+                                setMostrarAnuncioCompleto(true);
+                            }else{
+                                setMostrarAnuncioRewarded(true);                                    
+                            }
                         }
                     
                     console.log("El tiempo total es: "+tiempoTotalAlPresionar);
@@ -1520,7 +1527,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
             {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=="Transportista" && verCompetencia==true && <CompetenciaTransportistas emailState={emailState} tokenState={tokenState} 
             tipoDeUsuario={tipoDeUsuario} idUsuarioIniciado={idUsuarioIniciado} rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}></CompetenciaTransportistas>}
-            {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=='Pasajero' && userLocation.latitude!=0 && verRutasCercanas==true &&  <RutasCercaDelPasajero userLocation ={userLocation}
+            {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=='Pasajero' && userLocation.latitude!=0 && verRutasCercanas==true &&  <RutasCercaDelPasajero emailState={emailState} tokenState={tokenState} userLocation ={userLocation}
             rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}></RutasCercaDelPasajero>}
 
             {verParadasCercanas[0].observar==true &&
