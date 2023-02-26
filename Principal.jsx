@@ -31,6 +31,7 @@ import InterstitialADS from './components/Anuncios/InterstitialADS.jsx';
 import mobileAds from 'react-native-google-mobile-ads';
 import RewardedADS from './components/Anuncios/RewardedADS.jsx';
 import ComprasUsuariosPasajeros from './components/Tienda/CompraUsuariosPasajeros.jsx';
+import useComprasPlayStore from './src/hooks/useComprasPlayStore.jsx';
 
 const App=()=>{
 
@@ -393,7 +394,7 @@ const App=()=>{
         }
     },[idRutaAMostrar,visualizarRutas,emailState,secionIniciada,tokenState,tipoDeUsuario,tipoDeSubscripcion])
 
-    const verificarMenbresia=async(email,token)=>{
+    const verificarMenbresia=async(email,token,tipoUsuario)=>{
         try{
             let urlUsuarioT='https://www.georutas.lat/api/VerificarTiempoDeMenbresia?Email='+email+'&Token='+token;
             let datos=await fetch(urlUsuarioT).then(res=>datos=res.json());
@@ -408,7 +409,7 @@ const App=()=>{
 
                 let cantidadDeTiempo=fecha-fechaHoy;
 
-                if(cantidadDeTiempo<=0){
+                if(cantidadDeTiempo<=0 && tipoUsuario=='Transportista'){
                     setMensajeAlerta("Renueve su subscripción para poder acceder");
                     setMostrarAlerte(true);                    
                     setSecionIniciada(false);
@@ -416,6 +417,7 @@ const App=()=>{
                     setPermitirEnvio("false");
                     setPermitirEnviarUbicacion(false);
                     let valor=await AsyncStorage.setItem('tokenCodeGeoRutas','');
+                    return;
                 }else if(cantidadDeTiempo>0 && cantidadDeTiempo<86400000){
                     setMensajeAlerta("Su suscripción caduca en "+((int)(cantidadDeTiempo/3600000))+" horas");
                     setMostrarAlerte(true);                           
@@ -428,6 +430,22 @@ const App=()=>{
                 }else if(cantidadDeTiempo>=259200000 && cantidadDeTiempo<345600000){
                     setMensajeAlerta("Su suscripción caduca en 4 días");
                     setMostrarAlerte(true);
+                }else if(cantidadDeTiempo<=0 && tipoUsuario=='Pasajero' && tipoDeSubscripcion!='C'){
+                    setTipoDeMenbresiaCode('C');   
+                    setTipoDeSubscripcion('C');
+                }
+
+                if(datos.tipoSuscripcion=='C' && tipoUsuario=='Pasajero'  && tipoDeSubscripcion!='C'){
+                    setTipoDeMenbresiaCode('C');   
+                    setTipoDeSubscripcion('C');
+                }else if(datos.tipoSuscripcion=='B' && tipoUsuario=='Transportista'  && tipoDeSubscripcion!='B'){
+                    setMensajeAlerta("Renueve su subscripción para poder acceder");
+                    setMostrarAlerte(true);                    
+                    setSecionIniciada(false);
+                    setLoguearse(true);
+                    setPermitirEnvio("false");
+                    setPermitirEnviarUbicacion(false);
+                    let valor=await AsyncStorage.setItem('tokenCodeGeoRutas','');
                 }
             }
 
@@ -443,10 +461,15 @@ const App=()=>{
 
     const [mostrarAnuncioCompleto, setMostrarAnuncioCompleto]=useState(false);
     const [mostrarAnuncioRewarded, setMostrarAnuncioRewarded]=useState(false);
+    const [eliminarAnuncios,setEliminarAnuncios]=useState(false);
+
+    const [purchase, setPurchase]=useState(false);    
+
+    const {comprarProducto} = useComprasPlayStore(purchase, setPurchase);
 
 
   return (
-     <View style={{height:alturaTotal, width:width}}>
+     <View style={{height:height, width:width}}>
         
         <Inicio setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} setCoordenadasOrigen={setCoordenadasOrigen} tipoDeUsuario={tipoDeUsuario}
         setVerTrayectoria={setVerTrayectoria} setOcultarMenu={setOcultarMenu} coordenadasOrigen={coordenadasOrigen} coordenadasDestino={coordenadasDestino}
@@ -473,6 +496,7 @@ const App=()=>{
         pedirUbicacion={pedirUbicacion} pedirUbicacionSegundoPlano={pedirUbicacionSegundoPlano} setPedirUbicacionSegundoPlano={setPedirUbicacionSegundoPlano}
         verificarMenbresia={verificarMenbresia} setMostrarAnuncioCompleto={setMostrarAnuncioCompleto} obtenerTiempoDesdeElUltimoAnucio={obtenerTiempoDesdeElUltimoAnucio}
         tiempoDesdeUltimoAnuncio={tiempoDesdeUltimoAnuncio} setMostrarAnuncioRewarded={setMostrarAnuncioRewarded} setMostrarComprasPasajeros={setMostrarComprasPasajeros}
+        setEliminarAnuncios={setEliminarAnuncios}
         ></Inicio>
 
         {mostrarMenusBuenEstado==true && <ItemsTrayectos setOcultarLasMierdasDelPrimerMenu={setOcultarLasMierdasDelPrimerMenu} ocultarMenu={ocultarMenu} setIdRutaAMostrar={setIdRutaAMostrar} 
@@ -517,7 +541,7 @@ const App=()=>{
         {cambiarPassword==true && <CambiarPassword setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} height={height} width={width} setCambiarPassword={setCambiarPassword}></CambiarPassword>}
         
 
-        {verAdministrarUsuarios==true && <AdministrarUsuarios setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setLoguearse={setLoguearse} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} refrescar={refrescar}setRefrescar={setRefrescar} setChoferAEditar={setChoferAEditar} setEmailDelChoferEditar={setEmailDelChoferEditar} setEditarInfoDelChofer={setEditarInfoDelChofer} 
+        {verAdministrarUsuarios==true && <AdministrarUsuarios purchase={purchase} setPurchase={setPurchase} comprarProducto={comprarProducto} setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setLoguearse={setLoguearse} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} refrescar={refrescar}setRefrescar={setRefrescar} setChoferAEditar={setChoferAEditar} setEmailDelChoferEditar={setEmailDelChoferEditar} setEditarInfoDelChofer={setEditarInfoDelChofer} 
         nombre={nombreAdmin} setVerAdministrarUsuarios={setVerAdministrarUsuarios} 
         height={height} width={width} emailState={emailState} tokenState={tokenState}></AdministrarUsuarios>}
         {editarInfoDelChofer==true && <EditarUsuario setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} refrescar={refrescar}setRefrescar={setRefrescar} emailState={emailState} tokenState={tokenState} choferAEditar={choferAEditar} emailDelChoferEditar={emailDelChoferEditar} setEditarInfoDelChofer={setEditarInfoDelChofer} height={height} width={width} ></EditarUsuario>}
@@ -528,11 +552,11 @@ const App=()=>{
         {darBienvenida==true && <BVAplicacion setDarBienvenida={setDarBienvenida} height={height} width={width}></BVAplicacion>}
         {secionIniciada==true && justificarUbicacion==true && <JustificarUbicacion setPedirUbicacionSegundoPlano={setPedirUbicacionSegundoPlano} setMensajeAlerta={setMensajeAlerta} setMostrarAlerte={setMostrarAlerte} setPedirUbicacion={setPedirUbicacion} tipoDeUsuario={tipoDeUsuario} setJustificarUbicacion={setJustificarUbicacion} height={height} width={width}></JustificarUbicacion>}
         {pedirUbicacionSegundoPlano==2 && <BGPermisos setMostrarAlerte={setMostrarAlerte} setPedirUbicacionSegundoPlano={setPedirUbicacionSegundoPlano} height={height} width={width}></BGPermisos>}
-        {comprarSuscripcionT==true && <Compras setTipoDeSubscripcion={setTipoDeSubscripcion} setTokenGeoRutas={setTokenGeoRutas} setTokenState={setTokenState} setEmailState={setEmailState} datosDelUsuarioSinSuscripcion={datosDelUsuarioSinSuscripcion} setComprarSuscripcionT={setComprarSuscripcionT} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} 
+        {comprarSuscripcionT==true && <Compras purchase={purchase} setPurchase={setPurchase} comprarProducto={comprarProducto} setTipoDeSubscripcion={setTipoDeSubscripcion} setTokenGeoRutas={setTokenGeoRutas} setTokenState={setTokenState} setEmailState={setEmailState} datosDelUsuarioSinSuscripcion={datosDelUsuarioSinSuscripcion} setComprarSuscripcionT={setComprarSuscripcionT} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} 
                                         height={height} width={width} setLoguearse={setLoguearse} setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setIdUsuarioIniciado={setIdUsuarioIniciado} setIdUsuarioIniciadoCode={setIdUsuarioIniciadoCode}></Compras>}
         {mostrarAnuncioCompleto==true && <InterstitialADS enviarTiempoDesdeElUltimoAnuncio={enviarTiempoDesdeElUltimoAnuncio} setMostrarAnuncioCompleto={setMostrarAnuncioCompleto}></InterstitialADS>}
         {mostrarAnuncioRewarded==true && <RewardedADS setMostrarComprasPasajeros={setMostrarComprasPasajeros} enviarTiempoDesdeElUltimoAnuncio={enviarTiempoDesdeElUltimoAnuncio} setMostrarAnuncioRewarded={setMostrarAnuncioRewarded}></RewardedADS>}
-        {mostrarComprasPasajeros==true && mostrarAlerta==false && <ComprasUsuariosPasajeros setMostrarComprasPasajeros={setMostrarComprasPasajeros} setMostrarAlerte={setMostrarAlerte} height={height} width={width} setMensajeAlerta={setMensajeAlerta} setLoguearse={setLoguearse} setSecionIniciada={setSecionIniciada} setTipoDeSubscripcion={setTipoDeSubscripcion}
+        {mostrarComprasPasajeros==true && mostrarAlerta==false && <ComprasUsuariosPasajeros comprarProducto={comprarProducto} purchase={purchase} setPurchase={setPurchase} setEliminarAnuncios={setEliminarAnuncios} eliminarAnuncios={eliminarAnuncios} setMostrarComprasPasajeros={setMostrarComprasPasajeros} setMostrarAlerte={setMostrarAlerte} height={height} width={width} setMensajeAlerta={setMensajeAlerta} setLoguearse={setLoguearse} setSecionIniciada={setSecionIniciada} setTipoDeSubscripcion={setTipoDeSubscripcion}
                                             setTipoDeUsuario={setTipoDeUsuario} setMostrarAnuncioRewarded={setMostrarAnuncioRewarded} setmenDos={setmenDos} setMostrarItemMenuUno={setMostrarItemMenuUno} setIdRutaAMostrar={setIdRutaAMostrar} setOcultarTrayecto={setOcultarTrayecto} setVerRutasCercanas={setVerRutasCercanas}
                                             ></ComprasUsuariosPasajeros>}
     </View>

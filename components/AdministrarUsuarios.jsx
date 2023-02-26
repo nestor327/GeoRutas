@@ -5,19 +5,11 @@ import { getNombre } from "../data/asyncStorageData"
 import getAllRutas from "../data/rutasManagua"
 import imagen from '../assets/x_icon_imagen.png';
 import PerfilesDeUsuarios from "./ComponentesParaAdmins/PerfilesDeUsuarios";
-import * as IAP from 'react-native-iap'
+import * as IAP from 'react-native-iap';
 import { Platform,Alert } from 'react-native';
 
-const items=Platform.select({
-    ios:[],
-    android:['productosubcripcionchoferes']
-});
-
-let purchaseUpdateSuscription=null;
-let purchaseErrorSuscription=null;
-
 const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrarUsuarios,nombre,setEditarInfoDelChofer,setEmailDelChoferEditar,setChoferAEditar
-    ,refrescar,setRefrescar,setMostrarAlerte, setMensajeAlerta,setSecionIniciada,setTipoDeUsuario,setLoguearse})=>{
+    ,refrescar,setRefrescar,setMostrarAlerte, setMensajeAlerta,setSecionIniciada,setTipoDeUsuario,setLoguearse,comprarProducto,purchase,setPurchase})=>{
     
 
     const [data,setData]=useState([]);
@@ -25,9 +17,6 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
     
     const[arregloActualizar,setArregloActualizar]=useState([]);    
     
-    const [purchase, setPurchase]=useState(false);
-    const [productos, setProductos]=useState({});
-
     const obtenerLosDatos=async()=>{
 
         let todasLasRutas=getAllRutas();
@@ -123,62 +112,7 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
             obtenerLosDatos();
         },[refrescar])
 
-        useEffect(()=>{
-
-            try{
-                IAP.initConnection().catch(()=>{
-                    console.log("Ocurrio un error");
-                }).then((res)=>{
-                    console.log("Los datos de la tienda son: ");
-                    console.log(res);
-                    IAP.getProducts({skus:items}).catch(()=>{
-                        console.log("Ocurrio un error obteniendo los productos");
-                    }).then(res=>{
-                        console.log(res);
-                        setProductos(res);
-                    });
-                });
-            }catch{
-
-            }
-            
-            purchaseErrorSuscription=IAP.purchaseErrorListener((error)=>{
-                if(!(error.responseCode=="1" || error.responseCode=="7" || error.responseCode=="2")){
-                    setMensajeAlerta("Ocurrió un error con la transacción");
-                    setMostrarAlerte(true);
-                }
-            });
-    
-            purchaseUpdateSuscription=IAP.purchaseUpdatedListener((purchase)=>{
-                const reciep=purchase.transactionReceipt;
-                if(reciep){
-                    console.log(reciep);
-                    setPurchase(true);
-                    IAP.finishTransaction({purchase:purchase, isConsumable: false, developerPayloadAndroid: "" });
-                }
-            });
-    
-            return ()=>{
-                try{
-                    purchaseErrorSuscription.remove();
-                }catch{
-                    
-                }
-    
-                try{
-                    purchaseUpdateSuscription.remove();
-                }catch{
-    
-                }
-    
-                try{
-                    IAP.endConnection();
-                }catch{
-    
-                }
-            }
-        },[]);
-
+        
         useEffect(()=>{
             if(purchase==true){
                 setMensajeAlerta("Se logro realizar la compra");
@@ -235,12 +169,13 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
                             }else if(seleccionar==true && arregloActualizar.length==0){
                                 setMensajeAlerta("Seleccione cuál usuario activar");
                                 setMostrarAlerte(true);
-                            }else if(seleccionar==true && arregloActualizar.length>0){                                                                
-                                try{
-                                    IAP.requestPurchase({sku:'productosubcripcionchoferes'});
-                                }catch{
-                                    console.log("OCURRIO un error en la compra");
-                                }
+                            }else if(seleccionar==true && arregloActualizar.length>0){
+                                comprarProducto("productosubcripcionchoferes");
+                                // try{
+                                //     IAP.requestPurchase({sku:'productosubcripcionchoferes'});
+                                // }catch{
+                                //     console.log("OCURRIO un error en la compra");
+                                // }
                             }
                             
                         }}

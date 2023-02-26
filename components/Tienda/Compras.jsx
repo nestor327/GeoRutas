@@ -17,10 +17,7 @@ let purchaseErrorSuscription=null;
 
 const Compras=({datosDelUsuarioSinSuscripcion,setComprarSuscripcionT,setMostrarAlerte, setMensajeAlerta, width, height
                 ,setEmailState,setTokenState,setTokenGeoRutas,setTipoDeSubscripcion,setLoguearse,setSecionIniciada,setTipoDeUsuario
-                ,setIdUsuarioIniciado,setIdUsuarioIniciadoCode})=>{
-
-    const [purchase, setPurchase]=useState(false);
-    const [productos, setProductos]=useState({});
+                ,setIdUsuarioIniciado,setIdUsuarioIniciadoCode,purchase, setPurchase,comprarProducto})=>{
 
     const actualizarUsuarioBD=async(emails,emailState,tokenState)=>{
         try{
@@ -103,64 +100,11 @@ const Compras=({datosDelUsuarioSinSuscripcion,setComprarSuscripcionT,setMostrarA
     }
 
     useEffect(()=>{
-
-        try{
-            IAP.initConnection().catch(()=>{
-                console.log("Ocurrio un error");
-            }).then((res)=>{
-                console.log("Los datos de la tienda son: ");
-                console.log(res);
-                IAP.getProducts({skus:items}).catch(()=>{
-                    console.log("Ocurrio un error obteniendo los productos");
-                }).then(res=>{
-                    console.log(res);
-                    setProductos(res);
-                });
-            });
-        }catch{
-
+        if(purchase==true){
+            actualizarUsuarioBD([datosDelUsuarioSinSuscripcion.email],datosDelUsuarioSinSuscripcion.email,datosDelUsuarioSinSuscripcion.token);
+            setPurchase(false);
         }
-        
-        purchaseErrorSuscription=IAP.purchaseErrorListener((error)=>{
-            if(!(error.responseCode=="1" || error.responseCode=="7" || error.responseCode=="2")){
-                setMensajeAlerta("Ocurrió un error con la transacción");
-                setMostrarAlerte(true);
-            }
-        });
-
-        purchaseUpdateSuscription=IAP.purchaseUpdatedListener((purchase)=>{
-            const reciep=purchase.transactionReceipt;
-            if(reciep){
-                console.log(reciep);
-                setPurchase(true);
-                IAP.finishTransaction({purchase:purchase, isConsumable: false, developerPayloadAndroid: "" });
-                actualizarUsuarioBD([datosDelUsuarioSinSuscripcion.email],datosDelUsuarioSinSuscripcion.email,datosDelUsuarioSinSuscripcion.token);
-            }
-        });
-
-        console.log("Los datos de usuario son: ");
-        console.log(datosDelUsuarioSinSuscripcion);
-
-        return ()=>{
-            try{
-                purchaseErrorSuscription.remove();
-            }catch{
-                
-            }
-
-            try{
-                purchaseUpdateSuscription.remove();
-            }catch{
-
-            }
-
-            try{
-                IAP.endConnection();
-            }catch{
-
-            }
-        }
-    },[])
+    },[purchase])
 
     return(
         <View style={{width:'100%',height:height,position:'absolute',top:0,left:0,zIndex:230,backgroundColor:'#103070'}}>
@@ -189,7 +133,7 @@ const Compras=({datosDelUsuarioSinSuscripcion,setComprarSuscripcionT,setMostrarA
                             onPressOut={()=>{
                                 console.log("Que la verga");
                                 //actualizarUsuarioBD([datosDelUsuarioSinSuscripcion.email],datosDelUsuarioSinSuscripcion.email,datosDelUsuarioSinSuscripcion.token);
-                                IAP.requestPurchase({sku:'productosubcripcionchoferes'})
+                                comprarProducto("productosubcripcionchoferes");
                             }}                                                
                                 >
                         <Text style={{fontSize:19}}>Presiona para comprar</Text>
@@ -201,7 +145,7 @@ const Compras=({datosDelUsuarioSinSuscripcion,setComprarSuscripcionT,setMostrarA
                         {<Text style={{textAlign:'center'}}>Accede a todas las funciones de la aplicación al comprar esta suscripción</Text>}
                     </View>}
 
-                    <TouchableOpacity style={{marginTop:'7%',marginHorizontal:'32.5%',backgroundColor:'#0069c0'
+                    <TouchableOpacity style={{marginTop:'7%',marginHorizontal:'32.5%',backgroundColor:'#2956b2'
                                                 ,width:'35%',height:37,borderRadius:10}}
                             onPressOut={()=>{
                                 setComprarSuscripcionT(false);
