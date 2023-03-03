@@ -9,7 +9,8 @@ import * as IAP from 'react-native-iap';
 import { Platform,Alert } from 'react-native';
 
 const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrarUsuarios,nombre,setEditarInfoDelChofer,setEmailDelChoferEditar,setChoferAEditar
-    ,refrescar,setRefrescar,setMostrarAlerte, setMensajeAlerta,setSecionIniciada,setTipoDeUsuario,setLoguearse,comprarProducto,purchase,setPurchase})=>{
+    ,refrescar,setRefrescar,setMostrarAlerte, setMensajeAlerta,setSecionIniciada,setTipoDeUsuario,setLoguearse,comprarProducto,purchase,setPurchase,idFacturaOApellidos
+    ,tiempoDesdeLaUltimaSuscripcion})=>{
     
 
     const [data,setData]=useState([]);
@@ -43,7 +44,7 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
            }
     }
 
-    const actualizarUsuario=async()=>{
+    const actualizarUsuario=async(apellidos)=>{
         try{
             console.log("Entraste aqui");
             let emails=[];
@@ -72,7 +73,8 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
             console.log("La cantidad de segundos es: "+Date.parse(new Date()));
 
 
-            let datos=await fetch('https://www.georutas.lat/api/ActualizarMenbresia?Email='+emailState+'&Token='+tokenState+'&tiempo='+tiempo,options);
+            let datos=await fetch('https://www.georutas.lat/api/ActualizarMenbresia?Email='+emailState+'&Token='+tokenState+'&tiempo='
+                    +tiempoDesdeLaUltimaSuscripcion+'&apellidos='+apellidos,options);
         
                 if(datos.ok){
                     console.log(datos);
@@ -114,19 +116,21 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
 
         
         useEffect(()=>{
-            if(purchase==true){
+            if(purchase==true && idFacturaOApellidos!=null && idFacturaOApellidos!=undefined 
+                    && tiempoDesdeLaUltimaSuscripcion!='0'){
                 setMensajeAlerta("Se logro realizar la compra");
                 setMostrarAlerte(true);
                 console.log("Mierda")
-                actualizarUsuario();
+                console.log("El valor del is es: "+idFacturaOApellidos);
+                actualizarUsuario(idFacturaOApellidos);
                 console.log("Mierda")
                 setRefrescar(!refrescar);
                 setSeleccionar(!seleccionar);
-                arregloActualizar([]);
+                setArregloActualizar([]);
                 setPurchase(false);
             }
 
-        },[purchase])
+        },[purchase,tiempoDesdeLaUltimaSuscripcion,idFacturaOApellidos])
 
         return(
             
@@ -170,7 +174,7 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
                                 setMensajeAlerta("Seleccione cuál usuario activar");
                                 setMostrarAlerte(true);
                             }else if(seleccionar==true && arregloActualizar.length>0){
-                                comprarProducto("productosubcripcionchoferes");
+                                comprarProducto("suscripcionchofer");
                                 // try{
                                 //     IAP.requestPurchase({sku:'productosubcripcionchoferes'});
                                 // }catch{

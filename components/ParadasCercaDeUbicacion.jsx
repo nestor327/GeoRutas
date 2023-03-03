@@ -22,7 +22,9 @@
             
         
             if(isLoading){
-                console.log("Se estan cargando las paradas del origen");  
+                console.log("Se estan cargando las paradas del origen"); 
+                console.log("Latitude :"+lalitude);
+                console.log("Longitude :"+longitude);
                 return(
                     <View style={{height:40,width:40,backgroundColor:'red'}}>
                         <ActivityIndicator size="large" color="#0000ff" />
@@ -32,7 +34,8 @@
         
             let todasLasRutas=getAllRutas();
         
-            if(isLoading==false){    
+            if(isLoading==false){ 
+
                 let nombresEnElArregloFinal=[];
                 let coloresRuta=[];
                 
@@ -45,9 +48,9 @@
                     data.map((item, i)=>{
                         return(
                             <View key={i} onTouchEnd={()=>{
-                                setVerParadasCercanas([{observar:true,latitude:item.longitude,longitude:item.latitude,direccion:item.direccion,id_Ruta:item.id_Ruta}]);
+                                setVerParadasCercanas([{observar:true,latitude:item.longitude,longitude:item.latitude,direccion:item.direccion,id_Ruta:item.id_Ruta,id_Parada:item.id_Parada}]);
                                 let fecha= new Date();
-                                setFechaDeClicCambio(fecha);
+                                setFechaDeClicCambio(fecha.getTime());
                             }}>
                                 <RutasBarItem color={coloresRuta[i]} numeroDeRuta={nombresEnElArregloFinal[i]}
                                 tiempoDeLlegada={item.tiempoDeLlegada} mostrarTiempo={true}>

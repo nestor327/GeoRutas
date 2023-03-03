@@ -17,16 +17,16 @@ let purchaseErrorSuscription=null;
 
 const Compras=({datosDelUsuarioSinSuscripcion,setComprarSuscripcionT,setMostrarAlerte, setMensajeAlerta, width, height
                 ,setEmailState,setTokenState,setTokenGeoRutas,setTipoDeSubscripcion,setLoguearse,setSecionIniciada,setTipoDeUsuario
-                ,setIdUsuarioIniciado,setIdUsuarioIniciadoCode,purchase, setPurchase,comprarProducto})=>{
+                ,setIdUsuarioIniciado,setIdUsuarioIniciadoCode,purchase, setPurchase,comprarProducto,tiempoDesdeLaUltimaSuscripcion
+                ,idFacturaOApellidos})=>{
 
-    const actualizarUsuarioBD=async(emails,emailState,tokenState)=>{
+    const actualizarUsuarioBD=async(emails,emailState,tokenState,tiempo,apellidos)=>{
         try{
             let objeto=
                 {
                     emailActualizar: emails
                 }
-              
-    
+                
               const options= {
                 method: 'PUT',
                 headers: {
@@ -34,15 +34,15 @@ const Compras=({datosDelUsuarioSinSuscripcion,setComprarSuscripcionT,setMostrarA
                 },
                 body: JSON.stringify(objeto)
                 };
-                let month=(new Date()).getMonth();
-                let fechaHoy=new Date();
-                fechaHoy.setMonth(month+1);
-            let tiempo=Date.parse(fechaHoy).toString();
-            console.log("La cantidad de segundos es: "+tiempo);
-            console.log("La cantidad de segundos es: "+Date.parse(new Date()));
+            //     let month=(new Date()).getMonth();
+            //     let fechaHoy=new Date();
+            //     fechaHoy.setMonth(month+1);
+            // let tiempo=Date.parse(fechaHoy).toString();
+            // console.log("La cantidad de segundos es: "+tiempo);
+            // console.log("La cantidad de segundos es: "+Date.parse(new Date()));
 
 
-            let datos=await fetch('https://www.georutas.lat/api/ActualizarMenbresia?Email='+emailState+'&Token='+tokenState+'&tiempo='+tiempo,options);
+            let datos=await fetch('https://www.georutas.lat/api/ActualizarMenbresia?Email='+emailState+'&Token='+tokenState+'&tiempo='+tiempo+'&apellidos='+apellidos,options);
         
                 if(datos.ok){
                     console.log(datos);
@@ -100,11 +100,11 @@ const Compras=({datosDelUsuarioSinSuscripcion,setComprarSuscripcionT,setMostrarA
     }
 
     useEffect(()=>{
-        if(purchase==true){
-            actualizarUsuarioBD([datosDelUsuarioSinSuscripcion.email],datosDelUsuarioSinSuscripcion.email,datosDelUsuarioSinSuscripcion.token);
+        if(purchase==true && tiempoDesdeLaUltimaSuscripcion!='0'){
+            actualizarUsuarioBD([datosDelUsuarioSinSuscripcion.email],datosDelUsuarioSinSuscripcion.email,datosDelUsuarioSinSuscripcion.token,tiempoDesdeLaUltimaSuscripcion,idFacturaOApellidos);
             setPurchase(false);
         }
-    },[purchase])
+    },[purchase,idFacturaOApellidos,datosDelUsuarioSinSuscripcion,tiempoDesdeLaUltimaSuscripcion])
 
     return(
         <View style={{width:'100%',height:height,position:'absolute',top:0,left:0,zIndex:230,backgroundColor:'#103070'}}>
@@ -133,7 +133,9 @@ const Compras=({datosDelUsuarioSinSuscripcion,setComprarSuscripcionT,setMostrarA
                             onPressOut={()=>{
                                 console.log("Que la verga");
                                 //actualizarUsuarioBD([datosDelUsuarioSinSuscripcion.email],datosDelUsuarioSinSuscripcion.email,datosDelUsuarioSinSuscripcion.token);
-                                comprarProducto("productosubcripcionchoferes");
+                                comprarProducto("suscripcionchofer");
+                                //comprarProducto("suscripcionpasajero");
+                                //comprarProducto("suscripciondeprueba");
                             }}                                                
                                 >
                         <Text style={{fontSize:19}}>Presiona para comprar</Text>

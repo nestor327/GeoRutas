@@ -216,10 +216,14 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
             };
 
         let datos=null;
+        console.log("Llega hasta aqui y obtienes");
         try{
+            console.log("asdasd");
             datos=await fetch('https://www.georutas.lat/api/RegistrosExternos',options);
+            console.log("asdasd");
         }catch (er){
             datos=null;
+            console.log("aqui esta el error");
         }
         console.log("Llega hasta aqui y obtienes");
         console.log(datos);

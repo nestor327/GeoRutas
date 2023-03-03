@@ -7,19 +7,15 @@ import { useEffect, useState } from 'react';
 import imagen from '../../assets/x_icon_imagen.png'
 import { setTipoDeMenbresiaCode } from '../../data/asyncStorageData';
 
-const items=Platform.select({
-    ios:[],
-    android:['productosubcripcionchoferes']
-});
-
 let purchaseUpdateSuscription=null;
 let purchaseErrorSuscription=null;
 
 const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarComprasPasajeros,setMostrarAlerte, setMensajeAlerta, width, height
                 ,setTipoDeSubscripcion,setLoguearse,setSecionIniciada,setTipoDeUsuario,setMostrarAnuncioRewarded,setmenDos,setMostrarItemMenuUno
-                ,setIdRutaAMostrar,setOcultarTrayecto,setVerRutasCercanas,eliminarAnuncios,setEliminarAnuncios,purchase,setPurchase,comprarProducto})=>{
+                ,setIdRutaAMostrar,setOcultarTrayecto,setVerRutasCercanas,eliminarAnuncios,setEliminarAnuncios,purchase,setPurchase,comprarProducto
+                ,idFacturaOApellidos,tiempoDesdeLaUltimaSuscripcion})=>{
 
-    const actualizarUsuarioBD=async(emails,emailState,tokenState)=>{
+    const actualizarUsuarioBD=async(emails,emailState,tokenState,tiempo,apellidos)=>{
         try{
             let objeto=
                 {
@@ -34,15 +30,15 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                 },
                 body: JSON.stringify(objeto)
                 };
-                let month=(new Date()).getMonth();
-                let fechaHoy=new Date();
-                fechaHoy.setMonth(month+1);
-            let tiempo=Date.parse(fechaHoy).toString();
-            console.log("La cantidad de segundos es: "+tiempo);
-            console.log("La cantidad de segundos es: "+Date.parse(new Date()));
+            //     let month=(new Date()).getMonth();
+            //     let fechaHoy=new Date();
+            //     fechaHoy.setMonth(month+1);
+            // let tiempo=Date.parse(fechaHoy).toString();
+            // console.log("La cantidad de segundos es: "+tiempo);
+            // console.log("La cantidad de segundos es: "+Date.parse(new Date()));
 
 
-            let datos=await fetch('https://www.georutas.lat/api/ActualizarMenbresia?Email='+emailState+'&Token='+tokenState+'&tiempo='+tiempo,options);
+            let datos=await fetch('https://www.georutas.lat/api/ActualizarMenbresia?Email='+emailState+'&Token='+tokenState+'&tiempo='+tiempo+'&apellidos='+apellidos,options);
         
                 if(datos.ok){
                     console.log(datos);
@@ -54,15 +50,18 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                         setMostrarAlerte(true);
                         setTipoDeMenbresiaCode('A');   
                         setTipoDeSubscripcion('A');
+                        setMostrarComprasPasajeros(false);
                     }else if(json==2){
                         setMensajeAlerta("Su token caduco, reintente ingresar");
                         setMostrarAlerte(true);
                         setSecionIniciada(false);
                         setTipoDeUsuario("Ninguno");
                         setLoguearse(true);
+                        setMostrarComprasPasajeros(false);
                     }else if(json==0){
                         setMensajeAlerta("Ocurrió un error, revise su conexión");
                         setMostrarAlerte(true);
+                        setMostrarComprasPasajeros(false);
                     }
 
                 }else{
@@ -76,11 +75,13 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
     }
 
     useEffect(()=>{
-        if(purchase==true){
-            actualizarUsuarioBD([datosDelUsuarioSinSuscripcion.email],datosDelUsuarioSinSuscripcion.email,datosDelUsuarioSinSuscripcion.token);
+        if(purchase==true && tiempoDesdeLaUltimaSuscripcion!='0'){
+            // console.log("LA INFORMACION DEL USUARIO ES: ");
+            // console.log(datosDelUsuarioSinSuscripcion);
+            actualizarUsuarioBD([datosDelUsuarioSinSuscripcion.email],datosDelUsuarioSinSuscripcion.email,datosDelUsuarioSinSuscripcion.token,tiempoDesdeLaUltimaSuscripcion,idFacturaOApellidos);
             setPurchase(false);
         }
-    },[purchase])
+    },[purchase,datosDelUsuarioSinSuscripcion,idFacturaOApellidos,tiempoDesdeLaUltimaSuscripcion])
 
     return(
         <View style={{width:'100%',height:height,position:'absolute',top:0,left:0,zIndex:230,backgroundColor:'#00000065'}}>
@@ -116,7 +117,7 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                             onPressOut={()=>{
                                 console.log("Que la verga");
                                 //actualizarUsuarioBD([datosDelUsuarioSinSuscripcion.email],datosDelUsuarioSinSuscripcion.email,datosDelUsuarioSinSuscripcion.token);
-                                comprarProducto("productosubcripcionchoferes");
+                                comprarProducto("suscripcionpasajero");
                             }}                                                
                                 >
                         <Text style={{fontSize:19}}>Presiona para comprar</Text>

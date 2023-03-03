@@ -94,7 +94,7 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
                                     refCambiarLupa.current=false;
                                     setCargando(false);
                                     let fecha= new Date();
-                                    setFechaDeClicCambio(fecha);
+                                    setFechaDeClicCambio(fecha.getTime());
                                 }
                                 }>
                                     <Animated.View style={visualizarRutas==(i+1) && {opacity:fadeAnim.current, backgroundColor:'#1e81ce', padding:5, borderRadius:10}}

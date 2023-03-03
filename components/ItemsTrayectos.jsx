@@ -12,8 +12,8 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
                         ,setMostrarBarraSecundariaDeUbicacion,menCinco,
                         })=>{
 
-        const [fechaDeClicCambio, setFechaDeClicCambio]=useState(new Date());
-        const [fechaDeClicSalida, setFechaDeClicSalida]=useState(new Date());
+        const [fechaDeClicCambio, setFechaDeClicCambio]=useState(1);
+        const [fechaDeClicSalida, setFechaDeClicSalida]=useState(0);
 
         useEffect(()=>{
             setCargando(false);
@@ -39,7 +39,7 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
             onTouchEnd={()=>{
                 //setTipoDeClic(1);
                 let fecha= new Date();
-                setFechaDeClicSalida(fecha);
+                setFechaDeClicSalida(fecha.getTime());
             }}
             >
             <View style={{height:'100%',width:width,padding:0}}>
