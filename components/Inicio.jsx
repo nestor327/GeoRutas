@@ -25,6 +25,8 @@ import Geolocation from '@react-native-community/geolocation';
 import { PermissionStatus,PERMISSIONS, request, check,openSettings } from "react-native-permissions";
 import { getPermitirEnvio, getRutasParadasValue, setRutasParadasValue, setTokenGeoRutasCode } from '../data/asyncStorageData.js';
 import Cargando from './Cargando.jsx';
+import ReparandoRuta170 from './ReparandoRuta170.jsx';
+import UsuarioCercanoAUnaParada from './UsuarioCercanoAUnaParada.jsx';
 
 export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoordenadasOrigen,tipoDeUsuario
     ,setVerTrayectoria,setOcultarMenu,coordenadasOrigen,coordenadasDestino,setCoordenadasDestino,verTrayectoria,iconosTransportes,tiemposRutasTrayectorias
@@ -45,7 +47,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     ,emailState, tokenState,setTokenState,tipoDeSubscripcion,setVerAdministrarUsuarios,setCambiarPassword,setEditarPerfil
     ,registrarse,estadoAplicacion, setEstadoAplicacion,setMostrarAlerte,setMensajeAlerta,setMostrarMenusBuenEstado,sesionIniciadaConGoogle
     ,pedirUbicacion,pedirUbicacionSegundoPlano,setPedirUbicacionSegundoPlano,verificarMenbresia,setMostrarAnuncioCompleto
-    ,tiempoDesdeUltimoAnuncio,setMostrarAnuncioRewarded,obtenerTiempoDesdeElUltimoAnucio,setMostrarComprasPasajeros,setEliminarAnuncios
+    ,tiempoDesdeUltimoAnuncio,setMostrarAnuncioRewarded,obtenerTiempoDesdeElUltimoAnucio,setMostrarComprasPasajeros,setEliminarAnuncios,setTiempoDesdeUltimoAnuncio
     })=>{
     
 
@@ -124,8 +126,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
             usuario=await fetch(url).then(res=>usuario=res.json());
             //usuario=await fetch(url);
-            console.log("El usuario es: ");
-            console.log(usuario);    
+            // console.log("El usuario es: ");
+            // console.log(usuario);    
         }catch{
             setMensajeAlerta("Revisa tu conexión a internet");
             setMostrarAlerte(true);
@@ -1306,9 +1308,10 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     if(tipoDeUsuario=='Pasajero' && tipoDeSubscripcion=='C'){
                         let fechaAlPresionar=new Date();
                         let tiempoTotalAlPresionar=fechaAlPresionar.getHours()*3600 + fechaAlPresionar.getMinutes()*60 + fechaAlPresionar.getSeconds();
-    
+                        
                         if(Math.abs(tiempoTotalAlPresionar - parseInt(tiempoDesdeUltimoAnuncio))>=3600){                        
                             setMostrarAnuncioRewarded(true);
+                            //setTiempoDesdeUltimoAnuncio(tiempoTotalAlPresionar);
                         }else if(Math.abs(tiempoTotalAlPresionar - parseInt(tiempoDesdeUltimoAnuncio))>=180){
                             let random=Math.random()*100;
                             if(random<50){
@@ -1316,6 +1319,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                             }else{
                                 setMostrarAnuncioRewarded(true);                                    
                             }
+                            //setTiempoDesdeUltimoAnuncio(tiempoTotalAlPresionar);
                         }
                     
                     console.log("El tiempo total es: "+tiempoTotalAlPresionar);
@@ -1401,7 +1405,10 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                                 
                                 <Image style={{width:27,height:27}} source={urlDeLosIconos[item.id_Ruta-1]} ></Image>
                         
-                                <Text style={{color:'black'}}>{Math.floor(tiemposRutasTrayectorias[i]/3600)+":"+Math.floor(((tiemposRutasTrayectorias[i]-3600*(Math.floor(tiemposRutasTrayectorias[i]/3600)))/60))+":"+tiemposRutasTrayectorias[i]%60}</Text>
+                                <Text style={{color:'black'}}>
+                                    {Math.floor(tiemposRutasTrayectorias[i]/3600)
+                                    +":"+((Math.floor(((tiemposRutasTrayectorias[i]-3600*(Math.floor(tiemposRutasTrayectorias[i]/3600)))/60))>9)?Math.floor(((tiemposRutasTrayectorias[i]-3600*(Math.floor(tiemposRutasTrayectorias[i]/3600)))/60)):"0"+Math.floor(((tiemposRutasTrayectorias[i]-3600*(Math.floor(tiemposRutasTrayectorias[i]/3600)))/60)))
+                                    +":"+((tiemposRutasTrayectorias[i]%60>9)?tiemposRutasTrayectorias[i]%60:"0"+tiemposRutasTrayectorias[i]%60)}</Text>
                                 
                             </Marker>
                         )
@@ -1462,60 +1469,6 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                 )
             }
 
-            {/* {secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true &&
-                    iconosTransportes.map((item, i)=>{
-                        //latitude:coordenadasDestino.latitude,longitude:coordenadasDestino.longitude}
-                        //,{latitude:item.longitudParadaFinal,longitude:item.latitudParadaFinal
-                        
-                        console.log("1"+ocultarTrayecto);
-                        console.log("2"+mostrarItemMenuUno);
-                        console.log("3"+verTrayectoria);
-                        
-                    return(
-                        <View key={(item.nombre)}>
-                            <Marker coordinate={{
-                            latitude:item.longitudUsuarioComun,
-                            longitude:item.latitudUsuarioComun,
-                            latitudeDelta:0.02,
-                            longitudeDelta:0.05
-                        }} style={{alignItems:'center'}}>
-                            {(item.direccionParadaInicial=='D') && <Text style={{color:'black'}}>{"⇛"+item.nombre}</Text>}
-                            {(item.direccionParadaInicial=='I') && <Text style={{color:'black'}}>{"⇚"+item.nombre}</Text>}
-
-                            
-                            {<Image style={{width:27,height:27}} source={urlDeLosIconos[item.id_Ruta-1]} ></Image>}
-                        
-                            {<Text style={{color:'black'}}>{Math.floor(tiemposRutasTrayectorias[i]/3600)+":"+Math.floor(((tiemposRutasTrayectorias[i]-3600*(Math.floor(tiemposRutasTrayectorias[i]/3600)))/60))+":"+tiemposRutasTrayectorias[i]%60}</Text>}
-                            
-                        </Marker>
-
-                            {<LineasTrayectorias emailState={emailState} tokenState={tokenState} iconoTrayectoItem={item} color={item.color}></LineasTrayectorias>}
-
-                            
-                        {<Marker coordinate={{                            
-                            latitude:item.longitudParadaFinal,
-                            longitude:item.latitudParadaFinal,
-                            latitudeDelta:0.02,
-                            longitudeDelta:0.05}}>
-                            {<Image style={{width:35,height:35}} source={urlDeLasBajadas[item.id_Ruta-1]} ></Image>}
-
-                        </Marker>}
-                        
-                        {<Marker coordinate={{                            
-                            latitude:item.longitudParadaUsuarioComun,
-                            longitude:item.latitudParadaUsuarioComun,
-                            latitudeDelta:0.02,
-                            longitudeDelta:0.05}}>
-                            {<Image style={{width:35,height:35}} source={urlDeLasSubidas[item.id_Ruta-1]} ></Image>}
-                        </Marker>}
-
-                            {i==0 && <Polyline lineCap={"butt"} coordinates={[{latitude:coordenadasOrigen.latitude,longitude:coordenadasOrigen.longitude},{latitude:item.longitudParadaUsuarioComun,longitude:item.latitudParadaUsuarioComun}]} color={"black"}></Polyline>}
-                            {i==iconosTransportes.length-1 && <Polyline coordinates={[{latitude:coordenadasDestino.latitude,longitude:coordenadasDestino.longitude},{latitude:item.longitudParadaFinal,longitude:item.latitudParadaFinal}]} color={"black"}></Polyline>}                            
-                            
-                        </View>
-                    )
-                })
-            } */}
 
             {secionIniciada==true && mostrarParadas==true && <DireccionesSegunUbicacion emailState={emailState} tokenState={tokenState} idRuta={idRutaAMostrar}></DireccionesSegunUbicacion>}
             {secionIniciada==true && idRutaAMostrar>0 && mostrarUsuarios==true && <UsuariosTransportistas emailState={emailState} tokenState={tokenState} tipoDeUsuario={tipoDeUsuario} idRuta={idRutaAMostrar} idUsuarioIniciado={idUsuarioIniciado}
@@ -1551,21 +1504,6 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             
             return(
                 <View key={i}>
-
-                    {/* {item.direccion=='D' && <Marker coordinate={{latitude:item.latitude,
-                    longitude:item.longitude,
-                    latitudeDelta:0.02,
-                    longitudeDelta:0.05}}
-                    icon={require("../assets/parada-de-autobusDerecha.png")}></Marker>}
-
-                    {item.direccion=='I' && <Marker coordinate={{latitude:item.latitude,
-                    longitude:item.longitude,
-                    latitudeDelta:0.02,
-                    longitudeDelta:0.05}}
-                    icon={require("../assets/parada-de-autobusIzquierda.png")}></Marker>}
-
-                    {(item.direccion=='I' || item.direccion=='D') && <Polyline coordinates={[{latitude:item.latitude,longitude:item.longitude},
-                    {latitude:coordenadasOrigenSecundario.latitude,longitude:coordenadasOrigenSecundario.longitude}]}></Polyline>} */}
                         
                     <Marker onDragEnd={
                         async(coords)=>{
@@ -1591,6 +1529,9 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             })}  
             {secionIniciada==true && idUsuarioIniciado>0 && permitirEnviarUbicacion==true && tipoDeUsuario=="Transportista" && <UsuarioTransportistaLogueado emailState={emailState} tokenState={tokenState} activarPrecision={activarPrecision} direccionesPorUsuario={direccionesPorUsuario}
             setDireccionPorUsuario={setDireccionPorUsuario} idUsuarioIniciado={idUsuarioIniciado} userLocation={userLocation}></UsuarioTransportistaLogueado>}
+            {/* <ReparandoRuta170></ReparandoRuta170> */}
+            {verParadasCercanas[0].observar==true && <UsuarioCercanoAUnaParada idRuta={verParadasCercanas[0].id_Ruta} emailState={emailState} tokenState={tokenState} idParada={verParadasCercanas[0].id_Parada}
+                    tipoDeUsuario={tipoDeUsuario} idUsuarioIniciado={idUsuarioIniciado}></UsuarioCercanoAUnaParada>}
             
         </MapView>}         
     </View>

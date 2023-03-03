@@ -20,10 +20,7 @@ import urlDeLasImagenesEstaticas from "../data/urlDeLasImagenesDeLasRutas.js";
             refetchInterval:4000,
             cacheTime:4000
         })
-    
-    
-    
-        let obtenerCoordendasDeLasParadas=obtenerParadasPorParadas(idRuta,emailState,tokenState);
+
         if(isLoading){
             //console.log("Se estan cargando los usuarios");
         }
@@ -31,7 +28,7 @@ import urlDeLasImagenesEstaticas from "../data/urlDeLasImagenesDeLasRutas.js";
         let rutasDeManagua=getAllRutas();
         const urlDeLasImagenes=urlDeLasImagenesEstaticas();
     
-        if(isLoading==false && obtenerCoordendasDeLasParadas.length>0 && rutasDeManagua.length>0 && urlDeLasImagenes.length>0 && data!=null && data!=undefined && data.length>1 ){
+        if(isLoading==false && rutasDeManagua.length>0 && urlDeLasImagenes.length>0 && data!=null && data!=undefined && data.length>1 ){
     
             let nombresEnElArregloFinal=[];
     

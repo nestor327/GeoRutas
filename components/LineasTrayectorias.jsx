@@ -19,40 +19,16 @@ import { Polyline } from "react-native-maps";
             }
         
             if(isLoading==false){
-        
-        
-                let mayorDistancia=0;
-                let posicion=0;
-        
-                for(let i=0;i<data.length-2 ;i++){
-                    let distancia=Math.sqrt(Math.pow(data[i].latitude-data[i+1].latitude,2)+Math.pow(data[i].longitude-data[i+1].longitude,2));
-        
-                    if(distancia>mayorDistancia){
-                        mayorDistancia=distancia;
-                        posicion=i;
-                    }
-                }
-        
-                let distancia=Math.sqrt(Math.pow(data[0].latitude-data[data.length-1].latitude,2)+Math.pow(data[0].longitude-data[data.length-1].longitude,2));
-        
-                    if(distancia>mayorDistancia){
-                        mayorDistancia=distancia;
-                        posicion=data.length-1;
-                    }
+                console.log("Los datos son: ");
+                console.log(data.length);
         
                 let objeto={"latitude": -86.29734, "longitude": 12.15022}
-                let coordenadas=[]
-                let contador=1
-        
-                for(let y=posicion;y>=0;y--){
+                let coordenadas=[];
+                console.log("AQAQS");
+                for(let y=0;y<data.length;y++){
                     coordenadas.push({latitude: data[y].longitude, longitude: data[y].latitude})
-                    contador++;
                 }
-        
-                for(let y=data.length-1;y>posicion;y--){
-                    coordenadas.push({latitude: data[y].longitude, longitude: data[y].latitude})
-                    contador++;
-                }
+
         
                 return(
                     <Polyline strokeColor={color} strokeWidth={2.5} coordinates={coordenadas}></Polyline>

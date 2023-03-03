@@ -11,8 +11,8 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
 
     let url='https://www.georutas.lat/api/CalculoDeMenorRuta/'+coordenadasOrigen.longitude+','+coordenadasOrigen.latitude+','+coordenadasDestino.longitude+','+coordenadasDestino.latitude+'?Email='+emailState+'&Token='+tokenState;
 
-    console.log("mierda la url es: ");              
-                console.log(url);
+    // console.log("mierda la url es: ");              
+    //             console.log(url);
     let {data, error, isLoading,isError, isSuccess,status}=useQuery(["gets",coordenadasOrigen,coordenadasDestino,emailState,tokenState],async({queryKey})=>{
         return await fetch('https://www.georutas.lat/api/CalculoDeMenorRuta/'+queryKey[1].longitude+','+queryKey[1].latitude+','+queryKey[2].longitude+','+queryKey[2].latitude+'?Email='+queryKey[3]+'&Token='+queryKey[4]).then(res=>datos=res.json()).catch(error => data=[]);
                 //return await fetch('https://www.georutas.lat/api/CalculoDeMenorRuta/'+queryKey[1].latitude
@@ -34,7 +34,7 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
         // console.log(data);
         // console.log((Math.floor((coordenadasOrigen.latitude)*10)-1200)%45);        
         // console.log("Mierda");        
-        //data=[];        
+        // //data=[];        
         // console.log("El valor de la data es: ");
         // console.log(data);
     }

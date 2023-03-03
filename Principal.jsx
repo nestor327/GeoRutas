@@ -32,6 +32,7 @@ import mobileAds from 'react-native-google-mobile-ads';
 import RewardedADS from './components/Anuncios/RewardedADS.jsx';
 import ComprasUsuariosPasajeros from './components/Tienda/CompraUsuariosPasajeros.jsx';
 import useComprasPlayStore from './src/hooks/useComprasPlayStore.jsx';
+import MostrarInformacion from './components/Otros/MostrarInformacion.jsx';
 
 const App=()=>{
 
@@ -89,8 +90,8 @@ const App=()=>{
 
             let fecha=new Date(datos.fechaDeExpiracion);
             let fechaNueva=new Date();
-            console.log(fecha);
-            console.log(fechaNueva);
+            // console.log(fecha);
+            // console.log(fechaNueva);
             if(VERSIONDELAPLICACION!=datos.numeroDeVersion && fechaNueva<fecha){                
                 setMensajeAlerta("Actualiza la aplicacion, esta version caduca el: "+fecha.toLocaleDateString());
                 setMostrarAlerte(true);
@@ -341,13 +342,13 @@ const App=()=>{
             
             usuario=await fetch(url).then(res=>usuario=res.json());
             //usuario=await fetch(url);
-            console.log("El usuario es: ");
-            console.log("La url es: "+url);
-            console.log(usuario);
+            // console.log("El usuario es: ");
+            // console.log("La url es: "+url);
+            // console.log(usuario);
             
         }catch{
             setMensajeAlerta("Revisa tu conexión a internet");
-            setMostrarAlerte(true);        
+            setMostrarAlerte(true);
             return;
         }   
 
@@ -363,6 +364,9 @@ const App=()=>{
             setSecionIniciada(false);            
             setTipoDeUsuario("Ninguno");
             setLoguearse(true);
+        }else if(usuario.token=="4"){
+            setTipoDeSubscripcion('C');
+            setTipoDeMenbresiaCode('C');
         }else{
             setTokenState(usuario.token);
             setTokenGeoRutasCode(usuario.token);
@@ -378,7 +382,7 @@ const App=()=>{
         SplashScreen.hide();
         if(emailState.length>2 && secionIniciada==true){
             refrescarToken(emailState,tokenState);
-            console.log("ESTAS HACIENDO UNA PETICION AL TOKEN");
+            // console.log("ESTAS HACIENDO UNA PETICION AL TOKEN");
             if(idRutaAMostrar>0 && tipoDeUsuario=='Pasajero' && tipoDeSubscripcion=='C'){
 
                 setDatosDelUsuarioSinSuscripcion({apellidos: "Des", idTablaForanea: 0, nombres: "Des", tipoDeUsuario: "P",
@@ -401,11 +405,11 @@ const App=()=>{
 
             if(datos!=undefined && datos!=null && datos.emailUsuario.length>10){
                 let fecha=new Date(Date.parse(datos.tiempo));
-                console.log("La fecha obtenida es: ");
-                console.log(fecha);
-                let fechaHoy=new Date();
-                console.log("La otra fecha es: ");
-                console.log(fechaHoy);
+                // console.log("La fecha obtenida es: ");
+                // console.log(fecha);
+                // let fechaHoy=new Date();
+                // console.log("La otra fecha es: ");
+                // console.log(fechaHoy);
 
                 let cantidadDeTiempo=fecha-fechaHoy;
 
@@ -465,7 +469,11 @@ const App=()=>{
 
     const [purchase, setPurchase]=useState(false);    
 
-    const {comprarProducto} = useComprasPlayStore(purchase, setPurchase);
+    
+    const [tiempoDesdeLaUltimaSuscripcion, setTiempoDesdeLaUltimaSuscripcion]=useState("0");
+    const [mostrarInformacion, setMostrarInformacion]=useState(false);
+
+    const {comprarProducto,refrescarHistorial, purchaseTxt, historial,idFacturaOApellidos} = useComprasPlayStore(purchase, setPurchase,setMensajeAlerta,setMostrarAlerte,setTiempoDesdeLaUltimaSuscripcion,setMostrarInformacion,datosDelUsuarioSinSuscripcion,secionIniciada);
 
 
   return (
@@ -496,7 +504,7 @@ const App=()=>{
         pedirUbicacion={pedirUbicacion} pedirUbicacionSegundoPlano={pedirUbicacionSegundoPlano} setPedirUbicacionSegundoPlano={setPedirUbicacionSegundoPlano}
         verificarMenbresia={verificarMenbresia} setMostrarAnuncioCompleto={setMostrarAnuncioCompleto} obtenerTiempoDesdeElUltimoAnucio={obtenerTiempoDesdeElUltimoAnucio}
         tiempoDesdeUltimoAnuncio={tiempoDesdeUltimoAnuncio} setMostrarAnuncioRewarded={setMostrarAnuncioRewarded} setMostrarComprasPasajeros={setMostrarComprasPasajeros}
-        setEliminarAnuncios={setEliminarAnuncios}
+        setEliminarAnuncios={setEliminarAnuncios} setTiempoDesdeUltimoAnuncio={setTiempoDesdeUltimoAnuncio}
         ></Inicio>
 
         {mostrarMenusBuenEstado==true && <ItemsTrayectos setOcultarLasMierdasDelPrimerMenu={setOcultarLasMierdasDelPrimerMenu} ocultarMenu={ocultarMenu} setIdRutaAMostrar={setIdRutaAMostrar} 
@@ -542,8 +550,8 @@ const App=()=>{
         
 
         {verAdministrarUsuarios==true && <AdministrarUsuarios purchase={purchase} setPurchase={setPurchase} comprarProducto={comprarProducto} setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setLoguearse={setLoguearse} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} refrescar={refrescar}setRefrescar={setRefrescar} setChoferAEditar={setChoferAEditar} setEmailDelChoferEditar={setEmailDelChoferEditar} setEditarInfoDelChofer={setEditarInfoDelChofer} 
-        nombre={nombreAdmin} setVerAdministrarUsuarios={setVerAdministrarUsuarios} 
-        height={height} width={width} emailState={emailState} tokenState={tokenState}></AdministrarUsuarios>}
+        nombre={nombreAdmin} setVerAdministrarUsuarios={setVerAdministrarUsuarios} tiempoDesdeLaUltimaSuscripcion={tiempoDesdeLaUltimaSuscripcion}
+        height={height} width={width} emailState={emailState} tokenState={tokenState} idFacturaOApellidos={idFacturaOApellidos}></AdministrarUsuarios>}
         {editarInfoDelChofer==true && <EditarUsuario setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} refrescar={refrescar}setRefrescar={setRefrescar} emailState={emailState} tokenState={tokenState} choferAEditar={choferAEditar} emailDelChoferEditar={emailDelChoferEditar} setEditarInfoDelChofer={setEditarInfoDelChofer} height={height} width={width} ></EditarUsuario>}
         {registrarse==true && <Register setConfirmarCodigo={setConfirmarCodigo} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} emailState={emailState} tokenState={tokenState} setEditarPerfil={setEditarPerfil} editarPerfil={editarPerfil} setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} 
         height={height} width={width}></Register>}
@@ -552,13 +560,14 @@ const App=()=>{
         {darBienvenida==true && <BVAplicacion setDarBienvenida={setDarBienvenida} height={height} width={width}></BVAplicacion>}
         {secionIniciada==true && justificarUbicacion==true && <JustificarUbicacion setPedirUbicacionSegundoPlano={setPedirUbicacionSegundoPlano} setMensajeAlerta={setMensajeAlerta} setMostrarAlerte={setMostrarAlerte} setPedirUbicacion={setPedirUbicacion} tipoDeUsuario={tipoDeUsuario} setJustificarUbicacion={setJustificarUbicacion} height={height} width={width}></JustificarUbicacion>}
         {pedirUbicacionSegundoPlano==2 && <BGPermisos setMostrarAlerte={setMostrarAlerte} setPedirUbicacionSegundoPlano={setPedirUbicacionSegundoPlano} height={height} width={width}></BGPermisos>}
-        {comprarSuscripcionT==true && <Compras purchase={purchase} setPurchase={setPurchase} comprarProducto={comprarProducto} setTipoDeSubscripcion={setTipoDeSubscripcion} setTokenGeoRutas={setTokenGeoRutas} setTokenState={setTokenState} setEmailState={setEmailState} datosDelUsuarioSinSuscripcion={datosDelUsuarioSinSuscripcion} setComprarSuscripcionT={setComprarSuscripcionT} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} 
-                                        height={height} width={width} setLoguearse={setLoguearse} setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setIdUsuarioIniciado={setIdUsuarioIniciado} setIdUsuarioIniciadoCode={setIdUsuarioIniciadoCode}></Compras>}
+        {comprarSuscripcionT==true && <Compras tiempoDesdeLaUltimaSuscripcion={tiempoDesdeLaUltimaSuscripcion} purchase={purchase} setPurchase={setPurchase} comprarProducto={comprarProducto} setTipoDeSubscripcion={setTipoDeSubscripcion} setTokenGeoRutas={setTokenGeoRutas} setTokenState={setTokenState} setEmailState={setEmailState} datosDelUsuarioSinSuscripcion={datosDelUsuarioSinSuscripcion} setComprarSuscripcionT={setComprarSuscripcionT} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} 
+                                        height={height} width={width} setLoguearse={setLoguearse} setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setIdUsuarioIniciado={setIdUsuarioIniciado} setIdUsuarioIniciadoCode={setIdUsuarioIniciadoCode} idFacturaOApellidos={idFacturaOApellidos}></Compras>}
         {mostrarAnuncioCompleto==true && <InterstitialADS enviarTiempoDesdeElUltimoAnuncio={enviarTiempoDesdeElUltimoAnuncio} setMostrarAnuncioCompleto={setMostrarAnuncioCompleto}></InterstitialADS>}
         {mostrarAnuncioRewarded==true && <RewardedADS setMostrarComprasPasajeros={setMostrarComprasPasajeros} enviarTiempoDesdeElUltimoAnuncio={enviarTiempoDesdeElUltimoAnuncio} setMostrarAnuncioRewarded={setMostrarAnuncioRewarded}></RewardedADS>}
-        {mostrarComprasPasajeros==true && mostrarAlerta==false && <ComprasUsuariosPasajeros comprarProducto={comprarProducto} purchase={purchase} setPurchase={setPurchase} setEliminarAnuncios={setEliminarAnuncios} eliminarAnuncios={eliminarAnuncios} setMostrarComprasPasajeros={setMostrarComprasPasajeros} setMostrarAlerte={setMostrarAlerte} height={height} width={width} setMensajeAlerta={setMensajeAlerta} setLoguearse={setLoguearse} setSecionIniciada={setSecionIniciada} setTipoDeSubscripcion={setTipoDeSubscripcion}
+        {mostrarComprasPasajeros==true && <ComprasUsuariosPasajeros tiempoDesdeLaUltimaSuscripcion={tiempoDesdeLaUltimaSuscripcion} idFacturaOApellidos={idFacturaOApellidos} datosDelUsuarioSinSuscripcion={datosDelUsuarioSinSuscripcion} comprarProducto={comprarProducto} purchase={purchase} setPurchase={setPurchase} setEliminarAnuncios={setEliminarAnuncios} eliminarAnuncios={eliminarAnuncios} setMostrarComprasPasajeros={setMostrarComprasPasajeros} setMostrarAlerte={setMostrarAlerte} height={height} width={width} setMensajeAlerta={setMensajeAlerta} setLoguearse={setLoguearse} setSecionIniciada={setSecionIniciada} setTipoDeSubscripcion={setTipoDeSubscripcion}
                                             setTipoDeUsuario={setTipoDeUsuario} setMostrarAnuncioRewarded={setMostrarAnuncioRewarded} setmenDos={setmenDos} setMostrarItemMenuUno={setMostrarItemMenuUno} setIdRutaAMostrar={setIdRutaAMostrar} setOcultarTrayecto={setOcultarTrayecto} setVerRutasCercanas={setVerRutasCercanas}
                                             ></ComprasUsuariosPasajeros>}
+        {mostrarInformacion==true && emailState=='nestorgtd27@gmail.com' && <MostrarInformacion setMostrarInformacion={setMostrarInformacion} refrescarHistorial={refrescarHistorial} height={height} width={width} historial={historial} purchase={purchaseTxt}></MostrarInformacion>}
     </View>
 
   );
