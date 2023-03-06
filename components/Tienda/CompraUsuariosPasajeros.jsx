@@ -117,6 +117,7 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                             onPressOut={()=>{
                                 console.log("Que la verga");
                                 //actualizarUsuarioBD([datosDelUsuarioSinSuscripcion.email],datosDelUsuarioSinSuscripcion.email,datosDelUsuarioSinSuscripcion.token);
+                                setPurchase(false);
                                 comprarProducto("suscripcionpasajero");
                             }}                                                
                                 >

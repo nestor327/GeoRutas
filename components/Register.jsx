@@ -83,7 +83,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
     const obtenerDatosGuardados=async()=>{
         const valueNombre=await AsyncStorage.getItem('nombreUsuario');
         const correo=await AsyncStorage.getItem('correo');
-        getApellidos(setApellidos);
+        //getApellidos(setApellidos);
         getTelefono(setTelefono);
 
         if(valueNombre==null){
@@ -195,7 +195,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
                 let json=await datos.json();
                 if(json==3){
                     setNombre(nombre);
-                    setApellidos(apellidos);   
+                    //setApellidos(apellidos);   
                     setTelefonoAsync(telefono);
                 }
                 console.log(json);
@@ -234,7 +234,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
                             setApellidos(em);
                         }
                     }>{apellidos}</TextInput>
-                    <TextInput editable={!editarPerfil} keyboardType='email-address' placeholder='Ingresa tu correo' style={{paddingLeft:10,marginTop:'6%',borderRadius:20,backgroundColor:'#5060A0',marginLeft:'10%',marginRight:'10%',height:40,color:'black'}}
+                    <TextInput editable={!editarPerfil} keyboardType='email-address' placeholder='Ingresa tu correo' style={{paddingLeft:10,marginTop:'6%',borderRadius:20,backgroundColor:'#5060A0',marginLeft:'10%',marginRight:'10%',height:40,color:'white'}}
                     onChangeText={
                         (em)=>{
                             setEmail(em);

@@ -9,8 +9,7 @@
 
     const ParadasCercaDelOrigen=({lalitude,longitude,setVerParadasCercanas,emailState, tokenState,setFechaDeClicCambio})=>{
         try{
-            const {data,error,isLoading}=useQuery(['obtenerParadasEnElOrigen',lalitude,longitude],async({queryKey})=>{
-                //return await fetch('https://georutas.somee.com/api/SP_PCalcularRutasQuePasanCercaDeUnPunto/'+queryKey[1]+','+queryKey[2]).then(res=>datos=res.json())
+            const {data,error,isLoading}=useQuery(['obtenerParadasEnElOrigen',lalitude,longitude],async({queryKey})=>{                
                 return await fetch('https://www.georutas.lat/api/SP_PCalcularRutasQuePasanCercaDeUnPunto/'+queryKey[1]+','+queryKey[2]+'?Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());
             },{
                 staleTime:Infinity,
@@ -19,18 +18,6 @@
                 refetchOnWindowFocus:false
             })
         
-            
-        
-            if(isLoading){
-                console.log("Se estan cargando las paradas del origen"); 
-                console.log("Latitude :"+lalitude);
-                console.log("Longitude :"+longitude);
-                return(
-                    <View style={{height:40,width:40,backgroundColor:'red'}}>
-                        <ActivityIndicator size="large" color="#0000ff" />
-                    </View>
-                )
-            }
         
             let todasLasRutas=getAllRutas();
         
@@ -55,12 +42,6 @@
                                 <RutasBarItem color={coloresRuta[i]} numeroDeRuta={nombresEnElArregloFinal[i]}
                                 tiempoDeLlegada={item.tiempoDeLlegada} mostrarTiempo={true}>
                                 </RutasBarItem>
-                                {/* {item.id_Ruta==2 && <RutasBarItem color={coloresRuta[i]} numeroDeRuta={nombresEnElArregloFinal[i]}
-                                tiempoDeLlegada={item.tiempoDeLlegada} mostrarTiempo={true}>
-                                </RutasBarItem> }
-                                {item.id_Ruta==3 && <RutasBarItem color={coloresRuta[i]} numeroDeRuta={nombresEnElArregloFinal[i]}
-                                tiempoDeLlegada={item.tiempoDeLlegada} mostrarTiempo={true}>
-                                </RutasBarItem> } */}
                             </View>
                         )
                     })

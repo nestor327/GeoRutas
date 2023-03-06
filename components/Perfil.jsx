@@ -8,7 +8,6 @@ import RutasBarItem from './RutasBarItem';
 import ParadasFavoritas from './ParadasFavoritas';
 import { getRutasFavoritas,setRutasFavoritas } from '../data/asyncStorageData.js';
 import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
-// import { useInterstitialAd,InterstitialAd } from '@react-native-admob/admob';
 
 const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,setLoguearse,setRegistrarse,
     setSecionIniciada,setTipoDeUsuario,activarPrecision,
@@ -16,7 +15,8 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
     todasLasRutasCompetencia, rutasSeleccionadasCompetencia,setTodasLasRutasCompetencia, 
     setRutasSeleccionadasCompetencia, tipoDeSubscripcion,setVerAdministrarUsuarios,setCambiarPassword,
     setEditarPerfil,registrarse,setMostrarAlerte,setMensajeAlerta,setMostrarAnuncioCompleto,
-    setMostrarAnuncioRewarded,width,setEliminarAnuncios,height,setMostrarComprasPasajeros})=>{
+    setMostrarAnuncioRewarded,width,setEliminarAnuncios,height,setMostrarComprasPasajeros,
+    VERSIONDELAPLICACION})=>{
 
 
     const [nombre,setnombre]=useState();
@@ -34,8 +34,7 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
         getCorreo(setcorreo);
         obteniendoElPermiso();
         getRutasFavoritas(setArregloDeValores);
-        getRutasFavoritas(setArregloDeParadasFavoritasMomentaneo);
-        //console.log(todasLasRutasCompetencia);
+        getRutasFavoritas(setArregloDeParadasFavoritasMomentaneo);        
     },[registrarse])
 
     useEffect(()=>{
@@ -52,67 +51,6 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
         }
         
     },[arregloDeValores])
-
-
-    // const { adLoaded, adDismissed, show } = useInterstitialAd(
-    //     TestIds.REWARDED_INTERSTITIAL
-    //   );
-    
-    //   useEffect(() => {
-    //     if (adDismissed) {
-    //       //navigation.navigate('NextScreen');
-    //       console.log("AQUI SE VA A LA VERGA EN TEORIA");
-    //     }
-    //   }, [adDismissed]);
-
-    // const [interstitialAd, setInterstitialAd] = useState(
-    //     null
-    //   );
-
-    // const [adLoaded, setAdLoaded] = useState(false);
-    // const [adDismissed, setAdDismissed] = useState(false);
-    
-    // useEffect(() => {
-    //     const interstitial = InterstitialAd.createAd(TestIds.INTERSTITIAL);
-    //     setInterstitialAd(interstitial);
-    
-    //     const subscriptions = [
-    //       interstitial.addEventListener('onAdLoaded', () => {
-    //         setAdLoaded(true);
-    //       }),
-    //       interstitial.addEventListener('onAdDismissed', () => {
-    //         setAdDismissed(true);
-    //       }),
-    //     ];
-    
-    //     return () => {subscriptions[0].remove();subscriptions[1].remove();};
-    //   }, []);
-
-
-    //   useEffect(() => {
-    //     if (adDismissed) {
-    //       //navigation.navigate('NextScreen');
-    //       console.log("En teoria aqui esta navegando");
-    //     }
-    //   }, [adDismissed]);
-
-    // const { adLoaded, adDismissed, show } = useInterstitialAd(
-    //     TestIds.REWARDED_INTERSTITIAL,
-    //     {
-    //       requestOptions: {
-    //         requestNonPersonalizedAdsOnly: true,
-    //       },
-    //     }
-    //   );
-
-    //   useEffect(() => {
-    //     if (adDismissed) {
-    //       //navigation.navigate('NextScreen');
-    //     }else{
-    //         console.log("No se que pedo");
-    //         show();
-    //     }
-    //   }, [adDismissed]);
 
     return(
         <View style={[tipoDePerfil[0].principal]}>
@@ -300,15 +238,16 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
                 ,height:40,alignItems:'center',justifyContent:'center'}}
                 >
                 <Text style={{color:'white',fontSize:15}} onPress={()=>{
-                setEliminarAnuncios(true);
                 setMostrarComprasPasajeros(true);
+                setEliminarAnuncios(true);
                 }}>Eliminar Anuncios</Text>
             </TouchableOpacity>}
             <Text style={{color:'white',fontSize:15,marginTop:0,marginBottom:8}}>______________________________________</Text>
             {((tipoDeSubscripcion=='C' || tipoDeSubscripcion=='B') && tipoDeUsuario=='Pasajero') && <View style={{alignItems:'center',justifyContent:'center'}}>
                 <BannerAd 
                 size={BannerAdSize.BANNER} 
-                unitId={TestIds.BANNER} 
+                unitId={'ca-app-pub-1889500700036964/3903849703'}
+                //unitId={TestIds.BANNER}
                 requestOptions={{
                     requestNonPersonalizedAdsOnly:true
                 }}
@@ -316,33 +255,6 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
             </View>}
             </View>
             </View>
-            {/* <TouchableOpacity onPressOut={()=>{
-                // if (adLoaded) {
-                //     show();
-                //   } else {
-                //     //navigation.navigate('NextScreen');
-                //     console.log("INTENTASTE ELIMMINAR EL ANUNCIO");
-                //     console.log(adLoaded);
-                //   }
-
-                // if (adLoaded) {
-                //     interstitialAd?.show();
-                //   } else {
-                //     //navigation.navigate('NextScreen');
-                //     console.log("INTENTASTE ELIMMINAR EL ANUNCIO");
-                //   }
-
-                // if (adLoaded) {
-                //     show();
-                //   } else {
-                //     //navigation.navigate('NextScreen');
-                // }
-                //setMostrarAnuncioCompleto(true);
-                setMostrarAnuncioRewarded(true);
-                console.log("Aqui se ca");
-            }}>
-                <Text>Mostrar anuncio</Text>
-            </TouchableOpacity> */}
             
         </View>
         </View>

@@ -1,17 +1,15 @@
 
 import React, { useEffect, useState } from 'react';
-import { Button } from 'react-native';
 import { InterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
-import { View } from 'react-native/Libraries/Components/View/View';
 
-const adUnitId = TestIds.INTERSTITIAL;
+const adUnitId = 'ca-app-pub-1889500700036964/1659979689';
+                  
+  const interstitial = InterstitialAd.createForAdRequest(adUnitId,{
+    requestNonPersonalizedAdsOnly: true
+  });
 
-const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
-  requestNonPersonalizedAdsOnly: true,
-  keywords: ['fashion', 'clothing'],
-});
+function InterstitialADS ({VERSIONDELAPLICACION,setMostrarAnuncioCompleto,enviarTiempoDesdeElUltimoAnuncio}) {
 
-function InterstitialADS ({setMostrarAnuncioCompleto,enviarTiempoDesdeElUltimoAnuncio}) {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -40,17 +38,6 @@ function InterstitialADS ({setMostrarAnuncioCompleto,enviarTiempoDesdeElUltimoAn
   }else
   {
     interstitial.show();
-  
-//   return (
-//     <View style={{width:100,height:100,backgroundColor:'red',position:'absolute',zIndex:260}}>
-//         <Button
-//         title="Show Interstitial"
-//         onPress={() => {
-//             interstitial.show();
-//         }}
-//         />
-//     </View>
-//   );
 }
 }
 

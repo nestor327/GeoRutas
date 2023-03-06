@@ -133,6 +133,7 @@ const Compras=({datosDelUsuarioSinSuscripcion,setComprarSuscripcionT,setMostrarA
                             onPressOut={()=>{
                                 console.log("Que la verga");
                                 //actualizarUsuarioBD([datosDelUsuarioSinSuscripcion.email],datosDelUsuarioSinSuscripcion.email,datosDelUsuarioSinSuscripcion.token);
+                                setPurchase(false);
                                 comprarProducto("suscripcionchofer");
                                 //comprarProducto("suscripcionpasajero");
                                 //comprarProducto("suscripciondeprueba");

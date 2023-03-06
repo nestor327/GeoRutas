@@ -77,7 +77,7 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
         
             setRutasTrayectoria(resultados);
             setVisualizarRutas(keyy);        
-            verRutasTrayecto.current=!verRutasTrayecto.current;
+            //verRutasTrayecto.current=!verRutasTrayecto.current;
         
             setTiemposRutasTrayectorias(tiempos);        
         
