@@ -2,7 +2,7 @@ import React from "react";
 import { Linking, Text, TouchableOpacity, View } from "react-native";
 
 
-const AlertComponet=({width,urlDeLaAplicacion,AlerMensaje,height,tipoDeAlert,setMostrarAlerte})=>{
+const AlertComponet=({width,urlDeLaAplicacion,AlerMensaje,height,tipoDeAlert,setMostrarAlerte,setTipoDeAlerta})=>{
 
     const funcionRedirige=async ()=>{
         let url='https://www.facebook.com/profile.php?id=100089700816836';

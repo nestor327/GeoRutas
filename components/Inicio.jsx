@@ -25,7 +25,6 @@ import Geolocation from '@react-native-community/geolocation';
 import { PermissionStatus,PERMISSIONS, request, check,openSettings } from "react-native-permissions";
 import { getPermitirEnvio, getRutasParadasValue, setRutasParadasValue, setTokenGeoRutasCode } from '../data/asyncStorageData.js';
 import Cargando from './Cargando.jsx';
-import ReparandoRuta170 from './ReparandoRuta170.jsx';
 import UsuarioCercanoAUnaParada from './UsuarioCercanoAUnaParada.jsx';
 
 export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoordenadasOrigen,tipoDeUsuario
@@ -47,7 +46,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     ,emailState, tokenState,setTokenState,tipoDeSubscripcion,setVerAdministrarUsuarios,setCambiarPassword,setEditarPerfil
     ,registrarse,estadoAplicacion, setEstadoAplicacion,setMostrarAlerte,setMensajeAlerta,setMostrarMenusBuenEstado,sesionIniciadaConGoogle
     ,pedirUbicacion,pedirUbicacionSegundoPlano,setPedirUbicacionSegundoPlano,verificarMenbresia,setMostrarAnuncioCompleto
-    ,tiempoDesdeUltimoAnuncio,setMostrarAnuncioRewarded,obtenerTiempoDesdeElUltimoAnucio,setMostrarComprasPasajeros,setEliminarAnuncios,setTiempoDesdeUltimoAnuncio
+    ,tiempoDesdeUltimoAnuncio,setMostrarAnuncioRewarded,obtenerTiempoDesdeElUltimoAnucio,setMostrarComprasPasajeros,setEliminarAnuncios
+    ,setTiempoDesdeUltimoAnuncio,VERSIONDELAPLICACION
     })=>{
     
 
@@ -384,7 +384,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                 // console.log("Pedo");
 
                 //actualizarUbicacionEnElBackEnd(paradasCompletas,rutasParadas,coordenadasDeLaRuta,emailState, tokenState);
-                actualizarUbicacionEnElBackEnd(emailState, tokenState,(activarPrecision)?"1":"2");
+                actualizarUbicacionEnElBackEnd(emailState, tokenState,(!activarPrecision)?"1":"2");
                 
                 // //console.log(userLocation);
                 //let fecha= new Date();
@@ -583,7 +583,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     
                     if(tipoDeUsuario=='Transportista' && permitirEnviarUbicacion==true){
                         //actualizarUbicacionEnElBackEnd(paradasCompletas,rutasParadas,coordenadasDeLaRuta,emailState, tokenState);
-                        actualizarUbicacionEnElBackEnd(emailState, tokenState,(activarPrecision)?"1":"2");
+                        actualizarUbicacionEnElBackEnd(emailState, tokenState,(!activarPrecision)?"1":"2");
                         console.log("Mira en el fondo pasa esto"+usuarioTransportista.id_Ruta);
                         let fecha=new Date();
                         if(usuarioTransportista.id_Ruta!=null && usuarioTransportista.id_Ruta!=undefined && ((fecha.getMinutes()) + usuarioTransportista.id_Ruta)%30==0 && idUsuarioIniciado%33<15){
@@ -1260,7 +1260,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
 
 
-        {mostrarVentana=="flex" && <Perfil setMostrarComprasPasajeros={setMostrarComprasPasajeros} height={height} setEliminarAnuncios={setEliminarAnuncios} width={width} setMostrarAnuncioRewarded={setMostrarAnuncioRewarded} sesionIniciadaConGoogle={sesionIniciadaConGoogle} registrarse={registrarse} setEditarPerfil={setEditarPerfil} setCambiarPassword={setCambiarPassword} setVerAdministrarUsuarios={setVerAdministrarUsuarios} tipoDeSubscripcion={tipoDeSubscripcion} permitirEnviarUbicacion={permitirEnviarUbicacion} secionIniciada={secionIniciada} 
+        {mostrarVentana=="flex" && <Perfil VERSIONDELAPLICACION={VERSIONDELAPLICACION} setMostrarComprasPasajeros={setMostrarComprasPasajeros} height={height} setEliminarAnuncios={setEliminarAnuncios} width={width} setMostrarAnuncioRewarded={setMostrarAnuncioRewarded} sesionIniciadaConGoogle={sesionIniciadaConGoogle} registrarse={registrarse} setEditarPerfil={setEditarPerfil} setCambiarPassword={setCambiarPassword} setVerAdministrarUsuarios={setVerAdministrarUsuarios} tipoDeSubscripcion={tipoDeSubscripcion} permitirEnviarUbicacion={permitirEnviarUbicacion} secionIniciada={secionIniciada} 
             setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setRegistrarse={setRegistrarse} 
             setLoguearse={setLoguearse} tipoDePerfil={[{principal:{width:'100%',height:(height>width)?height-width*0.2:height*0.8-StatusBar.currentHeight,position:'absolute',top:0,left:0,zIndex:200,backgroundColor:'#00000045'}}]} 
             actualizar={serMostrarVentana} activarPrecision={activarPrecision} setActivarPrecision={setActivarPrecision}
@@ -1284,8 +1284,10 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         //Esta vaina genero problemas en el primer renderizado, sirve para usar google map en IOS
         provider={PROVIDER_GOOGLE} 
         
+        //showsUserLocation={true}
         showsUserLocation={(tipoDeUsuario=="Pasajero" && permitirSeguirPasajero==true)?true:false}
         showsMyLocationButton={false}
+
 
         onTouchStart={
             ()=>{
@@ -1311,9 +1313,11 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         
                         if(Math.abs(tiempoTotalAlPresionar - parseInt(tiempoDesdeUltimoAnuncio))>=3600){                        
                             setMostrarAnuncioRewarded(true);
+                            console.log("Entro en el primer anuncio");
                             //setTiempoDesdeUltimoAnuncio(tiempoTotalAlPresionar);
                         }else if(Math.abs(tiempoTotalAlPresionar - parseInt(tiempoDesdeUltimoAnuncio))>=180){
                             let random=Math.random()*100;
+                            console.log("Entro en el segundo anuncio");                            
                             if(random<50){
                                 setMostrarAnuncioCompleto(true);
                             }else{
@@ -1405,10 +1409,15 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                                 
                                 <Image style={{width:27,height:27}} source={urlDeLosIconos[item.id_Ruta-1]} ></Image>
                         
-                                <Text style={{color:'black'}}>
+                                {i==0 && <Text style={{color:'black'}}>
                                     {Math.floor(tiemposRutasTrayectorias[i]/3600)
                                     +":"+((Math.floor(((tiemposRutasTrayectorias[i]-3600*(Math.floor(tiemposRutasTrayectorias[i]/3600)))/60))>9)?Math.floor(((tiemposRutasTrayectorias[i]-3600*(Math.floor(tiemposRutasTrayectorias[i]/3600)))/60)):"0"+Math.floor(((tiemposRutasTrayectorias[i]-3600*(Math.floor(tiemposRutasTrayectorias[i]/3600)))/60)))
-                                    +":"+((tiemposRutasTrayectorias[i]%60>9)?tiemposRutasTrayectorias[i]%60:"0"+tiemposRutasTrayectorias[i]%60)}</Text>
+                                    +":"+((tiemposRutasTrayectorias[i]%60>9)?tiemposRutasTrayectorias[i]%60:"0"+tiemposRutasTrayectorias[i]%60)}</Text>}
+
+                                {i>0 && <Text style={{color:'black'}}>
+                                    {Math.floor((tiemposRutasTrayectorias[i]-tiemposRutasTrayectorias[i-1])/3600)
+                                    +":"+((Math.floor((((tiemposRutasTrayectorias[i]-tiemposRutasTrayectorias[i-1])-3600*(Math.floor((tiemposRutasTrayectorias[i]-tiemposRutasTrayectorias[i-1])/3600)))/60))>9)?Math.floor((((tiemposRutasTrayectorias[i]-tiemposRutasTrayectorias[i-1])-3600*(Math.floor((tiemposRutasTrayectorias[i]-tiemposRutasTrayectorias[i-1])/3600)))/60)):"0"+Math.floor((((tiemposRutasTrayectorias[i]-tiemposRutasTrayectorias[i-1])-3600*(Math.floor((tiemposRutasTrayectorias[i]-tiemposRutasTrayectorias[i-1])/3600)))/60)))
+                                    +":"+(((tiemposRutasTrayectorias[i]-tiemposRutasTrayectorias[i-1])%60>9)?(tiemposRutasTrayectorias[i]-tiemposRutasTrayectorias[i-1])%60:"0"+(tiemposRutasTrayectorias[i]-tiemposRutasTrayectorias[i-1])%60)}</Text>}
                                 
                             </Marker>
                         )
@@ -1529,8 +1538,9 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             })}  
             {secionIniciada==true && idUsuarioIniciado>0 && permitirEnviarUbicacion==true && tipoDeUsuario=="Transportista" && <UsuarioTransportistaLogueado emailState={emailState} tokenState={tokenState} activarPrecision={activarPrecision} direccionesPorUsuario={direccionesPorUsuario}
             setDireccionPorUsuario={setDireccionPorUsuario} idUsuarioIniciado={idUsuarioIniciado} userLocation={userLocation}></UsuarioTransportistaLogueado>}
-            {/* <ReparandoRuta170></ReparandoRuta170> */}
-            {verParadasCercanas[0].observar==true && <UsuarioCercanoAUnaParada idRuta={verParadasCercanas[0].id_Ruta} emailState={emailState} tokenState={tokenState} idParada={verParadasCercanas[0].id_Parada}
+            {verParadasCercanas[0].observar==true 
+                && (tipoDeUsuario=='Transportista' || (tipoDeUsuario=='Pasajero' && 
+                (tipoDeSubscripcion=='A' ||tipoDeSubscripcion=='S'))) && <UsuarioCercanoAUnaParada idRuta={verParadasCercanas[0].id_Ruta} emailState={emailState} tokenState={tokenState} idParada={verParadasCercanas[0].id_Parada}
                     tipoDeUsuario={tipoDeUsuario} idUsuarioIniciado={idUsuarioIniciado}></UsuarioCercanoAUnaParada>}
             
         </MapView>}         

@@ -11,10 +11,14 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
     let cantidadDeTrayectos =[0];
     let datosDeLasRutas=[];
     let todasLasRutas=getAllRutas();
-    
 
-    if(rutasEnElMapa==undefined){        
-        return;
+    
+    if(rutasEnElMapa==undefined || rutasTrayectoria==undefined || rutasTrayectoria.length==0){        
+        return(
+            <View style={{marginTop:'150%'}}>
+                <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+        )
     }
 
     for(let i=0;i<rutasEnElMapa.length;i++){
@@ -58,13 +62,14 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
     }
 //-86.304667,12.15155,171,199,18 
 
-    if(cantidadDeTrayectos==null || cantidadDeTrayectos==undefined || cantidadDeTrayectos.length==0){        
+    if(cantidadDeTrayectos==null || cantidadDeTrayectos==undefined || cantidadDeTrayectos.length<=1){
         return(
             <View style={{marginTop:'150%'}}>
                 <ActivityIndicator size="large" color="#0000ff" />
             </View>
         )
     }else{
+        const [mostrariItems, setMostrarItems]=useState(true);
         return(
             <View >
                 <ScrollView>
@@ -81,7 +86,9 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
                                         useNativeDriver: true
                                     }).start();
                                     if(identificadorKey.current==i+1){
-                                        verRutasTrayecto.current==!verRutasTrayecto.current;
+                                        setMostrarItems(!mostrariItems);
+                                    }else{
+                                        setMostrarItems(true);
                                     }
                                     console.log("Aqui se deberia de hacer el cambio"+(visualizarRutas));
                                     obtenerRutas(i+1);
@@ -120,7 +127,7 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
                                      
                                      <Text style={{color:'white'}} >Ruta: {i+1}</Text>
         
-                                     {visualizarRutas==(i+1) && verRutasTrayecto.current==true && <RutasDelTrayecto rutasTrayectoria={rutasTrayectoria}></RutasDelTrayecto>}
+                                     {visualizarRutas==(i+1) && mostrariItems==true && <RutasDelTrayecto rutasTrayectoria={rutasTrayectoria}></RutasDelTrayecto>}
                                 </View>
                                 
                             )

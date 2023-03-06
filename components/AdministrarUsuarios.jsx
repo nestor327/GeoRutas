@@ -5,8 +5,6 @@ import { getNombre } from "../data/asyncStorageData"
 import getAllRutas from "../data/rutasManagua"
 import imagen from '../assets/x_icon_imagen.png';
 import PerfilesDeUsuarios from "./ComponentesParaAdmins/PerfilesDeUsuarios";
-import * as IAP from 'react-native-iap';
-import { Platform,Alert } from 'react-native';
 
 const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrarUsuarios,nombre,setEditarInfoDelChofer,setEmailDelChoferEditar,setChoferAEditar
     ,refrescar,setRefrescar,setMostrarAlerte, setMensajeAlerta,setSecionIniciada,setTipoDeUsuario,setLoguearse,comprarProducto,purchase,setPurchase,idFacturaOApellidos
@@ -14,13 +12,16 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
     
 
     const [data,setData]=useState([]);
-    const [seleccionar, setSeleccionar]=useState(false);
     
-    const[arregloActualizar,setArregloActualizar]=useState([]);    
-    
+    const [arregloActualizar,setArregloActualizar]=useState([]);
+    const [cantidadDeInactivos, setCantidadDeInactivos]=useState(true);
+    const [comprando, setComprando]=useState(false);
+
     const obtenerLosDatos=async()=>{
 
         let todasLasRutas=getAllRutas();
+
+        let idRuta=1;
 
         for(let t=0; t<todasLasRutas.length;t++){        
             if(nombre.includes(todasLasRutas[t].nombre)){
@@ -28,10 +29,21 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
             }
         }
 
+        console.log("La mierda posee el id "+idRuta);
         try{
             let value=null;
-            value=await fetch('https://www.georutas.lat/api/UsuariosCoperativas?idRuta=1&Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());
+            value=await fetch('https://www.georutas.lat/api/UsuariosCoperativas?idRuta='+idRuta+'&Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());
             setData(value);            
+            //console.log(value[0]);
+            if(value.length>2){
+                setCantidadDeInactivos(value.filter(elem => elem.tipoSubscripcion=='B').length);
+                let nuevoArreglo=[];
+                for(let i=0;i<value.length;i++){
+                    nuevoArreglo.push(value[i].email);
+                }
+                setArregloActualizar(nuevoArreglo);
+                //console.log(arregloActualizar);
+            }
             if(value.length==1 && value.idTablaForanea==-2){
                 setMensajeAlerta("Inicie sesión");
                 setMostrarAlerte(true);
@@ -49,7 +61,7 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
             console.log("Entraste aqui");
             let emails=[];
             for(let y=0;y<arregloActualizar.length;y++){
-                emails.push(data[arregloActualizar[y]].email);
+                emails.push(arregloActualizar[y]);
             }
 
             let objeto=
@@ -85,7 +97,6 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
                         setMensajeAlerta("Usuarios activados");
                         setMostrarAlerte(true);                            
                         setRefrescar(!refrescar);
-                        setSeleccionar(!seleccionar);
                     }else if(json==2){
                         setMensajeAlerta("Inicie sesión");
                         setMostrarAlerte(true);
@@ -125,12 +136,25 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
                 actualizarUsuario(idFacturaOApellidos);
                 console.log("Mierda")
                 setRefrescar(!refrescar);
-                setSeleccionar(!seleccionar);
-                setArregloActualizar([]);
                 setPurchase(false);
             }
 
         },[purchase,tiempoDesdeLaUltimaSuscripcion,idFacturaOApellidos])
+
+        useEffect(()=>{
+            let k=0;
+            if(comprando){
+                k=setInterval(() => {
+                    setComprando(false);
+                    console.log("Estas en el interval");
+                }, 5000);
+            }
+
+            return()=>{
+                clearInterval(k);
+            }
+
+        },[comprando])
 
         return(
             
@@ -143,10 +167,12 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
                 </View>
                 <View style={{alignItems:'center',marginTop:'15%'}}>
                     <Text style={{color:'#f1f1f1',fontSize:29,marginBottom:20}}>Administra tus usuarios</Text>
-                    {seleccionar==false && <Text style={{color:'#f1f1f1',fontSize:15,marginBottom:10}}>Has click para editar los datos del chofer</Text>}
+                    <Text style={{color:'#f1f1f1',fontSize:15,marginBottom:10}}>Has click para editar los datos del chofer</Text>
                 </View>
                 <View style={{marginLeft:'0%',height:'60%',marginLeft:20}}>
+                {data==undefined || data.length<=1 && <ActivityIndicator size="large" color="#0000ff" />}
                 {data!=undefined && data.length>1 && <ScrollView>
+                    
                     {                        
                         data.map((item,i)=>{      
                              
@@ -156,45 +182,27 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
                                             setChoferAEditar(item);
                                     }}
                                     >
-                                        <PerfilesDeUsuarios setArregloActualizar={setArregloActualizar} setEmailDelChoferEditar={setEmailDelChoferEditar} setEditarInfoDelChofer={setEditarInfoDelChofer} seleccionar={seleccionar} arregloActualizar={arregloActualizar} item={item} i={i}></PerfilesDeUsuarios>
+                                        <PerfilesDeUsuarios  cantidadDeInactivos={cantidadDeInactivos} setEmailDelChoferEditar={setEmailDelChoferEditar} setEditarInfoDelChofer={setEditarInfoDelChofer} arregloActualizar={arregloActualizar} item={item} i={i}></PerfilesDeUsuarios>
                                     </View>
                                 )  
                         })
                     }
                 </ScrollView>}
-                {data==undefined || data==null && <ActivityIndicator size="large" color="#0000ff" />}
+                {data==undefined || data==null && <ActivityIndicator style={{height:40, width:40}} size="large" color="#0000ff" />}
                 </View>
 
                 <View style={{flexDirection:'row',marginTop:40,justifyContent:'center'}}>
                     <TouchableOpacity style={{height:40,width:'auto',backgroundColor:'blue',borderRadius:7,justifyContent:'center',paddingHorizontal:5}}
                         onPressOut={()=>{
-                            if(seleccionar==false){
-                                setSeleccionar(!seleccionar);
-                            }else if(seleccionar==true && arregloActualizar.length==0){
-                                setMensajeAlerta("Seleccione cuál usuario activar");
-                                setMostrarAlerte(true);
-                            }else if(seleccionar==true && arregloActualizar.length>0){
-                                comprarProducto("suscripcionchofer");
-                                // try{
-                                //     IAP.requestPurchase({sku:'productosubcripcionchoferes'});
-                                // }catch{
-                                //     console.log("OCURRIO un error en la compra");
-                                // }
-                            }
-                            
+                            comprarProducto("suscripcionpremiun");
+                            setComprando(true);
                         }}
                     >
-                        <Text style={{fontSize:16, color:'white'}}>{(seleccionar==false)?"Selecciona cual activar":"Comprar suscripción"}</Text>
+                        <Text style={{fontSize:16, color:'white'}}>{"Activar todos los usuarios"}</Text>
                     </TouchableOpacity>
-                    {seleccionar==true && <TouchableOpacity style={{marginLeft:10,height:40,width:'auto',borderRadius:7,backgroundColor:'blue',justifyContent:'center',paddingHorizontal:5}}
-                        onPressOut={()=>{
-                            setSeleccionar(false);
-                            setArregloActualizar([]);                            
-                        }}
-                    >
-                        <Text style={{fontSize:16, color:'white'}}>Cancelar</Text>
-                    </TouchableOpacity>}
+                    
                 </View>
+                {comprando==true && <ActivityIndicator size="large" color="#0000ff" />}
 
                 {/* <TouchableOpacity onPressOut={purchaseFullApp}>
                     <Text>Paga las suscriociones</Text>

@@ -60,7 +60,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         setCargando(false);
                         return;
                     }
-                    followUseLocation(50);
+                    followUseLocation(25);
                 
 
 

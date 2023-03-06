@@ -13,7 +13,7 @@ const EditarUsuario=({height,width,setEditarInfoDelChofer,emailDelChoferEditar,c
     useEffect(()=>{
         setCorreo(emailDelChoferEditar);
         setNombres(choferAEditar.nombres);
-        setApellidos(choferAEditar.apellidos);
+        setApellidos("");
         setTelefono(choferAEditar.telefono);
     },[])
 

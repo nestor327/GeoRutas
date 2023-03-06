@@ -38,10 +38,12 @@ import getAllRutas from '../data/rutasManagua.js'
     //console.log("La cantidad de paradas es: "+paradas.length);
     if(isLoading==false &&  rutasDeManagua.length>0){
 
-        //console.log(UsuarioEncontrado);
+
         UsuarioEncontrado=data;
         let nombresEnElArregloFinal=[];        
         UsuarioEncontrado=data;                
+        // console.log("El usaurio encontrado es: ");
+        // console.log(UsuarioEncontrado);
         nombresEnElArregloFinal.push(rutasDeManagua[data.id_Ruta-1].nombre);
 
             // let paradaAnteriorAdondeEstuvo=-1;
@@ -55,58 +57,7 @@ import getAllRutas from '../data/rutasManagua.js'
             if( UsuarioEncontrado.estado=='A'){
 
                 direccionesPorUsuarioDos=UsuarioEncontrado.direccion;
-                //console.log("Entraste");
-            //     for(let g=0;g<paradas.length;g++){
-            //     let distanciaALaActualParada=Math.sqrt(Math.pow((paradas[g].latitude-UsuarioEncontrado.latitudeAnterior),2)
-            //     +Math.pow((paradas[g].longitude-UsuarioEncontrado.longitudeAnterior),2));
-
-            //     if(distanciaPasadaALaRuta>distanciaALaActualParada){
-            //         distanciaPasadaALaRuta=distanciaALaActualParada;
-            //         paradaAnteriorAdondeEstuvo=g;
-            //     }
-            //     if(g<paradas.length-1){
-            //         if(paradas[g].direccion!=paradas[g+1].direccion){
-            //             ultimaParadaPorLaIzquierda=g;
-            //             ultimaParadaPorLaDerecha=g+1;
-            //         }
-            //     }
-            // }
-
             
-            // for(let g=0;g<paradas.length;g++){
-            //     let distanciaALaActualParada=Math.sqrt(Math.pow((paradas[g].latitude-UsuarioEncontrado.latitude),2)
-            //     +Math.pow((paradas[g].longitude-UsuarioEncontrado.longitude),2));
-
-            //     if(distanciaActualALaParada>distanciaALaActualParada 
-            //         && paradas[g].direccion==paradas[paradaAnteriorAdondeEstuvo].direccion){
-
-            //         distanciaActualALaParada=distanciaALaActualParada;
-            //         paradaEnDondeEstaEnLaMismaDireccionPasada=g;
-
-            //     }
-            // }
-
-            
-
-            // if(paradaAnteriorAdondeEstuvo<paradaEnDondeEstaEnLaMismaDireccionPasada){
-            //     direccionesPorUsuarioDos=paradas[paradaAnteriorAdondeEstuvo].direccion;
-            // }else if(paradaAnteriorAdondeEstuvo>paradaEnDondeEstaEnLaMismaDireccionPasada){
-            //     if(paradas[paradaAnteriorAdondeEstuvo].direccion=='D'){
-            //         direccionesPorUsuarioDos='I';
-            //     }else{
-            //         direccionesPorUsuarioDos='D';
-            //     }
-            // }else{
-            //     if(paradaEnDondeEstaEnLaMismaDireccionPasada==0 || paradaEnDondeEstaEnLaMismaDireccionPasada==paradas.length-1){
-            //         direccionesPorUsuarioDos=('I');
-            //     }else if(paradaEnDondeEstaEnLaMismaDireccionPasada==ultimaParadaPorLaDerecha 
-            //         || paradaEnDondeEstaEnLaMismaDireccionPasada==ultimaParadaPorLaDerecha){
-            //             direccionesPorUsuarioDos=('D');
-            //     }else {
-            //         direccionesPorUsuarioDos=(paradas[paradaEnDondeEstaEnLaMismaDireccionPasada].direccion);
-            //     }                
-            // }
-
             if(data!=undefined){             
                 return(          
                               

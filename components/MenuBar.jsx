@@ -80,6 +80,7 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                                 //console.log(userLocation);
                                 setMostrarBarraSecundariaDeUbicacion(true);
                                 setMostrarMenusBuenEstado(true);
+                                setVerPerfil('none');
                                 //obtenerRutas(2);
                                 
                             }else{
@@ -169,7 +170,7 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                             }
                             setOcultarTrayecto(false);
                             //setVerParadasCercanas(...{...{observar:false}})
-                            setVerParadasCercanas([{observar:true,latitude:verParadasCercanas[0].latitude,longitude:verParadasCercanas[0].longitude,direccion:verParadasCercanas[0].direccion,id_Ruta:verParadasCercanas[0].id_Ruta}]);
+                            setVerParadasCercanas([{observar:true,latitude:verParadasCercanas[0].latitude,longitude:verParadasCercanas[0].longitude,direccion:verParadasCercanas[0].direccion,id_Ruta:verParadasCercanas[0].id_Ruta,id_Parada:verParadasCercanas[0].id_Parada}]);
                             setOcultarTercerMenu(true);    
                             setMostrarBarraSecundariaDeUbicacion(false);
                             setMostrarMenusBuenEstado(true);
