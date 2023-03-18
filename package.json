@@ -25,6 +25,7 @@
     "react-native-maps": "^1.4.0",
     "react-native-permissions": "^3.6.1",
     "react-native-splash-screen": "^3.3.0",
+    "react-native-sqlite-2": "^3.6.2",
     "react-query": "^3.39.3"
   },
   "devDependencies": {

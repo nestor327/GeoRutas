@@ -13,35 +13,54 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                 ,menUno,setmenUno,menDos, setmenDos,menTres, setmenTres,menCuatro, setmenCuatro,menCinco, setmenCinco
                 ,verParadasCercanas,userLocation,setCoordenadasOrigenSecundario,setSecionIniciada, setTipoDeUsuario
                 ,permitirEnviarUbicacion, setMostrarBarraSecundariaDeUbicacion,refCambiarLupa,activarPrecision,setActivarPrecision
-                ,tipoDeUsuario,serMostrarVentana,cargando,setCargando,idRutaAMostrar,setMostrarMenusBuenEstado
+                ,tipoDeUsuario,serMostrarVentana,cargando,setCargando,idRutaAMostrar,setMostrarMenusBuenEstado,modoOscuro,setMostrarCompañerosCercanos
+                ,mostrarVentana
             })=>{
     
 
     const [verPerfil,setVerPerfil]=react.useState('none'); 
     
     useEffect(()=>{
-        serMostrarVentana(verPerfil);
+        serMostrarVentana(verPerfil);        
     },[verPerfil])
+
+    useEffect(()=>{
+        if(mostrarVentana=='none'){
+            setmenCuatro([{ display: 'flex',color:'#101043'}]);
+            let colorAOcul='#102769';
+            if(modoOscuro){
+                colorAOcul='#151553';
+            }
+            setmenCinco([{display:'none',color:colorAOcul}]);
+            setVerPerfil(mostrarVentana);
+        }        
+    },[mostrarVentana])
     
     const resultado = () => {
+        let colorAOcul='#102769';
+        if(modoOscuro){
+            colorAOcul='#151553';
+        }
         if (menUno[0].display == 'flex' ) {
-            setmenUno([{display:'none',color:'#102769'}]);
+            setmenUno([{display:'none',color:colorAOcul}]);
         } else if(menDos[0].display == 'flex'){
-            setmenDos([{display:'none',color:'#102769'}]);
-        }else if(menTres[0].display == 'flex'){
-            setmenTres([{display:'none',color:'#102769'}]);
+            setmenDos([{display:'none',color:colorAOcul}]);
+        }else if(menTres[0].display == 'flex'){            
+            setmenTres([{display:'none',color:colorAOcul}]);
         }else if(menCuatro[0].display=='flex'){
-            setmenCuatro([{display:'none',color:'#102769'}])
+            setmenCuatro([{display:'none',color:colorAOcul}])
         }else if(menCinco[0].display=='flex'){
-            setmenCinco([{display:'none',color:'#102769'}])
+            setmenCinco([{display:'none',color:colorAOcul}])
             setVerPerfil('none');
         }
         return false;
     }
+
+    
     
 
   return (
-    <View style={[{height:(height>width)?width*0.2:(height)*0.2,backgroundColor:'blue'}]}>
+    <View style={[{height:(height>width)?width*0.2:(height)*0.2}]}>
         {/* {(cargando==true && (menUno[0].display == 'flex' || menDos[0].display == 'flex' || menTres[0].display == 'flex')) 
         && <View style={[{position:'absolute', zIndex:240
                 ,backgroundColor:'#103070',opacity:0.7, height:'300%', width: (height>width)?width*0.2:height*0.2,top:'-300%'},
@@ -59,7 +78,7 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
              
 
             <View style={{ flexDirection: 'row', height: '100%', width: '100%' }} >
-                <View style={[styles.container,{ backgroundColor: '#102769' }]}>
+                <View style={[styles.container,!modoOscuro && { backgroundColor: '#102769' }, modoOscuro && {backgroundColor:'#151553'}]}>
                     <TouchableOpacity style={[{height:'60%',width:(height>width)?width*0.2*0.8:height*0.2*0.8,backgroundColor: menUno[0].color,
                      borderRadius:15,alignItems:'center',justifyContent:'center'}]}
                         onPress={() => {
@@ -70,8 +89,12 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                                     setMostrarItemMenuUno(true);
                                     setIdRutaAMostrar(-1);
                                 } else {
-                                    setmenUno([{ display: 'none',color:'#102769' }]);
-                                    setmenCuatro([{ display: 'flex',color:'#101043'}]);                           
+                                    let colorRes='#102769';
+                                    if(modoOscuro){
+                                        colorRes='#151553';
+                                    }
+                                    setmenUno([{ display: 'none',color:colorRes}]);
+                                    setmenCuatro([{ display: 'flex',color:'#101043'}]);                                    
                                     //setMostrarItemMenuUno(false);
                                 }
                                 //RutasTrayectorias(setRutasEnElMapa);    
@@ -81,6 +104,7 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                                 setMostrarBarraSecundariaDeUbicacion(true);
                                 setMostrarMenusBuenEstado(true);
                                 setVerPerfil('none');
+                                //setMostrarCompañerosCercanos(false);
                                 //obtenerRutas(2);
                                 
                             }else{
@@ -96,22 +120,26 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                     <Text style={{color:'white'}}>Trayectos</Text>
                 </View>
 
-                <View style={[styles.container, { backgroundColor: '#102769' }]}>
+                <View style={[styles.container, !modoOscuro && { backgroundColor: '#102769' }, modoOscuro && {backgroundColor:'#151553'}]}>
                     <TouchableOpacity style={{height:'60%',width:(height>width)?width*0.2*0.8:height*0.2*0.8,backgroundColor: menDos[0].color, borderRadius:15,alignItems:'center',justifyContent:'center'}}
                         onPress={() => {                    
                     
                             if(secionIniciada==true){
                                 if (menDos[0].display == 'none' && resultado() == false) {
                                     setmenDos([{ display: 'flex',color:'#101043' }]);                
-                                    setMostrarItemMenuUno(false);                        
+                                    setMostrarItemMenuUno(false);
                                 } else {
-                                    setmenDos([{ display: 'none',color:'#102769'}]);
+                                    let colorRes='#102769';
+                                    if(modoOscuro){
+                                        colorRes='#151553';
+                                    }
+                                    setmenDos([{ display: 'none',color:colorRes}]);
                                     setmenCuatro([{ display: 'flex',color:'#101043'}]);   
                                 }
                                 setOcultarTrayecto(false);
                                 setVerParadasCercanas([{observar:false,latitude:coordenadasOrigenSecundario.latitude,longitude:coordenadasOrigenSecundario.longitude,direccion:'K',id_Ruta:1}]);                                
                                 setMostrarBarraSecundariaDeUbicacion(false);
-                                setMostrarMenusBuenEstado(true);
+                                setMostrarMenusBuenEstado(true);                                
                             }else{
                                 setLoguearse(true);
                             }
@@ -119,13 +147,14 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                         }}>
                         
                         {menDos[0].display=='flex' && <Image source={require('../assets/TodasLasRutasv2.jpg')} style={{height:'90%',width:(height>width)?width*0.2*0.8*0.675:height*0.2*0.8*0.675, borderRadius:27}}/>}
-                        {menDos[0].display=='none' && <Image source={require('../assets/TodasLasRutas.jpg')} style={{height:'90%',width:(height>width)?width*0.2*0.8*0.675:height*0.2*0.8*0.675, borderRadius:27}}/>}
+                        {menDos[0].display=='none' && modoOscuro && <Image source={require('../assets/TodasLasRutasv4.png')} style={{height:'90%',width:(height>width)?width*0.2*0.8*0.675:height*0.2*0.8*0.675, borderRadius:27}}/>}
+                        {menDos[0].display=='none' && !modoOscuro && <Image source={require('../assets/TodasLasRutas.jpg')} style={{height:'90%',width:(height>width)?width*0.2*0.8*0.675:height*0.2*0.8*0.675, borderRadius:27}}/>}
 
                     </TouchableOpacity>    
                     <Text style={{color:'white'}}>Todas</Text>
                 </View>
 
-                <View style={[styles.container, { backgroundColor: '#102769' }]}>
+                <View style={[styles.container, !modoOscuro && { backgroundColor: '#102769' }, modoOscuro && {backgroundColor:'#151553'}]}>
                 
                         <TouchableOpacity style={{height:'60%',width:(height>width)?width*0.2*0.8:height*0.2*0.8,backgroundColor: menCuatro[0].color, borderRadius:15,alignItems:'center',justifyContent:'center'}}
                         onPress={()=>{
@@ -135,8 +164,9 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                                     setMostrarItemMenuUno(false);  
                                     setIdRutaAMostrar(-1);
                                 }   
-                                setOcultarTrayecto(false);    
+                                setOcultarTrayecto(false);
                                 setMostrarMenusBuenEstado(false);
+                                setMostrarItemMenuUno(true);
                             }else{
                                 setLoguearse(true);
                             }                 
@@ -149,23 +179,27 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
 
                 </View>
 
-                <View style={[styles.container, { backgroundColor: '#102769' }]}>
+                <View style={[styles.container, !modoOscuro && { backgroundColor: '#102769' }, modoOscuro && {backgroundColor:'#151553'}]}>
                     <TouchableOpacity style={{height:'60%',width:(height>width)?width*0.2*0.8:height*0.2*0.8,backgroundColor: menTres[0].color, borderRadius:15,alignItems:'center',justifyContent:'center'}}
                     onPress={() => {
                         if(secionIniciada==true){
-                            if(userLocation.latitude!=0 
-                                && userLocation.longitude>-86.430191 && userLocation.longitude<-86.109765
-                                && userLocation.latitude<12.195666 && userLocation.latitude>12.066094){
-                                setCoordenadasOrigenSecundario(userLocation);
-                                console.log("En teoria se actualizo");
-                            }
+                            // if(userLocation.latitude!=0 
+                            //     && userLocation.longitude>-86.430191 && userLocation.longitude<-86.109765
+                            //     && userLocation.latitude<12.195666 && userLocation.latitude>12.066094){
+                            //     //setCoordenadasOrigenSecundario(userLocation);
+                            //     console.log("En teoria se actualizo");
+                            // }
 
                             if (menTres[0].display == 'none' && resultado() == false) {
                                 setmenTres([{ display: 'flex',color:'#101043'  }]); 
                                 setMostrarItemMenuUno(false);    
                                 setIdRutaAMostrar(-1);                     
                             } else {
-                                setmenTres([{ display: 'none',color:'#102769'  }]);
+                                let colorRes='#102769';
+                                if(modoOscuro){
+                                    colorRes='#151553';
+                                }
+                                setmenTres([{ display: 'none',color:colorRes}]);
                                 setmenCuatro([{ display: 'flex',color:'#101043'}]);                      
                             }
                             setOcultarTrayecto(false);
@@ -174,18 +208,20 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                             setOcultarTercerMenu(true);    
                             setMostrarBarraSecundariaDeUbicacion(false);
                             setMostrarMenusBuenEstado(true);
+                            //setMostrarCompañerosCercanos(false);
                         }else{
                             setLoguearse(true);
                         }
                         
                     }}>
                         {menTres[0].display=='flex' && <Image source={require('../assets/siguientesv2.png')} style={{height:'90%',width:(height>width)?width*0.2*0.8*0.675:height*0.2*0.8*0.675, borderRadius:28}} />}
-                        {menTres[0].display=='none' &&<Image source={require('../assets/siguientes.png')} style={{height:'90%',width:(height>width)?width*0.2*0.8*0.675:height*0.2*0.8*0.675, borderRadius:28}} />}
+                        {menTres[0].display=='none' && modoOscuro && <Image source={require('../assets/siguientesv3.png')} style={{height:'90%',width:(height>width)?width*0.2*0.8*0.675:height*0.2*0.8*0.675, borderRadius:28}} />}
+                        {menTres[0].display=='none' && !modoOscuro && <Image source={require('../assets/siguientes.png')} style={{height:'90%',width:(height>width)?width*0.2*0.8*0.675:height*0.2*0.8*0.675, borderRadius:28}} />}
                     </TouchableOpacity>
                     <Text style={{color:'white'}}>Siguientes</Text>
                 </View>
 
-                <View style={[styles.container, { backgroundColor: '#102769' }]}>
+                <View style={[styles.container, !modoOscuro && { backgroundColor: '#102769' }, modoOscuro && {backgroundColor:'#151553'}]}>
                     <TouchableOpacity style={{height:'60%',width:(height>width)?width*0.2*0.8:height*0.2*0.8,backgroundColor: menCinco[0].color, borderRadius:15,alignItems:'center',justifyContent:'center'}}
                     onPress={()=>{
                     
@@ -199,23 +235,28 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                         }
                         
                         if(secionIniciada==true){
-                            setOcultarTrayecto(false);
+                            //setOcultarTrayecto(false);
                             if (menCinco[0].display == 'none' && resultado() == false) {
                                 setmenCinco([{ display: 'flex',color:'#101043'}]);
-                                setMostrarItemMenuUno(false);
-                                setIdRutaAMostrar(-1);
+                                //setMostrarItemMenuUno(false);
+                                //setIdRutaAMostrar(-1);
                             } else {
-                                setmenCinco([{ display: 'none',color:'#102769'}]);
+                                let colorRes='#102769';
+                                if(modoOscuro){
+                                    colorRes='#151553';
+                                }
+                                setmenCinco([{ display: 'none',color:colorRes}]);                                
                                 setmenCuatro([{ display: 'flex',color:'#101043'}]);   
                             }
                             
-                            setVerParadasCercanas([{observar:false,latitude:coordenadasOrigenSecundario.latitude,longitude:coordenadasOrigenSecundario.longitude,direccion:'K',id_Ruta:1}]);                            
+                            //setVerParadasCercanas([{observar:false,latitude:coordenadasOrigenSecundario.latitude,longitude:coordenadasOrigenSecundario.longitude,direccion:'K',id_Ruta:1}]);                            
                             setMostrarMenusBuenEstado(false);
                         }
     
                     }}>
                         {menCinco[0].display=='flex' && <Image source={require('../assets/usuario.png')} style={{height:'90%',width:(height>width)?width*0.2*0.8*0.675:height*0.2*0.8*0.675, borderRadius:27}} />}
-                        {menCinco[0].display=='none' && <Image source={require('../assets/usuariov2.png')} style={{height:'90%',width:(height>width)?width*0.2*0.8*0.675:height*0.2*0.8*0.675, borderRadius:27}} />}
+                        {menCinco[0].display=='none' && !modoOscuro && <Image source={require('../assets/usuariov2.png')} style={{height:'90%',width:(height>width)?width*0.2*0.8*0.675:height*0.2*0.8*0.675, borderRadius:27}} />}
+                        {menCinco[0].display=='none' && modoOscuro && <Image source={require('../assets/usuariov3.png')} style={{height:'90%',width:(height>width)?width*0.2*0.8*0.675:height*0.2*0.8*0.675, borderRadius:27}} />}
                     </TouchableOpacity>
                     <Text style={{color:'white'}}>Perfil</Text>
                 </View>

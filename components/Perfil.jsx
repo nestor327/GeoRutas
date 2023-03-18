@@ -8,6 +8,7 @@ import RutasBarItem from './RutasBarItem';
 import ParadasFavoritas from './ParadasFavoritas';
 import { getRutasFavoritas,setRutasFavoritas } from '../data/asyncStorageData.js';
 import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,setLoguearse,setRegistrarse,
     setSecionIniciada,setTipoDeUsuario,activarPrecision,
@@ -16,7 +17,7 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
     setRutasSeleccionadasCompetencia, tipoDeSubscripcion,setVerAdministrarUsuarios,setCambiarPassword,
     setEditarPerfil,registrarse,setMostrarAlerte,setMensajeAlerta,setMostrarAnuncioCompleto,
     setMostrarAnuncioRewarded,width,setEliminarAnuncios,height,setMostrarComprasPasajeros,
-    VERSIONDELAPLICACION})=>{
+    VERSIONDELAPLICACION,modoOscuro,setModoOscuro})=>{
 
 
     const [nombre,setnombre]=useState();
@@ -51,6 +52,15 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
         }
         
     },[arregloDeValores])
+
+    const establecerModoOscuro=async(valor)=>{
+        try{
+            let segunfoValor=await AsyncStorage.setItem('modoOscuro',valor);
+            console.log("Se actualizo el tipo de estado");
+        }catch{
+            console.log("Ocurrio un error");
+        }        
+    }
 
     return(
         <View style={[tipoDePerfil[0].principal]}>
@@ -143,8 +153,8 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
             </TouchableOpacity>
 
             {mostrarMenu==true && 
-            <View style={[{backgroundColor:'#103070',marginTop:'-80%',width:'79%',height:'60%',marginBottom:'40%'}
-                ,tipoDeUsuario=='Pasajero' && {marginTop:'-45%'}]}>
+            <View style={[{backgroundColor:'#103070',marginTop:'-90%',width:'79%',height:'90%',marginBottom:'40%'}
+                ,tipoDeUsuario=='Pasajero' && {marginTop:'-35%'}]}>
                 <View style={{alignItems:'center',flexDirection:'row'}}>
                     
                     <Text style={{color:'#f1f1f1',flex:1,textAlign:'center',fontSize:23,margin:'6%',marginLeft:'10%'}}>{(tipoDeUsuario=='Transportista')?"Competencia":"Favoritas"}</Text>
@@ -194,9 +204,9 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
 
                 </View>}
 
-            <Text style={{color:'white',fontSize:15,marginTop:0,marginBottom:8}}>______________________________________</Text>
+            {mostrarMenu==false && <Text style={{color:'white',fontSize:15,marginTop:0,marginBottom:8}}>______________________________________</Text>}
             
-            {tipoDeSubscripcion=='S' && <TouchableOpacity style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10
+            {tipoDeSubscripcion=='S' && mostrarMenu==false && <TouchableOpacity style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10
                 ,marginBottom:8,height:40,paddingTop:8,alignItems:'center'}}
                 onPressOut={()=>{
                     setVerAdministrarUsuarios(true);
@@ -205,7 +215,7 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
                 <Text style={{color:'white',fontSize:15}}>Administra tus Usuarios</Text>
             </TouchableOpacity>}
 
-            <TouchableOpacity style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10
+            {mostrarMenu==false && <TouchableOpacity style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10
                 ,marginBottom:8,height:40,paddingTop:8,alignItems:'center'}}
                 onPress={()=>{
                     if(secionIniciada==true){
@@ -223,9 +233,9 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
                     }
                     }}>
                 <Text style={{color:'white',fontSize:15}}>{(secionIniciada==true)?"Cerrar secion":"Iniciar secion"}</Text>
-            </TouchableOpacity>
+            </TouchableOpacity>}
 
-            {secionIniciada==false && <TouchableOpacity
+            {secionIniciada==false && mostrarMenu==false && <TouchableOpacity
                 style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10
                 ,marginBottom:8,height:40,alignItems:'center',justifyContent:'center'}}
                 >
@@ -233,7 +243,7 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
                 setRegistrarse(true);
                 }}>Registrarse</Text>
             </TouchableOpacity>}
-            {tipoDeSubscripcion=='C' && tipoDeUsuario=='Pasajero' && <TouchableOpacity
+            {tipoDeSubscripcion=='C' && tipoDeUsuario=='Pasajero' && mostrarMenu==false && <TouchableOpacity
                 style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10
                 ,height:40,alignItems:'center',justifyContent:'center'}}
                 >
@@ -242,12 +252,26 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
                 setEliminarAnuncios(true);
                 }}>Eliminar Anuncios</Text>
             </TouchableOpacity>}
-            <Text style={{color:'white',fontSize:15,marginTop:0,marginBottom:8}}>______________________________________</Text>
+            {mostrarMenu==false && <TouchableOpacity
+                style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10
+                ,height:40,alignItems:'center',justifyContent:'space-evenly',flexDirection:'row'}}
+                onPressOut={()=>{
+                    setModoOscuro(!modoOscuro);
+                    establecerModoOscuro((!modoOscuro).toString());
+                }}
+                >
+                <Text style={{color:'white',fontSize:15}}>Activar Modo Oscuro</Text>
+                <View style={[!modoOscuro && {height:30,width:60,backgroundColor:'#c3c3c3',borderRadius:17,justifyContent:'center'}
+                              ,modoOscuro && {height:30,width:60,backgroundColor:'#102790',borderRadius:17,justifyContent:'center'}]}>
+                    <Image source={(!modoOscuro)?require('../assets/modoclaro.png'):require('../assets/modoscuro.png')} style={[{height:28,width:28,marginLeft:1,tintColor:'#ffffff',borderColor:'#f1f1f1',borderWidth:2,borderRadius:16,backgroundColor:'#102790'},modoOscuro && {marginLeft:32}]}></Image>
+                </View>
+            </TouchableOpacity>}
+            {mostrarMenu==false && <Text style={{color:'white',fontSize:15,marginTop:0,marginBottom:8}}>______________________________________</Text>}
             {((tipoDeSubscripcion=='C' || tipoDeSubscripcion=='B') && tipoDeUsuario=='Pasajero') && <View style={{alignItems:'center',justifyContent:'center'}}>
                 <BannerAd 
                 size={BannerAdSize.BANNER} 
-                unitId={'ca-app-pub-1889500700036964/3903849703'}
-                //unitId={TestIds.BANNER}
+                //unitId={'ca-app-pub-1889500700036964/3903849703'}
+                unitId={TestIds.BANNER}
                 requestOptions={{
                     requestNonPersonalizedAdsOnly:true
                 }}

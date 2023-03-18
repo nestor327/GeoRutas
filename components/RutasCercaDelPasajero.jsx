@@ -9,7 +9,7 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
     
 
 
-    const RutasCercaDelPasajero=({userLocation,rutasSeleccionadasCompetencia,emailState, tokenState})=>{
+    const RutasCercaDelPasajero=({modoOscuro,userLocation,rutasSeleccionadasCompetencia,emailState, tokenState})=>{
 
     try{
         const {data,error,isLoading}=useQuery(['obtenerUsuariosCompetencia',emailState,tokenState],async({queryKey})=>{
@@ -72,8 +72,8 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
                                         latitudeDelta:0.02,
                                         longitudeDelta:0.05}}>
                                             
-                                            {item.direccion=='D' && <Text style={{color:'black'}}>{"⇛"+todasLasRutas[item.id_Ruta-1].nombre}</Text>}
-                                            {item.direccion=='I' && <Text style={{color:'black'}}>{"⇚"+todasLasRutas[item.id_Ruta-1].nombre}</Text>}
+                                            {item.direccion=='D' && <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{"⇛"+todasLasRutas[item.id_Ruta-1].nombre}</Text>}
+                                            {item.direccion=='I' && <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{"⇚"+todasLasRutas[item.id_Ruta-1].nombre}</Text>}
                                             <Image style={{width:25,height:25}} source={todasLasUrls[item.id_Ruta-1]} ></Image>
                         
                                     </Marker>

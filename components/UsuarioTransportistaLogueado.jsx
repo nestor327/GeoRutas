@@ -10,7 +10,8 @@ import getAllRutas from '../data/rutasManagua.js'
 
 //Este componente posee errores, revisalo luego
 
-    const UsuarioTransportistaLogueado=({emailState,tokenState,usuario,direccionesPorUsuario,setDireccionPorUsuario,idUsuarioIniciado,userLocation,activarPrecision})=>{
+    const UsuarioTransportistaLogueado=({emailState,tokenState,usuario,direccionesPorUsuario,setDireccionPorUsuario,idUsuarioIniciado,userLocation,activarPrecision,modoOscuro,tiempoParaUsaurioTransportistaLogueado
+        ,mostrarCompañerosCercanos,idRutaAMostrar, tiempoPromedio})=>{
         try{
             let direccionesPorUsuarioDos='K';
 
@@ -27,8 +28,9 @@ import getAllRutas from '../data/rutasManagua.js'
         
         )
 
-    if(isLoading){
+    if(!isLoading){
         //console.log("Se esta cargando la linea de la ruta");            
+        //console.log(tiempoPromedio);
     }
     //let paradas=obtenerParadasPorParadas(UsuarioEncontrado.id_Ruta);
     //console.log("El id que pasas es: "+UsuarioEncontrado.id_Ruta);
@@ -61,9 +63,21 @@ import getAllRutas from '../data/rutasManagua.js'
             if(data!=undefined){             
                 return(          
                               
-                        <Marker coordinate={{latitude:(activarPrecision==true)?data.longitude:userLocation.latitude, longitude:(activarPrecision==true)?data.latitude:userLocation.longitude}}>
-                            <Text style={{color:'black'}}>{(direccionesPorUsuarioDos=='D')?"⇛"+nombresEnElArregloFinal[0]:"⇚"+nombresEnElArregloFinal[0]}</Text>
-                            <Image style={{width:30,height:30}} source={require("../assets/transportistaAzul.png")}></Image>
+                        <Marker coordinate={{latitude:(activarPrecision==true)?data.longitude:userLocation.latitude, longitude:(activarPrecision==true)?data.latitude:userLocation.longitude}}
+                            style={{alignItems:'center'}}
+                        >
+                            <Text style={{color:(!modoOscuro)?'black':'#c3c3c3', fontWeight:'500'}}>{(direccionesPorUsuarioDos=='D')?"⇛ Tú "+nombresEnElArregloFinal[0]:"⇚ Tú "+nombresEnElArregloFinal[0]}</Text>
+                            <Image style={{width:30,height:30}} source={require("../assets/transportistaAzulv2.png")}></Image>
+                            {(mostrarCompañerosCercanos || (Math.ceil(idUsuarioIniciado/33.0)==idRutaAMostrar)) && <Text 
+                                    style={{color:((tiempoPromedio-tiempoParaUsaurioTransportistaLogueado)>300)?"#f41c1c"
+                                                    :((tiempoPromedio-tiempoParaUsaurioTransportistaLogueado)<-300)?"#ff7f27"
+                                                    :(!modoOscuro)?'black':'#c3c3c3', fontWeight:'700'}}>
+                                                        {(((tiempoPromedio-tiempoParaUsaurioTransportistaLogueado)>0)?"+":"")+
+                                                        ((Math.floor((((tiempoPromedio-tiempoParaUsaurioTransportistaLogueado))/60))>9)?Math.floor((((tiempoPromedio-tiempoParaUsaurioTransportistaLogueado))/60)):"0"
+                                                        +Math.floor((((tiempoPromedio-tiempoParaUsaurioTransportistaLogueado)-3600*(Math.floor((tiempoPromedio-tiempoParaUsaurioTransportistaLogueado)/3600)))/60)))
+                                                        +":"+(((tiempoPromedio-tiempoParaUsaurioTransportistaLogueado)%60>9)?(tiempoPromedio-tiempoParaUsaurioTransportistaLogueado)%60:"0"+(tiempoPromedio-tiempoParaUsaurioTransportistaLogueado)%60)
+                                                        }
+                                                </Text>}
                         </Marker>
                     
                 )    

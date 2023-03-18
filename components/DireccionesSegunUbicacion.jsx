@@ -19,9 +19,10 @@ try{
 
     
 
-    if(isLoading){
+    if(!isLoading){
         //console.log("Se estan cargando las paradas");     
         //setMostrarSniperCargando(true);
+        //console.log(data);
     }
 
     //let paradasEnComun=rutasParadasManagua(idRuta)._j;    

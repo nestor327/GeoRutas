@@ -26,6 +26,9 @@ import { PermissionStatus,PERMISSIONS, request, check,openSettings } from "react
 import { getPermitirEnvio, getRutasParadasValue, setRutasParadasValue, setTokenGeoRutasCode } from '../data/asyncStorageData.js';
 import Cargando from './Cargando.jsx';
 import UsuarioCercanoAUnaParada from './UsuarioCercanoAUnaParada.jsx';
+import styles from '../componentStyles/mapviewStyles.js';
+import UsuariosTransportistasConTiempo from './UsuariosTransportistasConTiempos.jsx';
+import SeguimientoAlTrayecto from './SeguimientoAlTrayecto.jsx';
 
 export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoordenadasOrigen,tipoDeUsuario
     ,setVerTrayectoria,setOcultarMenu,coordenadasOrigen,coordenadasDestino,setCoordenadasDestino,verTrayectoria,iconosTransportes,tiemposRutasTrayectorias
@@ -47,7 +50,9 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     ,registrarse,estadoAplicacion, setEstadoAplicacion,setMostrarAlerte,setMensajeAlerta,setMostrarMenusBuenEstado,sesionIniciadaConGoogle
     ,pedirUbicacion,pedirUbicacionSegundoPlano,setPedirUbicacionSegundoPlano,verificarMenbresia,setMostrarAnuncioCompleto
     ,tiempoDesdeUltimoAnuncio,setMostrarAnuncioRewarded,obtenerTiempoDesdeElUltimoAnucio,setMostrarComprasPasajeros,setEliminarAnuncios
-    ,setTiempoDesdeUltimoAnuncio,VERSIONDELAPLICACION
+    ,setTiempoDesdeUltimoAnuncio,VERSIONDELAPLICACION,modoOscuro,setModoOscuro,mostrarCompañerosCercanos, setMostrarCompañerosCercanos
+    ,tiempoParaUsaurioTransportistaLogueado, setTiempoParaUsaurioTransportistaLogueado, setTiempoPromedio, tiempoPromedio
+    ,iniciarRecorridoDeLaTrayectoria, setIniciarRecorridoDeLaTrayectoria,datosDeLosUsuarios
     })=>{
     
 
@@ -446,14 +451,19 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                 setVerTrayectoria(false);                         
                 setVerParadasCercanas([{observar:false,latitude:coordenadasOrigenSecundario.latitude,longitude:coordenadasOrigenSecundario.longitude,direccion:'K',id_Ruta:1}]);
                 
-                if (menUno[0].display == 'flex' ) {
-                    setmenUno([{display:'none',color:'#102769'}]);
+                let colorRes='#102769';
+                if(modoOscuro){
+                    colorRes='#151553';
+                }
+
+                if (menUno[0].display == 'flex' ) {                    
+                    setmenUno([{ display: 'none',color:colorRes}]);
                 } else if(menDos[0].display == 'flex'){
-                    setmenDos([{display:'none',color:'#102769'}]);
+                    setmenDos([{display:'none',color:colorRes}]);
                 }else if(menTres[0].display == 'flex'){
-                    setmenTres([{display:'none',color:'#102769'}]);
+                    setmenTres([{display:'none',color:colorRes}]);
                 }else if(menCinco[0].display=='flex'){
-                    setmenCinco([{display:'none',color:'#102769'}])                    
+                    setmenCinco([{display:'none',color:colorRes}])                    
                 }
                 setmenCuatro([{ display: 'flex',color:'#101043' }]);
         }
@@ -528,16 +538,21 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             if(refInputAutoComplete.current.isFocused()==true){
                 setMostrarBarraSecundariaDeUbicacion(true);
                 refInputAutoComplete.current.clear();
+                let colorRes='#102769';
+                if(modoOscuro){
+                    colorRes='#151553';
+                }
+
                 if (menUno[0].display == 'flex' ) {
-                    setmenUno([{display:'none',color:'#102769'}]);
+                    setmenUno([{display:'none',color:colorRes}]);
                 } else if(menDos[0].display == 'flex'){
-                    setmenDos([{display:'none',color:'#102769'}]);
+                    setmenDos([{display:'none',color:colorRes}]);
                 }else if(menTres[0].display == 'flex'){
-                    setmenTres([{display:'none',color:'#102769'}]);
+                    setmenTres([{display:'none',color:colorRes}]);
                 }else if(menCuatro[0].display=='flex'){
-                    setmenCuatro([{display:'none',color:'#102769'}])
+                    setmenCuatro([{display:'none',color:colorRes}])
                 }else if(menCinco[0].display=='flex'){
-                    setmenCinco([{display:'none',color:'#102769'}])                    
+                    setmenCinco([{display:'none',color:colorRes}])                    
                 }
                 //setmenUno([{ display: 'flex',color:'#101043' }]);
                 setMostrarItemMenuUno(true);
@@ -689,14 +704,17 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         setVerTrayectoria={setVerTrayectoria} ocultarTrayecto={ocultarTrayecto} permisos={permisos}
         askLocationPermissionSetting={askLocationPermissionSetting} setUsuarioTransportista={setUsuarioTransportista} setCargando={setCargando}
         emailState={emailState} tokenState={tokenState} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} 
-        setMostrarComprasPasajeros={setMostrarComprasPasajeros} tipoDeSubscripcion={tipoDeSubscripcion}
+        setMostrarComprasPasajeros={setMostrarComprasPasajeros} tipoDeSubscripcion={tipoDeSubscripcion} mostrarCompañerosCercanos={mostrarCompañerosCercanos} setMostrarCompañerosCercanos={setMostrarCompañerosCercanos}
+        menCuatro={menCuatro} verParadasCercanas={verParadasCercanas} setIdRutaAMostrar={setIdRutaAMostrar} setMostrarMenusBuenEstado={setMostrarMenusBuenEstado} setMostrarItemMenuUno={setMostrarItemMenuUno}
+        setVerParadasCercanas={setVerParadasCercanas} setMostrarBarraSecundariaDeUbicacion={setMostrarBarraSecundariaDeUbicacion} coordenadasOrigenSecundario={coordenadasOrigenSecundario} 
+        iniciarRecorridoDeLaTrayectoria={iniciarRecorridoDeLaTrayectoria} setIniciarRecorridoDeLaTrayectoria={setIniciarRecorridoDeLaTrayectoria}
         ></IconosDeNavegacion>
 
 
 
 
         <View style={[{width:'90%',zIndex:100,top:height*0.08-StatusBar.currentHeight,position:'absolute', 
-        backgroundColor:'#2060A5',flexDirection:'row',marginLeft:'5%',borderTopRightRadius:20, 
+        backgroundColor:(!modoOscuro)?'#2060A5':'#151567',flexDirection:'row',marginLeft:'5%',borderTopRightRadius:20, 
         borderTopLeftRadius:20},mostrarBarraSecundariaDeUbicacion==false && {borderBottomRightRadius:20,borderBottomLeftRadius:20}
         ]}>
         {((activarPrecision==false || bacgroundPermisos!='granted') && tipoDeUsuario=='Transportista') && 
@@ -737,17 +755,22 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         }
 
 
-                        if (menUno[0].display == 'none') {                            
+                        if (menUno[0].display == 'none') {        
+                            let colorRes='#102769';
+                            if(modoOscuro){
+                                colorRes='#151553';
+                            }
+
                             if (menUno[0].display == 'flex' ) {
-                                setmenUno([{display:'none',color:'#102769'}]);
+                                setmenUno([{display:'none',color:colorRes}]);
                             } else if(menDos[0].display == 'flex'){
-                                setmenDos([{display:'none',color:'#102769'}]);
+                                setmenDos([{display:'none',color:colorRes}]);
                             }else if(menTres[0].display == 'flex'){
-                                setmenTres([{display:'none',color:'#102769'}]);
+                                setmenTres([{display:'none',color:colorRes}]);
                             }else if(menCuatro[0].display=='flex'){
-                                setmenCuatro([{display:'none',color:'#102769'}])
+                                setmenCuatro([{display:'none',color:colorRes}])
                             }else if(menCinco[0].display=='flex'){
-                                setmenCinco([{display:'none',color:'#102769'}])                    
+                                setmenCinco([{display:'none',color:colorRes}])                    
                             }                            
                             setMostrarItemMenuUno(true);
                             setIdRutaAMostrar(-1);
@@ -755,7 +778,12 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                             setVerTransportistasPorLaDerecha(false);
                             setVerTransportistasPorLaIzquierda(false);
                         } else {
-                            setmenUno([{ display: 'none',color:'#102769' }]);
+                            let colorRes='#102769';
+                            if(modoOscuro){
+                                colorRes='#151553';
+                            }
+
+                            setmenUno([{ display: 'none',color:colorRes}]);
                             setmenCuatro([{ display: 'flex',color:'#101043'}]);                           
                             //setMostrarItemMenuUno(false);
                         }
@@ -818,13 +846,13 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
                     textInputContainer:{
                         //Este es el color de subrayado sin detalles del buscador
-                        backgroundColor:'#2060A5',
+                        backgroundColor:(!modoOscuro)?'#2060A5':'#151567',
                         marginTop:8,
                         marginBottom:3,
                         color:'black'
                     },
                     textInput: {                    
-                        backgroundColor: '#dcdcdc',
+                        backgroundColor: (!modoOscuro)?'#dcdcdc':'#a1b2d5',
                         height: 35,
                         borderRadius: 14,
                         paddingVertical: 0,
@@ -903,16 +931,21 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                                 
                         }
 
+                        let colorRes='#102769';
+                        if(modoOscuro){
+                            colorRes='#151553';
+                        }
+
                         if (menUno[0].display == 'flex' ) {
-                            setmenUno([{display:'none',color:'#102769'}]);
+                            setmenUno([{display:'none',color:colorRes}]);
                         } else if(menDos[0].display == 'flex'){
-                            setmenDos([{display:'none',color:'#102769'}]);
+                            setmenDos([{display:'none',color:colorRes}]);
                         }else if(menTres[0].display == 'flex'){
-                            setmenTres([{display:'none',color:'#102769'}]);
+                            setmenTres([{display:'none',color:colorRes}]);
                         }else if(menCuatro[0].display=='flex'){
-                            setmenCuatro([{display:'none',color:'#102769'}])
+                            setmenCuatro([{display:'none',color:colorRes}])
                         }else if(menCinco[0].display=='flex'){
-                            setmenCinco([{display:'none',color:'#102769'}])                    
+                            setmenCinco([{display:'none',color:colorRes}])
                         }
 
                         setOcultarTrayecto(false);
@@ -936,16 +969,21 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             <View onTouchEnd={()=>{
                 if(mostrarBarraSecundariaDeUbicacion==false){
                     serMostrarVentana('flex'); 
+                    let colorRes='#102769';
+                    if(modoOscuro){
+                        colorRes='#151553';
+                    }
+
                     if (menUno[0].display == 'flex' ) {
-                        setmenUno([{display:'none',color:'#102769'}]);
+                        setmenUno([{display:'none',color:colorRes}]);
                     } else if(menDos[0].display == 'flex'){
-                        setmenDos([{display:'none',color:'#102769'}]);
+                        setmenDos([{display:'none',color:colorRes}]);
                     }else if(menTres[0].display == 'flex'){
-                        setmenTres([{display:'none',color:'#102769'}]);
+                        setmenTres([{display:'none',color:colorRes}]);
                     }else if(menCuatro[0].display=='flex'){
-                        setmenCuatro([{display:'none',color:'#102769'}])
+                        setmenCuatro([{display:'none',color:colorRes}])
                     }else if(menCinco[0].display=='flex'){
-                        setmenCinco([{display:'none',color:'#102769'}])                    
+                        setmenCinco([{display:'none',color:colorRes}])                    
                     }
                     //setmenUno([{ display: 'flex',color:'#101043' }]);
                     //setMostrarItemMenuUno(true);
@@ -957,23 +995,29 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     setMostrarBarraSecundariaDeUbicacion(false);
                     refInputAutoComplete.current.blur();
                     refInputAutoComplete.current.clear(); 
+
+                    let colorRes='#102769';
+                    if(modoOscuro){
+                        colorRes='#151553';
+                    }
+
                     if (menUno[0].display == 'flex' ) {
-                        setmenUno([{display:'none',color:'#102769'}]);
+                        setmenUno([{display:'none',color:colorRes}]);
                     } else if(menDos[0].display == 'flex'){
-                        setmenDos([{display:'none',color:'#102769'}]);
+                        setmenDos([{display:'none',color:colorRes}]);
                     }else if(menTres[0].display == 'flex'){
-                        setmenTres([{display:'none',color:'#102769'}]);
+                        setmenTres([{display:'none',color:colorRes}]);
                     }else if(menCuatro[0].display=='flex'){
-                        setmenCuatro([{display:'none',color:'#102769'}])
+                        setmenCuatro([{display:'none',color:colorRes}])
                     }else if(menCinco[0].display=='flex'){
-                        setmenCinco([{display:'none',color:'#102769'}])                    
+                        setmenCinco([{display:'none',color:colorRes}])                    
                     }
                 }                
                 }}>
                 
                 <Image 
                     //source={require('../assets/Sukuna.jpg')} 
-                    source={(mostrarBarraSecundariaDeUbicacion==true)?require('../assets/x_icon_imagen.png'):require('../assets/ajustes.png')}
+                    source={(mostrarBarraSecundariaDeUbicacion==true)?require('../assets/x_icon_imagen.png'):((!modoOscuro)?require('../assets/ajustes.png'):require('../assets/ajustesv2.png'))}
                     style={[{width:39, height:39,marginLeft:6,marginRight:6, borderRadius:20,marginTop:6,marginBottom:6,
                     },(mostrarBarraSecundariaDeUbicacion==true) && {tintColor:'#f1f1f1',marginRight:10,marginLeft:4}]}>
                 </Image>
@@ -981,7 +1025,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     </View>
     
     {mostrarBarraSecundariaDeUbicacion==true && <View style={{width:(mostrarBarraSecundariaDeUbicacion==true)?'90%':12,zIndex:90,top:height*0.08+47-StatusBar.currentHeight
-    ,position:'absolute', backgroundColor:'#2060A5',flexDirection:'row',marginLeft:'5%',
+    ,position:'absolute', backgroundColor:(!modoOscuro)?'#2060A5':'#151567',flexDirection:'row',marginLeft:'5%',
         borderBottomLeftRadius:20,borderBottomRightRadius:20,alignItems:'flex-start',paddingBottom:0,paddingTop:5}}>
             
             <TouchableOpacity 
@@ -1227,11 +1271,16 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             onPress={()=>{
 
                 if(menUno[0].display=='none' && secionIniciada==true){
+                    let colorRes='#102769';
+                    if(modoOscuro){
+                        colorRes='#151553';
+                    }
+
                     setmenUno([{ display: 'flex',color:'#101043' }]);
                     if(menDos[0].display == 'flex'){
-                        setmenDos([{display:'none',color:'#102769'}]);
+                        setmenDos([{display:'none',color:colorRes}]);
                     }else if(menTres[0].display == 'flex'){
-                        setmenTres([{display:'none',color:'#102769'}]);
+                        setmenTres([{display:'none',color:colorRes}]);
                     }
                     setMostrarMenusBuenEstado(true);
                     setMostrarItemMenuUno(true);
@@ -1239,7 +1288,12 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     setOcultarMenu(true);       
                     setVerParadasCercanas([{observar:false,latitude:coordenadasOrigenSecundario.latitude,longitude:coordenadasOrigenSecundario.longitude,direccion:'K',id_Ruta:1}]);                        
                 }else if(secionIniciada==true){
-                    setmenUno([{ display: 'none',color:'#102769' }]);
+                    let colorRes='#102769';
+                    if(modoOscuro){
+                        colorRes='#151553';
+                    }
+
+                    setmenUno([{ display: 'none',color:colorRes}]);
                     setmenCuatro([{ display: 'flex',color:'#101043'}]);                          
                 }else{
                     setLoguearse(true);
@@ -1249,9 +1303,9 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         >
                 <Image 
                 //require('../assets/Citycons_bus_icon-icons.com_67914.png')
-                    source={(refCambiarLupa.current==true)?require("../assets/lupaRota.png"):require("../assets/lupa.png")}
-                    style={{marginBottom:0,width:40, height:40,marginRight:7,backgroundColor:'#2060A5',borderRadius:20,
-                        borderWidth:2,borderColor:'#2060A5',marginLeft:7}}>                    
+                    source={(refCambiarLupa.current==true)?((!modoOscuro)?require("../assets/lupaRota.png"):require("../assets/lupaRotav2.png")):(!modoOscuro)?require("../assets/lupa.png"):require("../assets/lupav2.png")}
+                    style={{marginBottom:0,width:40, height:40,marginRight:7,backgroundColor:(!modoOscuro)?'#2060A5':'#151567',borderRadius:20,
+                        borderWidth:2,borderColor:(!modoOscuro)?'#2060A5':'#151567',marginLeft:7}}>                    
                 </Image>
         </TouchableOpacity>}
     </View>}
@@ -1267,7 +1321,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             tipoDeUsuario={tipoDeUsuario} permisosEnSegundoPlano={bacgroundPermisos} setPermisosEnSegundoPlano={setBacgroundPermisos}
             todasLasRutasCompetencia={todasLasRutasCompetencia} rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}
             setTodasLasRutasCompetencia={setTodasLasRutasCompetencia} setRutasSeleccionadasCompetencia={setRutasSeleccionadasCompetencia}
-            setMensajeAlerta={setMensajeAlerta} setMostrarAlerte={setMostrarAlerte} setMostrarAnuncioCompleto={setMostrarAnuncioCompleto}></Perfil>}
+            setMensajeAlerta={setMensajeAlerta} setMostrarAlerte={setMostrarAlerte} setMostrarAnuncioCompleto={setMostrarAnuncioCompleto} modoOscuro={modoOscuro} setModoOscuro={setModoOscuro}></Perfil>}
         
          {<MapView
 
@@ -1288,6 +1342,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         showsUserLocation={(tipoDeUsuario=="Pasajero" && permitirSeguirPasajero==true)?true:false}
         showsMyLocationButton={false}
 
+        customMapStyle={(modoOscuro)?styles.mapStyle:styles.mapStyleLight}
 
         onTouchStart={
             ()=>{
@@ -1311,10 +1366,10 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         let fechaAlPresionar=new Date();
                         let tiempoTotalAlPresionar=fechaAlPresionar.getHours()*3600 + fechaAlPresionar.getMinutes()*60 + fechaAlPresionar.getSeconds();
                         
-                        if(Math.abs(tiempoTotalAlPresionar - parseInt(tiempoDesdeUltimoAnuncio))>=3600){                        
+                        if(Math.abs(tiempoTotalAlPresionar - parseInt(tiempoDesdeUltimoAnuncio))>=3600){
                             setMostrarAnuncioRewarded(true);
                             console.log("Entro en el primer anuncio");
-                            //setTiempoDesdeUltimoAnuncio(tiempoTotalAlPresionar);
+                            setTiempoDesdeUltimoAnuncio(tiempoTotalAlPresionar);
                         }else if(Math.abs(tiempoTotalAlPresionar - parseInt(tiempoDesdeUltimoAnuncio))>=180){
                             let random=Math.random()*100;
                             console.log("Entro en el segundo anuncio");                            
@@ -1323,7 +1378,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                             }else{
                                 setMostrarAnuncioRewarded(true);                                    
                             }
-                            //setTiempoDesdeUltimoAnuncio(tiempoTotalAlPresionar);
+                            setTiempoDesdeUltimoAnuncio(tiempoTotalAlPresionar);
                         }
                     
                     console.log("El tiempo total es: "+tiempoTotalAlPresionar);
@@ -1336,7 +1391,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         }
         >
 
-            {secionIniciada==true && mostrarItemMenuUno==true && verRutasCercanas==false && verCompetencia==false &&
+            {secionIniciada==true && mostrarItemMenuUno==true && verRutasCercanas==false && verCompetencia==false && !mostrarCompañerosCercanos &&
             <>
                 <Marker onDragEnd={
                     async(coords)=>{
@@ -1360,7 +1415,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     draggable={true}>
                         <Image 
                         style={{height:40,width:40}}
-                        source={require("../assets/UsuarioPersona.png")}
+                        source={(!modoOscuro)?require("../assets/UsuarioPersona.png"):require("../assets/UsuarioPersona.png")}
                         ></Image>
 
                 </Marker>
@@ -1394,7 +1449,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             </>}
 
 
-            {secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true &&
+            {!iniciarRecorridoDeLaTrayectoria && secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && !mostrarCompañerosCercanos &&
                     iconosTransportes.map((item, i)=>{
                         return(
                             <Marker key={i} coordinate={{
@@ -1403,18 +1458,18 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                                 latitudeDelta:0.02,
                                 longitudeDelta:0.05
                             }} style={{alignItems:'center'}}>
-                                {(item.direccionParadaInicial=='D') && <Text style={{color:'black'}}>{"⇛"+item.nombre}</Text>}
-                                {(item.direccionParadaInicial=='I') && <Text style={{color:'black'}}>{"⇚"+item.nombre}</Text>}
+                                {(item.direccionParadaInicial=='D') && <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{"⇛"+item.nombre}</Text>}
+                                {(item.direccionParadaInicial=='I') && <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{"⇚"+item.nombre}</Text>}
     
                                 
                                 <Image style={{width:27,height:27}} source={urlDeLosIconos[item.id_Ruta-1]} ></Image>
                         
-                                {i==0 && <Text style={{color:'black'}}>
+                                {i==0 && <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>
                                     {Math.floor(tiemposRutasTrayectorias[i]/3600)
                                     +":"+((Math.floor(((tiemposRutasTrayectorias[i]-3600*(Math.floor(tiemposRutasTrayectorias[i]/3600)))/60))>9)?Math.floor(((tiemposRutasTrayectorias[i]-3600*(Math.floor(tiemposRutasTrayectorias[i]/3600)))/60)):"0"+Math.floor(((tiemposRutasTrayectorias[i]-3600*(Math.floor(tiemposRutasTrayectorias[i]/3600)))/60)))
                                     +":"+((tiemposRutasTrayectorias[i]%60>9)?tiemposRutasTrayectorias[i]%60:"0"+tiemposRutasTrayectorias[i]%60)}</Text>}
 
-                                {i>0 && <Text style={{color:'black'}}>
+                                {i>0 && <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>
                                     {Math.floor((tiemposRutasTrayectorias[i]-tiemposRutasTrayectorias[i-1])/3600)
                                     +":"+((Math.floor((((tiemposRutasTrayectorias[i]-tiemposRutasTrayectorias[i-1])-3600*(Math.floor((tiemposRutasTrayectorias[i]-tiemposRutasTrayectorias[i-1])/3600)))/60))>9)?Math.floor((((tiemposRutasTrayectorias[i]-tiemposRutasTrayectorias[i-1])-3600*(Math.floor((tiemposRutasTrayectorias[i]-tiemposRutasTrayectorias[i-1])/3600)))/60)):"0"+Math.floor((((tiemposRutasTrayectorias[i]-tiemposRutasTrayectorias[i-1])-3600*(Math.floor((tiemposRutasTrayectorias[i]-tiemposRutasTrayectorias[i-1])/3600)))/60)))
                                     +":"+(((tiemposRutasTrayectorias[i]-tiemposRutasTrayectorias[i-1])%60>9)?(tiemposRutasTrayectorias[i]-tiemposRutasTrayectorias[i-1])%60:"0"+(tiemposRutasTrayectorias[i]-tiemposRutasTrayectorias[i-1])%60)}</Text>}
@@ -1424,7 +1479,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     })
             }
 
-            {secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true &&
+            {secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && !mostrarCompañerosCercanos &&
                     iconosTransportes.map((item, i)=>{
                         return(
                             <View key={i} >
@@ -1433,7 +1488,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         )
                     })
             }
-            {secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true &&
+            {secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && !mostrarCompañerosCercanos &&
                     iconosTransportes.map((item, i)=>{
                         return(
                             <Marker key={i} coordinate={{                            
@@ -1447,7 +1502,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         )
                     })
             }
-            {secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true &&
+            {secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && !mostrarCompañerosCercanos &&
                     iconosTransportes.map((item, i)=>{
                         return(
                             <Marker key={i} coordinate={{                            
@@ -1460,36 +1515,48 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         )
                     })
             }
-            {secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true &&
+            {secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && !mostrarCompañerosCercanos &&
                     iconosTransportes.map((item, i)=>{
                         if(i==0){
                             return(                            
-                                <Polyline key={i} lineCap={"butt"} coordinates={[{latitude:coordenadasOrigen.latitude,longitude:coordenadasOrigen.longitude},{latitude:item.longitudParadaUsuarioComun,longitude:item.latitudParadaUsuarioComun}]} color={"black"}></Polyline>
+                                <Polyline key={i} lineCap={"butt"} coordinates={[{latitude:coordenadasOrigen.latitude,longitude:coordenadasOrigen.longitude},{latitude:item.longitudParadaUsuarioComun,longitude:item.latitudParadaUsuarioComun}]} strokeColor={(!modoOscuro)?"black":"#c3c3c3"}></Polyline>
                            )
                         }
                     })
             }
-            {secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true &&
+            {secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && !mostrarCompañerosCercanos &&
                     iconosTransportes.map((item, i)=>{
                         if(i==iconosTransportes.length-1){                        
                         return(                    
-                            <Polyline key={i} coordinates={[{latitude:coordenadasDestino.latitude,longitude:coordenadasDestino.longitude},{latitude:item.longitudParadaFinal,longitude:item.latitudParadaFinal}]} color={"black"}></Polyline>
+                            <Polyline key={i} coordinates={[{latitude:coordenadasDestino.latitude,longitude:coordenadasDestino.longitude},{latitude:item.longitudParadaFinal,longitude:item.latitudParadaFinal}]} strokeColor={(!modoOscuro)?"black":"#c3c3c3"}></Polyline>
                     )}}
                 )
             }
 
 
-            {secionIniciada==true && mostrarParadas==true && <DireccionesSegunUbicacion emailState={emailState} tokenState={tokenState} idRuta={idRutaAMostrar}></DireccionesSegunUbicacion>}
-            {secionIniciada==true && idRutaAMostrar>0 && mostrarUsuarios==true && <UsuariosTransportistas emailState={emailState} tokenState={tokenState} tipoDeUsuario={tipoDeUsuario} idRuta={idRutaAMostrar} idUsuarioIniciado={idUsuarioIniciado}
-                        verTransportistasPorLaDerecha={verTransportistasPorLaDerecha} verTransportistasPorLaIzquierda={verTransportistasPorLaIzquierda}></UsuariosTransportistas>}
+            {secionIniciada==true && mostrarParadas==true && !mostrarCompañerosCercanos && <DireccionesSegunUbicacion emailState={emailState} tokenState={tokenState} idRuta={idRutaAMostrar}></DireccionesSegunUbicacion>}
+            {secionIniciada==true && idRutaAMostrar>0 && mostrarUsuarios==true && tipoDeUsuario=='Pasajero' && <UsuariosTransportistas emailState={emailState} tokenState={tokenState} tipoDeUsuario={tipoDeUsuario} idRuta={idRutaAMostrar} idUsuarioIniciado={idUsuarioIniciado}
+                        verTransportistasPorLaDerecha={verTransportistasPorLaDerecha} verTransportistasPorLaIzquierda={verTransportistasPorLaIzquierda} modoOscuro={modoOscuro}></UsuariosTransportistas>}
             
-            {secionIniciada==true && idRutaAMostrar>0 &&
+            {secionIniciada==true && tipoDeUsuario=='Transportista' && idRutaAMostrar>0 && mostrarUsuarios==true && !mostrarCompañerosCercanos && <UsuariosTransportistasConTiempo setTiempoPromedio={setTiempoPromedio} setTiempoParaUsaurioTransportistaLogueado={setTiempoParaUsaurioTransportistaLogueado} modoSimplificado={false}
+                            emailState={emailState} tokenState={tokenState} tipoDeUsuario={tipoDeUsuario} idRuta={idRutaAMostrar} idUsuarioIniciado={idUsuarioIniciado}
+                        verTransportistasPorLaDerecha={verTransportistasPorLaDerecha} verTransportistasPorLaIzquierda={verTransportistasPorLaIzquierda} modoOscuro={modoOscuro}></UsuariosTransportistasConTiempo>}
+                        
+            {mostrarCompañerosCercanos && secionIniciada==true && tipoDeUsuario=='Transportista' && <UsuariosTransportistasConTiempo setTiempoPromedio={setTiempoPromedio} setTiempoParaUsaurioTransportistaLogueado={setTiempoParaUsaurioTransportistaLogueado} modoSimplificado={true}
+                            emailState={emailState} tokenState={tokenState} tipoDeUsuario={tipoDeUsuario} idRuta={idRutaAMostrar} idUsuarioIniciado={idUsuarioIniciado}
+                        verTransportistasPorLaDerecha={verTransportistasPorLaDerecha} verTransportistasPorLaIzquierda={verTransportistasPorLaIzquierda} modoOscuro={modoOscuro}></UsuariosTransportistasConTiempo>}
+                        
+            {secionIniciada==true && mostrarCompañerosCercanos && tipoDeUsuario=='Transportista' &&
+                <LineaDeUnaRuta emailState={emailState} tokenState={tokenState} setCargando={setCargando} setMostrarSniperCargando={setMostrarSniperCargando} idRuta={Math.ceil(idUsuarioIniciado/33.0)} ></LineaDeUnaRuta>
+            }
+            {secionIniciada==true && idRutaAMostrar>0 && !mostrarCompañerosCercanos &&
                 <LineaDeUnaRuta emailState={emailState} tokenState={tokenState} setCargando={setCargando} setMostrarSniperCargando={setMostrarSniperCargando} idRuta={idRutaAMostrar} ></LineaDeUnaRuta>
             }
 
-            {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=="Transportista" && verCompetencia==true && <CompetenciaTransportistas emailState={emailState} tokenState={tokenState} 
+            {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=="Transportista" && verCompetencia==true && <CompetenciaTransportistas modoOscuro={modoOscuro} emailState={emailState} tokenState={tokenState} 
             tipoDeUsuario={tipoDeUsuario} idUsuarioIniciado={idUsuarioIniciado} rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}></CompetenciaTransportistas>}
-            {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=='Pasajero' && userLocation.latitude!=0 && verRutasCercanas==true &&  <RutasCercaDelPasajero emailState={emailState} tokenState={tokenState} userLocation ={userLocation}
+
+            {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=='Pasajero' && userLocation.latitude!=0 && verRutasCercanas==true &&  <RutasCercaDelPasajero modoOscuro={modoOscuro} emailState={emailState} tokenState={tokenState} userLocation ={userLocation}
             rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}></RutasCercaDelPasajero>}
 
             {verParadasCercanas[0].observar==true &&
@@ -1506,7 +1573,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     longitudeDelta:0.05}}
                     icon={require("../assets/parada-de-autobusIzquierda.png")}></Marker>
             }
-            {(verParadasCercanas[0].direccion=='I' || verParadasCercanas[0].direccion=='D') && <Polyline coordinates={[{latitude:verParadasCercanas[0].latitude,longitude:verParadasCercanas[0].longitude},
+            {(verParadasCercanas[0].direccion=='I' || verParadasCercanas[0].direccion=='D') && <Polyline strokeColor={(!modoOscuro)?"black":"#c3c3c3"} coordinates={[{latitude:verParadasCercanas[0].latitude,longitude:verParadasCercanas[0].longitude},
                     {latitude:coordenadasOrigenSecundario.latitude,longitude:coordenadasOrigenSecundario.longitude}]}></Polyline>}
 
             {secionIniciada==true && verParadasCercanas[0].observar==true && verParadasCercanas.map((item, i)=>{
@@ -1536,12 +1603,13 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     </View>
                 )
             })}  
-            {secionIniciada==true && idUsuarioIniciado>0 && permitirEnviarUbicacion==true && tipoDeUsuario=="Transportista" && <UsuarioTransportistaLogueado emailState={emailState} tokenState={tokenState} activarPrecision={activarPrecision} direccionesPorUsuario={direccionesPorUsuario}
-            setDireccionPorUsuario={setDireccionPorUsuario} idUsuarioIniciado={idUsuarioIniciado} userLocation={userLocation}></UsuarioTransportistaLogueado>}
-            {verParadasCercanas[0].observar==true 
+            {secionIniciada==true && idUsuarioIniciado>0 && permitirEnviarUbicacion==true && tipoDeUsuario=="Transportista" && <UsuarioTransportistaLogueado tiempoPromedio={tiempoPromedio} mostrarCompañerosCercanos={mostrarCompañerosCercanos} tiempoParaUsaurioTransportistaLogueado={tiempoParaUsaurioTransportistaLogueado} modoOscuro={modoOscuro} emailState={emailState} tokenState={tokenState} activarPrecision={activarPrecision} direccionesPorUsuario={direccionesPorUsuario}
+            setDireccionPorUsuario={setDireccionPorUsuario} idUsuarioIniciado={idUsuarioIniciado} userLocation={userLocation} idRutaAMostrar={idRutaAMostrar}></UsuarioTransportistaLogueado>}
+            {verParadasCercanas[0].observar==true && verParadasCercanas[0].id_Parada>0
                 && (tipoDeUsuario=='Transportista' || (tipoDeUsuario=='Pasajero' && 
-                (tipoDeSubscripcion=='A' ||tipoDeSubscripcion=='S'))) && <UsuarioCercanoAUnaParada idRuta={verParadasCercanas[0].id_Ruta} emailState={emailState} tokenState={tokenState} idParada={verParadasCercanas[0].id_Parada}
+                (tipoDeSubscripcion=='A' ||tipoDeSubscripcion=='S'))) && <UsuarioCercanoAUnaParada modoOscuro={modoOscuro} idRuta={verParadasCercanas[0].id_Ruta} emailState={emailState} tokenState={tokenState} idParada={verParadasCercanas[0].id_Parada}
                     tipoDeUsuario={tipoDeUsuario} idUsuarioIniciado={idUsuarioIniciado}></UsuarioCercanoAUnaParada>}
+            {iniciarRecorridoDeLaTrayectoria && <SeguimientoAlTrayecto datosDeLosUsuarios={datosDeLosUsuarios} modoOscuro={modoOscuro}emailState={emailState}tokenState={tokenState}></SeguimientoAlTrayecto>}
             
         </MapView>}         
     </View>

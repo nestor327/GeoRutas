@@ -6,21 +6,20 @@ import getAllRutas from '../data/rutasManagua.js'
 
 const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRutasTrayecto,obtenerRutas
     ,setVerTrayectoria,setVerRutasCercanas,identificadorKey,refCambiarLupa
-    ,setVerCompetencia,setOcultarTrayecto,setCargando,setFechaDeClicCambio})=>{
+    ,setVerCompetencia,setOcultarTrayecto,setCargando,setFechaDeClicCambio,setMostrarCompañerosCercanos})=>{
 
     let cantidadDeTrayectos =[0];
     let datosDeLasRutas=[];
     let todasLasRutas=getAllRutas();
 
-    
-    if(rutasEnElMapa==undefined || rutasTrayectoria==undefined || rutasTrayectoria.length==0){        
+    if(rutasEnElMapa==undefined){
         return(
             <View style={{marginTop:'150%'}}>
                 <ActivityIndicator size="large" color="#0000ff" />
             </View>
         )
     }
-
+    
     for(let i=0;i<rutasEnElMapa.length;i++){
         if(cantidadDeTrayectos[cantidadDeTrayectos.length-1]<rutasEnElMapa[i].id_Idetificador){
             cantidadDeTrayectos.push(rutasEnElMapa[i].id_Idetificador);
@@ -62,7 +61,7 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
     }
 //-86.304667,12.15155,171,199,18 
 
-    if(cantidadDeTrayectos==null || cantidadDeTrayectos==undefined || cantidadDeTrayectos.length<=1){
+    if(cantidadDeTrayectos==null || cantidadDeTrayectos==undefined || cantidadDeTrayectos.length<=0){
         return(
             <View style={{marginTop:'150%'}}>
                 <ActivityIndicator size="large" color="#0000ff" />
@@ -102,6 +101,7 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
                                     setCargando(false);
                                     let fecha= new Date();
                                     setFechaDeClicCambio(fecha.getTime());
+                                    setMostrarCompañerosCercanos(false);
                                 }
                                 }>
                                     <Animated.View style={visualizarRutas==(i+1) && {opacity:fadeAnim.current, backgroundColor:'#1e81ce', padding:5, borderRadius:10}}

@@ -52,7 +52,7 @@
         //console.log("Se esta cargando la linea de la ruta");            
     }
 
-    if(isLoading==false){
+    if(isLoading==false && !error){
 
         
         let coordenadas=[]
