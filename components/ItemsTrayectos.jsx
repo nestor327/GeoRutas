@@ -9,7 +9,7 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
                         ,visualizarRutas,verRutasTrayecto,obtenerRutas,setVerTrayectoria,setVerRutasCercanas, setVerCompetencia,setOcultarTrayecto
                         ,identificadorKey, refCambiarLupa, setCargando,ocultarTercerMenu,menTres,emailState, tokenState, latitude, longitude
                         ,setVerParadasCercanas,setMostrarMenusBuenEstado,setmenUno,setmenDos,setmenTres,setmenCinco,setmenCuatro
-                        ,setMostrarBarraSecundariaDeUbicacion,menCinco,
+                        ,setMostrarBarraSecundariaDeUbicacion,menCinco,modoOscuro,setMostrarCompañerosCercanos
                         })=>{
 
         const [fechaDeClicCambio, setFechaDeClicCambio]=useState(1);
@@ -21,12 +21,18 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
 
         useEffect(()=>{
             if(fechaDeClicSalida>fechaDeClicCambio){
+
+                let colorRes='#102769';
+                if(modoOscuro){
+                    colorRes='#151553';
+                }
+
                 if (menUno[0].display == 'flex' ) {
-                    setmenUno([{display:'none',color:'#102769'}]);
+                    setmenUno([{display:'none',color:colorRes}]);
                 } else if(menDos[0].display == 'flex'){
-                    setmenDos([{display:'none',color:'#102769'}]);
+                    setmenDos([{display:'none',color:colorRes}]);
                 }else if(menTres[0].display == 'flex'){
-                    setmenTres([{display:'none',color:'#102769'}]);
+                    setmenTres([{display:'none',color:colorRes}]);
                 }
                 setmenCuatro([{ display: 'flex',color:'#101043' }]);
                 // setMostrarBarraSecundariaDeUbicacion(false);
@@ -46,7 +52,7 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
                 <View style={[menDos, { left:(height<width)?width*0.2+(width*0.2-height*0.2)/2:width*0.2, 
                 width: (height>width)?width*0.2:height*0.2,zIndex:1000,  position: 'absolute', 
                 top:(height>width)?height-width*0.8:height*0.6-height*0.2-StatusBar.currentHeight*0.8, 
-                backgroundColor: '#102769',height:(height>width)?width*0.6:height*0.4 }]}
+                backgroundColor: '#102769',height:(height>width)?width*0.6:height*0.4 },modoOscuro && {backgroundColor:'#151553'}]}
                 >
                 <ScrollView
                 >
@@ -60,6 +66,7 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
                                 // let fecha=new Date();
                                 // setFechaDeClicCambio(fecha);
                                 //setTipoDeClic(2);
+                                setMostrarCompañerosCercanos(false);
                             }}                            
                             >
                             { i>=0 && <RutasBarItem color={item.color} numeroDeRuta={item.nombre}
@@ -73,14 +80,14 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
 
             {ocultarMenu==true && <View style={[menUno, {left:(height<width)?(width*0.2-height*0.2)/2:0, 
             width: (height>width)?width*0.2:height*0.2, height:(height>width)?width*0.6:height*0.4, position: 'absolute', 
-            top:(height>width)?height-width*0.8:height*0.6-height*0.2-StatusBar.currentHeight*0.8, backgroundColor: '#102769' }]}>
+            top:(height>width)?height-width*0.8:height*0.6-height*0.2-StatusBar.currentHeight*0.8, backgroundColor: '#102769'},modoOscuro && {backgroundColor:'#151553'}]}>
                   <ScrollView>
                       
                       <IntercambiosRutas setFechaDeClicCambio={setFechaDeClicCambio} rutasEnElMapa={data} rutasTrayectoria={rutasTrayectoria} visualizarRutas={visualizarRutas} 
                       verRutasTrayecto={verRutasTrayecto} obtenerRutas={obtenerRutas}
                       setVerTrayectoria={setVerTrayectoria}
                       setVerRutasCercanas={setVerRutasCercanas} setVerCompetencia={setVerCompetencia} setOcultarTrayecto={setOcultarTrayecto}
-                      identificadorKey={identificadorKey} refCambiarLupa={refCambiarLupa} setCargando={setCargando}
+                      identificadorKey={identificadorKey} refCambiarLupa={refCambiarLupa} setCargando={setCargando} setMostrarCompañerosCercanos={setMostrarCompañerosCercanos}
                       ></IntercambiosRutas>
 
                   </ScrollView>
@@ -89,11 +96,11 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
             {ocultarTercerMenu==true && <View style={[menTres, { left:(height<width)?3*width*0.2+(width*0.2-height*0.2)/2:3*width*0.2, 
             width: (height>width)?width*0.2:height*0.2, 
             height: (height>width)?width*0.6:height*0.4, position: 'absolute', 
-            top:(height>width)?height-width*0.8:height*0.6-height*0.2-StatusBar.currentHeight*0.8, backgroundColor: '#102769' }]}>
+            top:(height>width)?height-width*0.8:height*0.6-height*0.2-StatusBar.currentHeight*0.8, backgroundColor: '#102769'},modoOscuro && {backgroundColor:'#151553'}]}>
                 <ScrollView>
                 {
                     <ParadasCercaDelOrigen setFechaDeClicCambio={setFechaDeClicCambio} emailState={emailState} tokenState={tokenState} lalitude={latitude} longitude={longitude} 
-                    setVerParadasCercanas={setVerParadasCercanas}></ParadasCercaDelOrigen>
+                    setVerParadasCercanas={setVerParadasCercanas} setMostrarCompañerosCercanos={setMostrarCompañerosCercanos}></ParadasCercaDelOrigen>
                 }
                 </ScrollView>
             </View>}

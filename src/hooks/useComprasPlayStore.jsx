@@ -3,7 +3,8 @@ import * as IAP from 'react-native-iap';
 import {useEffect} from 'react';
 
 
-const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,setMostrarAlerte,setTiempoDesdeLaUltimaSuscripcion,setMostrarInformacion,datosDelUsuarioSinSuscripcion,secionIniciada)=>{
+const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,setMostrarAlerte,setTiempoDesdeLaUltimaSuscripcion
+                ,setMostrarInformacion,datosDelUsuarioSinSuscripcion,secionIniciada,verificarCualEsElUsuarioDeLaCompra,usuarioRegistrado)=>{
 
     const items=Platform.select({
         ios:[],
@@ -19,52 +20,54 @@ const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,set
     const [purchaseTxt, setPurchaseTxt]=useState("");
     const [idFacturaOApellidos, setIdFacturaOApellidos]=useState("GPA.4394-0891-5913-27372");
     useEffect(()=>{
-
-        try{            
-            IAP.initConnection().catch(()=>{
-                console.log("Ocurrio un error");
-            }).then((res)=>{
-                console.log("Los datos de la tienda son: ");
-                console.log(res);
-                IAP.getSubscriptions({skus:items}).catch(()=>{
-                    console.log("Ocurrio un error obteniendo los productos");
-                }).then(res=>{
-                    console.log("LAS SUSCRIPCIONES FUERON: ");
+        if(emailState!=undefined && emailState!=null && emailState.length>8){
+            try{            
+                IAP.initConnection().catch(()=>{
+                    console.log("Ocurrio un error");
+                }).then((res)=>{
+                    console.log("Los datos de la tienda son: ");
                     console.log(res);
-                    setProductos(res);
+                    IAP.getSubscriptions({skus:items}).catch(()=>{
+                        console.log("Ocurrio un error obteniendo los productos");
+                    }).then(res=>{
+                        console.log("LAS SUSCRIPCIONES FUERON: ");
+                        console.log(res);
+                        setProductos(res);
+                    });
                 });
-            });
-        
-            purchaseErrorSuscription=IAP.purchaseErrorListener((error)=>{
-                if(!(error.responseCode=="1" || error.responseCode=="7" || error.responseCode=="2")){
-                    setMensajeAlerta("Ocurrió un error con la transacción");
-                    setMostrarAlerte(true);
-                }
-            });
-    
-            purchaseUpdateSuscription=IAP.purchaseUpdatedListener((purchaseEvent)=>{
-                const reciep=purchaseEvent.transactionReceipt;
-                if(reciep){
-                    IAP.finishTransaction({purchase:purchaseEvent, isConsumable: false, developerPayloadAndroid: emailState});
-                    console.log("EL SUPUESTO PURCHASE DE LA VENTA ES: ");
-                    console.log(purchaseEvent);
-                    setIdFacturaOApellidos("GPA.3394-0891-5913-27372");
-                    setPurchaseTxt(JSON.stringify(purchaseEvent));
-                    setMostrarInformacion(true);
-
-                    let month=(new Date()).getMonth();
-                    let fechaHoy=new Date();
-                    fechaHoy.setMonth(month+1);
-                    let tiempo=(Date.parse(fechaHoy)+(1000*60*60*24)).toString();
-                    setTiempoDesdeLaUltimaSuscripcion(tiempo);
-                    setPurchase(true);                    
-                }
-            });
             
-        }catch{
-
+                purchaseErrorSuscription=IAP.purchaseErrorListener((error)=>{
+                    if(!(error.responseCode=="1" || error.responseCode=="7" || error.responseCode=="2")){
+                        setMensajeAlerta("Ocurrió un error con la transacción");
+                        setMostrarAlerte(true);
+                    }
+                });
+        
+                purchaseUpdateSuscription=IAP.purchaseUpdatedListener((purchaseEvent)=>{
+                    const reciep=purchaseEvent.transactionReceipt;
+                    if(reciep){
+                        IAP.finishTransaction({purchase:purchaseEvent, isConsumable: false, developerPayloadAndroid: ""});
+                        console.log("EL SUPUESTO PURCHASE DE LA VENTA ES: ");
+                        console.log(purchaseEvent);
+                        verificarCualEsElUsuarioDeLaCompra(2,emailState);
+                        setIdFacturaOApellidos("GPA.3394-0891-5913-27372");
+                        setPurchaseTxt(JSON.stringify(purchaseEvent));
+                        setMostrarInformacion(true);
+    
+                        let month=(new Date()).getMonth();
+                        let fechaHoy=new Date();
+                        fechaHoy.setMonth(month+1);
+                        let tiempo=(Date.parse(fechaHoy)+(1000*60*60*24)).toString();
+                        setTiempoDesdeLaUltimaSuscripcion(tiempo);
+                        setPurchase(true);                    
+                    }
+                });
+                
+            }catch{
+    
+            }
         }
-
+        
         return ()=>{
             try{
                 purchaseErrorSuscription.remove();
@@ -84,7 +87,7 @@ const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,set
 
             }
         }
-    },[]);
+    },[emailState]);
 
     const refrescarHistorial=async()=>{
         try{
@@ -98,8 +101,8 @@ const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,set
 
     const comprarProducto=async(producto)=>{
         try{            
-            //IAP.requestSubscription({sku:producto});
-            console.log("lA MIERDA ES: ");
+            //IAP.requestSubscription({sku:producto});            
+            console.log("lA MIERDA ES: ");            
             //console.log(productos);
             let subscriptionOffers = [];
             if(producto==productos[0].productId){
@@ -123,7 +126,8 @@ const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,set
                 const info=await IAP.getPurchaseHistory().then((res)=>{
                     console.log(res);                
                     
-                    
+                    verificarCualEsElUsuarioDeLaCompra(1,emailState);
+
                     for(let y=0;y<JSON.parse(JSON.stringify(res)).length;y++){
                         // console.log(JSON.parse(JSON.parse(JSON.stringify(res))[y].dataAndroid).productId);
                         // console.log("la comparacion es: ");
@@ -152,29 +156,41 @@ const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,set
 
                         let tiempoDos=(fecha.getTime()+1000*3600*24);
 
+                        if(((fecha>fechaActual && parseInt(cantidadComprada)>=1 && posicion>=0 && datosDelUsuarioSinSuscripcion.apellidos.includes('GPA') 
+                                    && datosDelUsuarioSinSuscripcion.apellidos.length>21 && secionIniciada==false) 
+                                    || secionIniciada==true)
+                                    && usuarioRegistrado.name==emailState && usuarioRegistrado.name.length>8
+                                    ){
+                                        console.log("Los datos del usuario registrado son: ");
+                                        console.log(usuarioRegistrado);
 
-                        if((fecha>fechaActual && parseInt(cantidadComprada)>=1 && posicion>=0 && datosDelUsuarioSinSuscripcion.apellidos.includes('GPA') && datosDelUsuarioSinSuscripcion.apellidos.length>21 && secionIniciada==false) || secionIniciada==true){
-                            
-                            console.log("Los datos del usuario son: ");
-
-                            let tiempoDesdeLaVenta=tiempo;
-                            let tiempoDeLaVentaActual=(new Date).getTime();
-                            
-                            console.log("Los tiempos son: ");
-                            console.log(tiempoDesdeLaVenta);
-                            console.log(tiempoDeLaVentaActual);
-                            console.log((tiempoDesdeLaVenta-tiempoDeLaVentaActual));
-
-                            if(fecha>fechaActual && parseInt(cantidadComprada)>=1 && Math.abs((tiempoDesdeLaVenta-tiempoDeLaVentaActual))>=345600000){
+                                        let tiempoDesdeLaVenta=tiempo;
+                                        let tiempoDeLaVentaActual=(new Date).getTime();
+                                        
+                                        console.log("Los tiempos son: ");
+                                        console.log(tiempoDesdeLaVenta);
+                                        console.log(tiempoDeLaVentaActual);
+                                        console.log((tiempoDesdeLaVenta-tiempoDeLaVentaActual));
+                            if(fecha>fechaActual && parseInt(cantidadComprada)>=1 
+                            //&& Math.abs((tiempoDesdeLaVenta-tiempoDeLaVentaActual))>=345600000
+                            ){
                                 console.log("LA SUSCRIPCION YA ESTA COMPRADA");
                                 setTiempoDesdeLaUltimaSuscripcion((tiempoDos).toString());
                                 setPurchase(true);    
                                 return;                        
                             }
-                        }else if(posicion>=0 && secionIniciada==false && fecha>fechaActual && parseInt(cantidadComprada)>=1){
-                            setMensajeAlerta("Otro usuario compró esta suscripción, acceda desde otro dispositivo y compre una");
-                            setMostrarAlerte(true);
                         }
+                        // else if(posicion>=0 && secionIniciada==false && fecha>fechaActual && parseInt(cantidadComprada)>=1){
+                        //     setMensajeAlerta("Otro usuario compró esta suscripción, acceda desde otro dispositivo y compre una");
+                        //     setMostrarAlerte(true);
+                        // }else if(posicion>=0 && secionIniciada==true && fecha>fechaActual && parseInt(cantidadComprada)>=1 && usuarioRegistrado.name!=emailState && usuarioRegistrado.name.length>8){
+                        //     setMensajeAlerta("Otro usuario compró esta suscripción, acceda desde otro dispositivo y compre una");                            
+                        //     setMostrarAlerte(true);
+                        // }
+                        // console.log(posicion>=0 && secionIniciada==false && fecha>fechaActual && parseInt(cantidadComprada)>=1);
+                        // console.log(fecha>fechaActual );
+                        // console.log(posicion>=0);
+                        // console.log(parseInt(cantidadComprada)>=1);
                     }
 
                 });

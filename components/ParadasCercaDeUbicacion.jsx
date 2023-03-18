@@ -7,7 +7,7 @@
     import RutasBarItem from '../components/RutasBarItem.jsx';
     import getAllRutas from "../data/rutasManagua.js";
 
-    const ParadasCercaDelOrigen=({lalitude,longitude,setVerParadasCercanas,emailState, tokenState,setFechaDeClicCambio})=>{
+    const ParadasCercaDelOrigen=({lalitude,longitude,setVerParadasCercanas,emailState, tokenState,setFechaDeClicCambio,setMostrarCompañerosCercanos})=>{
         try{
             const {data,error,isLoading}=useQuery(['obtenerParadasEnElOrigen',lalitude,longitude],async({queryKey})=>{                
                 return await fetch('https://www.georutas.lat/api/SP_PCalcularRutasQuePasanCercaDeUnPunto/'+queryKey[1]+','+queryKey[2]+'?Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());
@@ -38,6 +38,7 @@
                                 setVerParadasCercanas([{observar:true,latitude:item.longitude,longitude:item.latitude,direccion:item.direccion,id_Ruta:item.id_Ruta,id_Parada:item.id_Parada}]);
                                 let fecha= new Date();
                                 setFechaDeClicCambio(fecha.getTime());
+                                setMostrarCompañerosCercanos(false);
                             }}>
                                 <RutasBarItem color={coloresRuta[i]} numeroDeRuta={nombresEnElArregloFinal[i]}
                                 tiempoDeLlegada={item.tiempoDeLlegada} mostrarTiempo={true}>

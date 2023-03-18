@@ -13,7 +13,7 @@ let purchaseErrorSuscription=null;
 const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarComprasPasajeros,setMostrarAlerte, setMensajeAlerta, width, height
                 ,setTipoDeSubscripcion,setLoguearse,setSecionIniciada,setTipoDeUsuario,setMostrarAnuncioRewarded,setmenDos,setMostrarItemMenuUno
                 ,setIdRutaAMostrar,setOcultarTrayecto,setVerRutasCercanas,eliminarAnuncios,setEliminarAnuncios,purchase,setPurchase,comprarProducto
-                ,idFacturaOApellidos,tiempoDesdeLaUltimaSuscripcion})=>{
+                ,idFacturaOApellidos,tiempoDesdeLaUltimaSuscripcion,modoOscuro})=>{
 
     const actualizarUsuarioBD=async(emails,emailState,tokenState,tiempo,apellidos)=>{
         try{
@@ -78,7 +78,7 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
         if(purchase==true && tiempoDesdeLaUltimaSuscripcion!='0'){
             // console.log("LA INFORMACION DEL USUARIO ES: ");
             // console.log(datosDelUsuarioSinSuscripcion);
-            actualizarUsuarioBD([datosDelUsuarioSinSuscripcion.email],datosDelUsuarioSinSuscripcion.email,datosDelUsuarioSinSuscripcion.token,tiempoDesdeLaUltimaSuscripcion,idFacturaOApellidos);
+            actualizarUsuarioBD([datosDelUsuarioSinSuscripcion.email],datosDelUsuarioSinSuscripcion.email,datosDelUsuarioSinSuscripcion.token,tiempoDesdeLaUltimaSuscripcion,idFacturaOApellidos);            
             setPurchase(false);
         }
     },[purchase,datosDelUsuarioSinSuscripcion,idFacturaOApellidos,tiempoDesdeLaUltimaSuscripcion])
@@ -90,7 +90,12 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                             left:(height>width)?'5%':'25%',zIndex:190}}>
                     
                 <TouchableOpacity style={{position:'absolute',top:14,left:'88%'}} onPressOut={()=>{
-                    setmenDos([{display:'none',color:'#102769'}]);
+                    let colorRes='#102769';
+                    if(modoOscuro){
+                        colorRes='#151553';
+                    }
+
+                    setmenDos([{display:'none',color:colorRes}]);
                     setMostrarItemMenuUno(false);    
                     setIdRutaAMostrar(-1);           
                     setOcultarTrayecto(false);
@@ -145,7 +150,12 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                         <TouchableOpacity style={{marginTop:(eliminarAnuncios==false)?'7%':'3%',backgroundColor:'#2956b2'
                                                     ,width:'40%',height:37,borderRadius:10}}
                                 onPressOut={()=>{
-                                    setmenDos([{display:'none',color:'#102769'}]);
+                                    let colorRes='#102769';
+                                    if(modoOscuro){
+                                        colorRes='#151553';
+                                    }
+
+                                    setmenDos([{display:'none',color:colorRes}]);
                                     setMostrarItemMenuUno(false);    
                                     setIdRutaAMostrar(-1);           
                                     setOcultarTrayecto(false);

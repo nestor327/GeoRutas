@@ -13,7 +13,7 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
     
 
 
-const CompetenciaTransportistas=({tipoDeUsuario,idUsuarioIniciado,setCargando,rutasSeleccionadasCompetencia,emailState, tokenState})=>{
+const CompetenciaTransportistas=({tipoDeUsuario,idUsuarioIniciado,setCargando,rutasSeleccionadasCompetencia,emailState, tokenState, modoOscuro})=>{
 
 try{        
     const {data,error,isLoading,isSuccess}=useQuery(['obtenerUsuariosCompetencia',emailState,tokenState],async({queryKey})=>{
@@ -86,8 +86,10 @@ try{
                 if(((item.id_UsuarioTransporte)!=idUsuarioIniciado) && item.estado=='A' && arregloFinal[posicionUsuario].direccion==item.direccion){
                     return(
                         <Marker key={i} coordinate={{latitude:item.longitude,
-                            longitude:item.latitude}}>                                
-                                <Text style={{color:'black'}}>{(item.direccion=='D')?"⇛"+rutasDeManagua[item.id_Ruta-1].nombre:"⇚"+rutasDeManagua[item.id_Ruta-1].nombre}</Text>                                
+                            longitude:item.latitude}}
+                            style={{alignItems:'center'}}
+                            >                                
+                                <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{(item.direccion=='D')?"⇛"+rutasDeManagua[item.id_Ruta-1].nombre:"⇚"+rutasDeManagua[item.id_Ruta-1].nombre}</Text>                                
                                 <Image source={urlDeLasImagenes[item.id_Ruta-1]} style={{width:25,height:25}}/>            
                         </Marker>
                     ) 

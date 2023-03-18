@@ -15,7 +15,9 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
     tipoDeUsuario,mostrarParadas,mostrarItemMenuUno,verTrayectoria,verCompetencia,verRutasCercanas,centrePosition,siguiendoAlUsuario,
     askLocationPermission,followUseLocation, stopFollowUserLocation,permitirSeguirPasajero, setPermitirSeguirPasajero,setVerTrayectoria,
     ocultarTrayecto,permisos,askLocationPermissionSetting, setUsuarioTransportista,setCargando,emailState, tokenState,setMostrarAlerte, 
-    setMensajeAlerta,setMostrarComprasPasajeros,tipoDeSubscripcion
+    setMensajeAlerta,setMostrarComprasPasajeros,tipoDeSubscripcion,mostrarCompañerosCercanos, setMostrarCompañerosCercanos,menCuatro,verParadasCercanas,
+    setIdRutaAMostrar,setMostrarMenusBuenEstado,setMostrarItemMenuUno,setVerParadasCercanas,setMostrarBarraSecundariaDeUbicacion,coordenadasOrigenSecundario,
+    iniciarRecorridoDeLaTrayectoria, setIniciarRecorridoDeLaTrayectoria
     })=>{
 
         // useEffect(()=>{
@@ -355,25 +357,38 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                     imagen={require('../assets/verUsuarios.png')}
                 />}
 
-                {ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && tipoDeUsuario=="Transportista" && <Fab
+                {iniciarRecorridoDeLaTrayectoria && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && tipoDeUsuario=="Transportista" && <Fab
                     onPres={()=>{                
                         setCargando(true);
-                        obtenerRutas(identificadorKey.current);   
-
+                        //obtenerRutas(identificadorKey.current);   
+                        setIniciarRecorridoDeLaTrayectoria(false);
                         setVerTrayectoria(true);
                         setVerRutasCercanas(false);  
                         setVerCompetencia(false);    
                         setOcultarTrayecto(true);   
                         setCargando(false);
                     }}
-                        imagen={require('../assets/cambioDetrayectoriaCero.jpg')}
+                    imagen={require('../assets/cambioDetrayectoriaTres.jpg')}
                 />}
-
-                {ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && tipoDeUsuario=="Pasajero" && <Fab
+                {!iniciarRecorridoDeLaTrayectoria && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && tipoDeUsuario=="Transportista" && <Fab
                     onPres={()=>{                
                         setCargando(true);
-                        obtenerRutas(identificadorKey.current);   
-                        
+                        //obtenerRutas(identificadorKey.current);   
+                        setIniciarRecorridoDeLaTrayectoria(true);
+                        setVerTrayectoria(true);
+                        setVerRutasCercanas(false);  
+                        setVerCompetencia(false);    
+                        setOcultarTrayecto(true);   
+                        setCargando(false);
+                    }}
+                        imagen={require('../assets/cambioDetrayectoriaCuatro.jpg')}
+                />}
+
+                {iniciarRecorridoDeLaTrayectoria && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && tipoDeUsuario=="Pasajero" && <Fab
+                    onPres={()=>{                
+                        setCargando(true);
+                        //obtenerRutas(identificadorKey.current);   
+                        setIniciarRecorridoDeLaTrayectoria(false);
                         setVerTrayectoria(true);                           
                         setVerRutasCercanas(false);  
                         setVerCompetencia(false);    
@@ -381,7 +396,22 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         setCargando(false);
                     }}
 
-                        imagen={require('../assets/cambioDetrayectoriaCero.jpg')}
+                    imagen={require('../assets/cambioDetrayectoriaTres.jpg')}
+                />}
+
+                {!iniciarRecorridoDeLaTrayectoria && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && tipoDeUsuario=="Pasajero" && <Fab
+                    onPres={()=>{                
+                        setCargando(true);
+                        //obtenerRutas(identificadorKey.current);   
+                        setIniciarRecorridoDeLaTrayectoria(true);
+                        setVerTrayectoria(true);                           
+                        setVerRutasCercanas(false);  
+                        setVerCompetencia(false);    
+                        setOcultarTrayecto(true);  
+                        setCargando(false);
+                    }}
+                    imagen={require('../assets/cambioDetrayectoriaCuatro.jpg')}
+                        
                 />}
 
                 
@@ -434,7 +464,6 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                 imagen={require('../assets/DireccionDeTransportistasDerechaNegada.png')}
             />}
 
-            
             {idRutaAMostrar>0 && mostrarUsuarios==true && verTransportistasPorLaDerecha==true && <Fab 
                 onPres={()=>{
                     setCargando(true);
@@ -445,7 +474,31 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                     setCargando(false);
                 }}
                 imagen={require('../assets/DireccionDeTransportistasDerecha.png')}
-            />}
+                />}
+
+                {mostrarCompañerosCercanos && tipoDeUsuario=='Transportista' && <Fab 
+                onPres={()=>{
+                    setMostrarCompañerosCercanos(false);
+                }}
+                imagen={require('../assets/carreteraPositive.png')}
+                />}
+
+                {!mostrarCompañerosCercanos && tipoDeUsuario=='Transportista' && <Fab 
+                onPres={()=>{
+                    setMostrarCompañerosCercanos(true);
+                    setIdRutaAMostrar(-1);
+                    setOcultarTrayecto(false);
+                    setMostrarMenusBuenEstado(false);
+                    setMostrarItemMenuUno(true);
+                    setOcultarTrayecto(false);
+                    setVerParadasCercanas([{observar:false,latitude:coordenadasOrigenSecundario.latitude,longitude:coordenadasOrigenSecundario.longitude,direccion:'K',id_Ruta:1}]);                                
+                    setMostrarBarraSecundariaDeUbicacion(false);
+                    setMostrarMenusBuenEstado(true);           
+                    setVerCompetencia(false);
+                }}
+                imagen={require('../assets/carreteraNegative.png')}
+                />}               
+
         </View>
     </View>
     )

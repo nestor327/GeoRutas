@@ -1,4 +1,5 @@
 import React from "react";
+import {useState} from 'react';
 import getAllRutas from "../../data/rutasManagua";
 import { useQuery,queryKey } from "react-query";
 
@@ -6,7 +7,7 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
     setTiemposRutasTrayectorias,setIconosTransportes,setIdUsuariosDeTrayectoria,verRutasTrayecto,key,emailState,tokenState)=>{
 
 
-    try{
+    // try{
             //Ojo si quieres respuestas diferentes, envia parametros diferentes OJOOOO
 
     let url='https://www.georutas.lat/api/CalculoDeMenorRuta/'+coordenadasOrigen.longitude+','+coordenadasOrigen.latitude+','+coordenadasDestino.longitude+','+coordenadasDestino.latitude+'?Email='+emailState+'&Token='+tokenState;
@@ -23,14 +24,18 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
         refetchInterval:Infinity,
         cacheTime:20000
     });
+
+    const [datosDeLosUsuarios,setDatosDeLosUsuarios]=useState([]);
     //let data=
     //let isLoading=false;
 
     const todasLasRutas=getAllRutas();
     
     if(!isLoading){
-        // console.log(coordenadasOrigen);
-        // console.log(coordenadasDestino);
+//         console.log(coordenadasOrigen);
+//         console.log(coordenadasDestino);
+//         {"latitude": 12.13461313426314, "longitude": -86.243103928864}
+//  LOG  {"latitude": 12.07068808917854, "longitude": -86.14017382264137}
         // console.log(data);
         // console.log((Math.floor((coordenadasOrigen.latitude)*10)-1200)%45);        
         // console.log("Mierda");        
@@ -54,9 +59,10 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
             const tiempos=[];
             const transportes=[];
             const idUsuarios=[];
-                
+            const arregloDatosDeLosUsuarios=[];
         
             //console.log(data);
+            let posicionesDeLosArreglos=1;
             for(let k=0;k<data.length;k++){
                 //let tiempoAcumulado=0;
                 if(data[k].id_Idetificador==(keyy)){
@@ -72,9 +78,18 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
                                      longitudUsuarioComun:data[k].longitudUsuarioComun,latitudUsuarioComun:data[k].latitudUsuarioComun});
                     
                     idUsuarios.push({id_Usuario:data[k].id_Usuario,id_Ruta:data[k].id_Ruta});
+                    arregloDatosDeLosUsuarios.push({
+                        posicionTrayecto: posicionesDeLosArreglos,
+                        id_UsuarioTransporte: data[k].id_Usuario,
+                        idParadaInicial: data[k].id_ParadaUsuarioComun,
+                        idParadaFinal: data[k].id_ParadaFinal,
+                        idRuta: data[k].id_Ruta
+                      })
+                      posicionesDeLosArreglos++;
                 }
             }
         
+            setDatosDeLosUsuarios(arregloDatosDeLosUsuarios);
             setRutasTrayectoria(resultados);
             setVisualizarRutas(keyy);        
             //verRutasTrayecto.current=!verRutasTrayecto.current;
@@ -93,18 +108,21 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
 
         return{
             data,
-            obtenerRutas
+            obtenerRutas,
+            datosDeLosUsuarios
         }   
-    }catch{
-        let data=[];
-        const obtenerRutas=()=>{
-            console.log("Ocurrio un error, al obtener los datos");
-        }
-        return{
-            data,
-            obtenerRutas
-        }   
-    }
+    // }catch{
+    //     let data=[];
+    //     const obtenerRutas=()=>{
+    //         console.log("Ocurrio un error, al obtener los datos");
+    //     }
+    //     let datosDeLosUsuarios=[];
+    //     return{
+    //         data,
+    //         obtenerRutas,
+    //         datosDeLosUsuarios
+    //     }   
+    // }
 }
 
 export default useTrayectoria
