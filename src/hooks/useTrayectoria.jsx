@@ -32,6 +32,7 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
     const todasLasRutas=getAllRutas();
     
     if(!isLoading){
+        //console.log(data);
 //         console.log(coordenadasOrigen);
 //         console.log(coordenadasDestino);
 //         {"latitude": 12.13461313426314, "longitude": -86.243103928864}
@@ -63,11 +64,14 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
         
             //console.log(data);
             let posicionesDeLosArreglos=1;
+            let posicionUltimoRegistro=0;
             for(let k=0;k<data.length;k++){
                 //let tiempoAcumulado=0;
                 if(data[k].id_Idetificador==(keyy)){
                     resultados.push(data[k]);
                     tiempos.push(Math.abs(data[k].tiempoDeLlegada));
+                    console.log("Los tiempos son: ");
+                    console.log(tiempos);
                     //tiempoAcumulado=tiempoAcumulado+Math.abs(data[k].tiempoDeLlegada);
                     
                     transportes.push({color:data[k].color, direccionParadaInicial:data[k].direccionParadaInicial, 
@@ -83,12 +87,26 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
                         id_UsuarioTransporte: data[k].id_Usuario,
                         idParadaInicial: data[k].id_ParadaUsuarioComun,
                         idParadaFinal: data[k].id_ParadaFinal,
-                        idRuta: data[k].id_Ruta
+                        idRuta: data[k].id_Ruta,
+                        tiempo: Math.abs(data[k].tiempoDeLlegada)
+                        //tiempo: Math.abs((k>0)?(data[k].tiempoDeLlegada-data[k-1].tiempoDeLlegada):data[k].tiempoDeLlegada)
+                        //tiempo: Math.abs((k>0)?(data[k].tiempoDeLlegada-data[k-1].tiempoDeLlegada):data[k].tiempoDeLlegada)
                       })
+                    //   if(k>0){
+                    //     console.log("k>0");                
+                    //     console.log(k);
+                    // }else{
+                    //     console.log("k<0");
+                    //     console.log(k);
+                    // }
                       posicionesDeLosArreglos++;
+                      posicionUltimoRegistro=k;
                 }
             }
         
+            arregloDatosDeLosUsuarios[arregloDatosDeLosUsuarios.length-1].tiempo=Math.abs(arregloDatosDeLosUsuarios[arregloDatosDeLosUsuarios.length-1].tiempo-
+               ((Math.ceil((Math.sqrt(Math.pow((data[posicionUltimoRegistro].longitudParadaFinal-coordenadasDestino.latitude),2)+Math.pow((data[posicionUltimoRegistro].latitudParadaFinal-coordenadasDestino.longitude),2))/0.000009)/1.1))));
+
             setDatosDeLosUsuarios(arregloDatosDeLosUsuarios);
             setRutasTrayectoria(resultados);
             setVisualizarRutas(keyy);        

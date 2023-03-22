@@ -12,7 +12,7 @@ import useTrayectoria from './src/hooks/useTrayectoria.jsx';
 import RutasBarItem from './components/RutasBarItem.jsx';
 import IntercambiosRutas from './components/IntercambiosRutas.jsx';
 import ParadasCercaDelOrigen from './components/ParadasCercaDeUbicacion.jsx';
-import { getNombre, getRutasFavoritas, getTokenGeoRutasCode, getUsuario, setApellidos, setIdUsuarioIniciadoCode, setNombre, setPermitirEnvio, setRutasFavoritas, setTipoDeMenbresiaCode, setTipoDeUsuarioCode, setTokenGeoRutasCode } from './data/asyncStorageData.js';
+import { getApellidos, getNombre, getRutasFavoritas, getTokenGeoRutasCode, getUsuario, setApellidos, setIdUsuarioIniciadoCode, setNombre, setPermitirEnvio, setRutasFavoritas, setTipoDeMenbresiaCode, setTipoDeUsuarioCode, setTokenGeoRutasCode } from './data/asyncStorageData.js';
 import ConfirmarCodigo from './components/ConfirmarCodigo.jsx';
 import CambiarPassword from './components/CambiarPassword.jsx';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -202,7 +202,7 @@ const App=()=>{
       const [tipoDeSubscripcion,setTipoDeSubscripcion]=useState('C');
       const [verAdministrarUsuarios, setVerAdministrarUsuarios]=useState(false);
 
-      const [nombreAdmin,setNombreAdmin]=useState();//Esto es practicamente forzado
+      const [nombreAdmin,setNombreAdmin]=useState("");//Esto es practicamente forzado
 
       const [editarPerfil,setEditarPerfil]=useState(false);
       const [emailDelChoferEditar, setEmailDelChoferEditar]=useState("");
@@ -331,7 +331,7 @@ const App=()=>{
         obtenerToken();
         getRutasFavoritas(setRutasSeleccionadasCompetencia);
         getTokenGeoRutasCode(setTokenGeoRutas);
-        getNombre(setNombreAdmin);
+        getApellidos(setNombreAdmin);
         obtenerTiempoDesdeElUltimoAnucio();
         verificarElTipoDeEstiloDeLaAplicacion();
       },[])
@@ -403,13 +403,15 @@ const App=()=>{
         {apellidos: "", idTablaForanea: 0, nombres: "", tipoDeUsuario: "P",
             tipoSubscripcion: "B", token: ""});
     const [mostrarComprasPasajeros, setMostrarComprasPasajeros]=useState(false);
-    
+
+    const [iniciarRecorridoDeLaTrayectoria, setIniciarRecorridoDeLaTrayectoria]=useState(false);
+
     useEffect(()=>{
         SplashScreen.hide();
         if(emailState.length>2 && secionIniciada==true){
             refrescarToken(emailState,tokenState);
             // console.log("ESTAS HACIENDO UNA PETICION AL TOKEN");
-            if(idRutaAMostrar>0 && tipoDeUsuario=='Pasajero' && tipoDeSubscripcion=='C'){
+            if((tipoDeUsuario=='Pasajero' && tipoDeSubscripcion=='C') && (iniciarRecorridoDeLaTrayectoria==true || idRutaAMostrar>0)){
 
                 setDatosDelUsuarioSinSuscripcion({apellidos: "Des", idTablaForanea: 0, nombres: "Des", tipoDeUsuario: "P",
                 tipoSubscripcion: "C", token: tokenState, email:emailState});
@@ -422,7 +424,7 @@ const App=()=>{
 
             }
         }
-    },[idRutaAMostrar,visualizarRutas,emailState,secionIniciada,tokenState,tipoDeUsuario,tipoDeSubscripcion])
+    },[idRutaAMostrar,visualizarRutas,emailState,secionIniciada,tokenState,tipoDeUsuario,tipoDeSubscripcion,iniciarRecorridoDeLaTrayectoria])
 
     const verificarMenbresia=async(email,token,tipoUsuario)=>{
         try{
@@ -525,7 +527,7 @@ const App=()=>{
     const [tiempoParaUsaurioTransportistaLogueado, setTiempoParaUsaurioTransportistaLogueado]=useState(0);
     const [tiempoPromedio, setTiempoPromedio]=useState(900);
 
-    const [iniciarRecorridoDeLaTrayectoria, setIniciarRecorridoDeLaTrayectoria]=useState(false);    
+    const [fechaDeClicSalida, setFechaDeClicSalida]=useState(1);
 
   return (
      <View style={{height:height, width:width}}>
@@ -559,6 +561,7 @@ const App=()=>{
         modoOscuro={modoOscuro} setModoOscuro={setModoOscuro} mostrarCompañerosCercanos={mostrarCompañerosCercanos} setMostrarCompañerosCercanos={setMostrarCompañerosCercanos} tiempoParaUsaurioTransportistaLogueado={tiempoParaUsaurioTransportistaLogueado}
         setTiempoParaUsaurioTransportistaLogueado={setTiempoParaUsaurioTransportistaLogueado} setTiempoPromedio={setTiempoPromedio} tiempoPromedio={tiempoPromedio} iniciarRecorridoDeLaTrayectoria={iniciarRecorridoDeLaTrayectoria} 
         setIniciarRecorridoDeLaTrayectoria={setIniciarRecorridoDeLaTrayectoria} datosDeLosUsuarios={datosDeLosUsuarios}
+        setFechaDeClicSalida={setFechaDeClicSalida}
         ></Inicio>
 
         {mostrarMenusBuenEstado==true && <ItemsTrayectos setOcultarLasMierdasDelPrimerMenu={setOcultarLasMierdasDelPrimerMenu} ocultarMenu={ocultarMenu} setIdRutaAMostrar={setIdRutaAMostrar} 
@@ -576,7 +579,7 @@ const App=()=>{
         longitude={coordenadasOrigenSecundario.longitude} setVerParadasCercanas={setVerParadasCercanas}
         setMostrarMenusBuenEstado={setMostrarMenusBuenEstado} setmenUno={setmenUno} setmenDos={setmenDos} setmenTres={setmenTres}
         setmenCinco={setmenCinco}
-        menCinco={menCinco} modoOscuro={modoOscuro} setMostrarCompañerosCercanos={setMostrarCompañerosCercanos}
+        menCinco={menCinco} modoOscuro={modoOscuro} setMostrarCompañerosCercanos={setMostrarCompañerosCercanos} fechaDeClicSalida={fechaDeClicSalida} setFechaDeClicSalida={setFechaDeClicSalida}
         >
 
         </ItemsTrayectos>}
@@ -594,11 +597,12 @@ const App=()=>{
         activarPrecision={activarPrecision} setActivarPrecision={setActivarPrecision} tipoDeUsuario={tipoDeUsuario} 
         serMostrarVentana={serMostrarVentana} cargando={cargando} setCargando={setCargando} idRutaAMostrar={idRutaAMostrar}        
         setMostrarMenusBuenEstado={setMostrarMenusBuenEstado} modoOscuro={modoOscuro} setMostrarCompañerosCercanos={setMostrarCompañerosCercanos} mostrarVentana={mostrarVentana}
+        setIniciarRecorridoDeLaTrayectoria={setIniciarRecorridoDeLaTrayectoria}
         ></MenuBar>
   
         
         {loguearse==true && <Login setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} setTipoDeSubscripcion={setTipoDeSubscripcion} setCambiarPassword={setCambiarPassword} setTipoDeUsuario={setTipoDeUsuario} setSecionIniciada={setSecionIniciada} setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} setLosguearTransportista={setLosguearTransportista} height={height} width={width} 
-        setIdUsuarioIniciado={setIdUsuarioIniciado} setUsuarioLogueado={setUsuarioLogueado} setTokenGeoRutas={setTokenGeoRutas} setConfirmarCodigo={setConfirmarCodigo} setEmailState={setEmailState} setTokenState={setTokenState} setComprarSuscripcionT={setComprarSuscripcionT} setDatosDelUsuarioSinSuscripcion={setDatosDelUsuarioSinSuscripcion}></Login>}
+        setIdUsuarioIniciado={setIdUsuarioIniciado} setUsuarioLogueado={setUsuarioLogueado} setTokenGeoRutas={setTokenGeoRutas} setConfirmarCodigo={setConfirmarCodigo} setEmailState={setEmailState} setTokenState={setTokenState} setComprarSuscripcionT={setComprarSuscripcionT} setDatosDelUsuarioSinSuscripcion={setDatosDelUsuarioSinSuscripcion} setNombreAdmin={setNombreAdmin}></Login>}
         {confirmarCodigo==true &&<ConfirmarCodigo setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} height={height} width={width} setConfirmarCodigo={setConfirmarCodigo}></ConfirmarCodigo>}
         {cambiarPassword==true && <CambiarPassword setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} height={height} width={width} setCambiarPassword={setCambiarPassword}></CambiarPassword>}
         
@@ -618,10 +622,10 @@ const App=()=>{
                                         height={height} width={width} setLoguearse={setLoguearse} setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setIdUsuarioIniciado={setIdUsuarioIniciado} setIdUsuarioIniciadoCode={setIdUsuarioIniciadoCode} idFacturaOApellidos={idFacturaOApellidos}></Compras>}
         {mostrarAnuncioCompleto==true && <InterstitialADS VERSIONDELAPLICACION={VERSIONDELAPLICACION} enviarTiempoDesdeElUltimoAnuncio={enviarTiempoDesdeElUltimoAnuncio} setMostrarAnuncioCompleto={setMostrarAnuncioCompleto}></InterstitialADS>}
         {mostrarAnuncioRewarded==true && <RewardedADS VERSIONDELAPLICACION={VERSIONDELAPLICACION} setMostrarComprasPasajeros={setMostrarComprasPasajeros} enviarTiempoDesdeElUltimoAnuncio={enviarTiempoDesdeElUltimoAnuncio} setMostrarAnuncioRewarded={setMostrarAnuncioRewarded}></RewardedADS>}
-        {mostrarComprasPasajeros==true && <ComprasUsuariosPasajeros tiempoDesdeLaUltimaSuscripcion={tiempoDesdeLaUltimaSuscripcion} idFacturaOApellidos={idFacturaOApellidos} datosDelUsuarioSinSuscripcion={datosDelUsuarioSinSuscripcion} comprarProducto={comprarProducto} purchase={purchase} setPurchase={setPurchase} setEliminarAnuncios={setEliminarAnuncios} eliminarAnuncios={eliminarAnuncios} setMostrarComprasPasajeros={setMostrarComprasPasajeros} setMostrarAlerte={setMostrarAlerte} height={height} width={width} setMensajeAlerta={setMensajeAlerta} setLoguearse={setLoguearse} setSecionIniciada={setSecionIniciada} setTipoDeSubscripcion={setTipoDeSubscripcion}
+        {mostrarComprasPasajeros==true && <ComprasUsuariosPasajeros iniciarRecorridoDeLaTrayectoria={iniciarRecorridoDeLaTrayectoria} setIniciarRecorridoDeLaTrayectoria={setIniciarRecorridoDeLaTrayectoria} tiempoDesdeLaUltimaSuscripcion={tiempoDesdeLaUltimaSuscripcion} idFacturaOApellidos={idFacturaOApellidos} datosDelUsuarioSinSuscripcion={datosDelUsuarioSinSuscripcion} comprarProducto={comprarProducto} purchase={purchase} setPurchase={setPurchase} setEliminarAnuncios={setEliminarAnuncios} eliminarAnuncios={eliminarAnuncios} setMostrarComprasPasajeros={setMostrarComprasPasajeros} setMostrarAlerte={setMostrarAlerte} height={height} width={width} setMensajeAlerta={setMensajeAlerta} setLoguearse={setLoguearse} setSecionIniciada={setSecionIniciada} setTipoDeSubscripcion={setTipoDeSubscripcion}
                                             setTipoDeUsuario={setTipoDeUsuario} setMostrarAnuncioRewarded={setMostrarAnuncioRewarded} setmenDos={setmenDos} setMostrarItemMenuUno={setMostrarItemMenuUno} setIdRutaAMostrar={setIdRutaAMostrar} setOcultarTrayecto={setOcultarTrayecto} setVerRutasCercanas={setVerRutasCercanas}
                                             modoOscuro={modoOscuro}></ComprasUsuariosPasajeros>}
-        {mostrarInformacion==true && emailState=='nestorgtd27@gmail.com' && <MostrarInformacion setMostrarInformacion={setMostrarInformacion} refrescarHistorial={refrescarHistorial} height={height} width={width} historial={historial} purchase={purchaseTxt}></MostrarInformacion>}
+        {mostrarInformacion==true && emailState=='nestordgt27@gmail.com' && <MostrarInformacion setMostrarInformacion={setMostrarInformacion} refrescarHistorial={refrescarHistorial} height={height} width={width} historial={historial} purchase={purchaseTxt}></MostrarInformacion>}
     </View>
 
   );

@@ -68,7 +68,7 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
             </View>
         )
     }else{
-        const [mostrariItems, setMostrarItems]=useState(true);
+        const [mostrariItems, setMostrarItems]=useState(false);
         return(
             <View >
                 <ScrollView>

@@ -18,6 +18,7 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
         ,setTipoDeUsuario,height,width,setIdUsuarioIniciado,setUsuarioLogueado,setTokenGeoRutas
         ,setConfirmarCodigo,setCambiarPassword,setEmailState, setTokenState,setTipoDeSubscripcion
         ,setMostrarAlerte,setMensajeAlerta,setComprarSuscripcionT,setDatosDelUsuarioSinSuscripcion
+        ,setNombreAdmin
         })=>{
  
     const [usuarioState,setUsuarioState]=react.useState("");
@@ -155,7 +156,9 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                     return;
                 }
                 setNombre(json.nombres);
-                setApellidos(json.apellidos);                
+                setApellidos(json.apellidos);   
+                setNombreAdmin(json.apellidos);     
+                console.log("Se guardo el apellido"+json.apellidos);
                 setTokenState(json.token);
                 setTokenGeoRutasCode(json.token);
                 setTokenGeoRutas(json.token);
@@ -291,7 +294,9 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                 return;
             }
             setNombre(json.nombres)
-
+            setApellidos(json.apellidos); 
+            setNombreAdmin(json.apellidos);
+            console.log("Se guardo el apellido"+json.apellidos);
             setUsuario(json.email);
             setCorreo(json.email);
             setEmailState(json.email);
@@ -418,7 +423,10 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                 return;
             }
 
-            setNombre(json.nombres)
+            setNombre(json.nombres);
+            setApellidos(json.apellidos);
+            setNombreAdmin(json.apellidos);
+            console.log("Se guardo el apellido"+json.apellidos);
             setUsuario(json.email);
             setCorreo(json.email);
 

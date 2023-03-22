@@ -379,6 +379,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         setVerRutasCercanas(false);  
                         setVerCompetencia(false);    
                         setOcultarTrayecto(true);   
+                        setMensajeAlerta("Has iniciado el recorrido");
                         setCargando(false);
                     }}
                         imagen={require('../assets/cambioDetrayectoriaCuatro.jpg')}
@@ -408,6 +409,12 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         setVerRutasCercanas(false);  
                         setVerCompetencia(false);    
                         setOcultarTrayecto(true);  
+                        if(tipoDeSubscripcion=='C'){
+                            setMostrarComprasPasajeros(true);
+                        }
+
+                        setMensajeAlerta("Has iniciado el recorrido");
+                        setMostrarAlerte(true);                        
                         setCargando(false);
                     }}
                     imagen={require('../assets/cambioDetrayectoriaCuatro.jpg')}

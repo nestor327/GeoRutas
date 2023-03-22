@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { View,Text,Image, TouchableOpacity, ScrollView, TextInputBase } from 'react-native'
+import { View,Text,Image, TouchableOpacity, ScrollView, TextInputBase, BackHandler} from 'react-native'
 import imagen from '../assets/x_icon_imagen.png';
 import { getNombre,getCorreo, setTokenGeoRutasCode } from '../data/asyncStorageData.js';
 import { check, openSettings, PERMISSIONS, request } from 'react-native-permissions';
@@ -52,6 +52,21 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
         }
         
     },[arregloDeValores])
+
+    const handleBackButton = () => {
+        actualizar('none');
+        // Aquí puedes agregar la lógica que deseas ejecutar al presionar el botón de retroceso
+        // Por ejemplo, puedes cerrar un modal o salir de la aplicación
+        return true; // Si deseas evitar el comportamiento predeterminado del botón de retroceso (que es salir de la aplicación), devuelve "true"
+    };
+
+    useEffect(()=>{
+        BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+
+        return () => {
+        BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
+        };
+    },[])
 
     const establecerModoOscuro=async(valor)=>{
         try{
@@ -131,16 +146,16 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
 
             </TouchableOpacity>}
 
-            <TouchableOpacity style={{borderWidth:2.2,width:'70%',borderRadius:10
+            {mostrarMenu==false && <TouchableOpacity style={{borderWidth:2.2,width:'70%',borderRadius:10
                 ,marginBottom:8,height:40,paddingTop:8,borderColor:'white',alignItems:'center'}}
                 onPressOut={()=>{
                     setCambiarPassword(true);
                 }}
                 >
                 <Text style={{color:'white',fontSize:15}}>Cambiar Contraseña</Text>
-            </TouchableOpacity>
+            </TouchableOpacity>}
 
-            <TouchableOpacity style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10
+            {mostrarMenu==false && <TouchableOpacity style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10
                 ,height:40,paddingTop:8,alignItems:'center'}}
                 onPress={()=>{
                     setMostrarMenu(true);
@@ -150,10 +165,10 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
                 >
                 <Text style={{color:'white',fontSize:15}}>{(tipoDeUsuario=='Transportista')?"Seleccionar Competencia":"Seleccionar Favoritas"}</Text>
                 
-            </TouchableOpacity>
+            </TouchableOpacity>}
 
             {mostrarMenu==true && 
-            <View style={[{backgroundColor:'#103070',marginTop:'-90%',width:'79%',height:'90%',marginBottom:'40%'}
+            <View style={[{backgroundColor:'#103070',marginTop:'-75%',width:'79%',height:'90%',marginBottom:'40%'}
                 ,tipoDeUsuario=='Pasajero' && {marginTop:'-35%'}]}>
                 <View style={{alignItems:'center',flexDirection:'row'}}>
                     
@@ -260,7 +275,7 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
                     establecerModoOscuro((!modoOscuro).toString());
                 }}
                 >
-                <Text style={{color:'white',fontSize:15}}>Activar Modo Oscuro</Text>
+                <Text style={{color:'white',fontSize:15}}>{(!modoOscuro)?"Activar modo oscuro":"Desactivar modo oscuro"}</Text>
                 <View style={[!modoOscuro && {height:30,width:60,backgroundColor:'#c3c3c3',borderRadius:17,justifyContent:'center'}
                               ,modoOscuro && {height:30,width:60,backgroundColor:'#102790',borderRadius:17,justifyContent:'center'}]}>
                     <Image source={(!modoOscuro)?require('../assets/modoclaro.png'):require('../assets/modoscuro.png')} style={[{height:28,width:28,marginLeft:1,tintColor:'#ffffff',borderColor:'#f1f1f1',borderWidth:2,borderRadius:16,backgroundColor:'#102790'},modoOscuro && {marginLeft:32}]}></Image>
@@ -270,8 +285,8 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
             {((tipoDeSubscripcion=='C' || tipoDeSubscripcion=='B') && tipoDeUsuario=='Pasajero') && <View style={{alignItems:'center',justifyContent:'center'}}>
                 <BannerAd 
                 size={BannerAdSize.BANNER} 
-                //unitId={'ca-app-pub-1889500700036964/3903849703'}
-                unitId={TestIds.BANNER}
+                unitId={'ca-app-pub-1889500700036964/3903849703'}
+                //unitId={TestIds.BANNER}
                 requestOptions={{
                     requestNonPersonalizedAdsOnly:true
                 }}

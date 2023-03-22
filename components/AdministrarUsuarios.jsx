@@ -23,8 +23,10 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
 
         let idRuta=1;
 
-        for(let t=0; t<todasLasRutas.length;t++){        
-            if(nombre.includes(todasLasRutas[t].nombre)){
+        console.log("El nombre del usuario es: "+nombre);
+        
+        for(let t=0; t<todasLasRutas.length;t++){
+            if(nombre==(todasLasRutas[t].nombre)){
                 idRuta=(t+1);
             }
         }

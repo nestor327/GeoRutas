@@ -35,7 +35,7 @@
         return await fetch('https://www.georutas.lat/api/Coordenadas/'+queryKey[1]+'?email='+queryKey[2]+'&token='+queryKey[3]).then(res=>datos=res.json())
     },{
         staleTime:Infinity,
-        cacheTime:20000,
+        cacheTime:3600000,
         onSuccess:()=>{
             setMostrarSniperCargando(true);            
             setCargando(false);
@@ -68,11 +68,9 @@
                 <View></View>
             )
         }
-        
+        //console.log(data);
         for(let y=0;y<data.length;y++){
-            
-                coordenadas.push({latitude: data[y].longitude, longitude: data[y].latitude})                        
-                
+            coordenadas.push({latitude: data[y].longitude, longitude: data[y].latitude})
         }
         
         
