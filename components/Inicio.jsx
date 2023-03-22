@@ -3,7 +3,7 @@
 //Hay un endpoint que devuelve las paradasrutas para una sola ruta
 
 import React, { useEffect,useRef, useState  } from 'react'
-import { View,Text, Platform, StatusBar, ActivityIndicator, Image, TextInput, TouchableOpacity, Keyboard, AppState, Linking, ScrollView} from 'react-native';
+import { View,Text, Platform, StatusBar, ActivityIndicator, Image, TextInput, TouchableOpacity, Keyboard, AppState, Linking, ScrollView, BackHandler} from 'react-native';
 import {enableLatestRenderer, Marker, PROVIDER_GOOGLE,Polyline} from 'react-native-maps';
 import MapView from 'react-native-maps';
 import IconosDeNavegacion from './IconosDeNavegacion.jsx';
@@ -52,7 +52,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     ,tiempoDesdeUltimoAnuncio,setMostrarAnuncioRewarded,obtenerTiempoDesdeElUltimoAnucio,setMostrarComprasPasajeros,setEliminarAnuncios
     ,setTiempoDesdeUltimoAnuncio,VERSIONDELAPLICACION,modoOscuro,setModoOscuro,mostrarCompañerosCercanos, setMostrarCompañerosCercanos
     ,tiempoParaUsaurioTransportistaLogueado, setTiempoParaUsaurioTransportistaLogueado, setTiempoPromedio, tiempoPromedio
-    ,iniciarRecorridoDeLaTrayectoria, setIniciarRecorridoDeLaTrayectoria,datosDeLosUsuarios
+    ,iniciarRecorridoDeLaTrayectoria, setIniciarRecorridoDeLaTrayectoria,datosDeLosUsuarios,setFechaDeClicSalida
     })=>{
     
 
@@ -554,19 +554,31 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                 }else if(menCinco[0].display=='flex'){
                     setmenCinco([{display:'none',color:colorRes}])                    
                 }
+                setmenCuatro([{display:'flex',color:'#101043'}])
                 //setmenUno([{ display: 'flex',color:'#101043' }]);
                 setMostrarItemMenuUno(true);
                 setIdRutaAMostrar(-1);
                 setOcultarMenu(true);       
                 setVerParadasCercanas([{observar:false,latitude:coordenadasOrigenSecundario.latitude,longitude:coordenadasOrigenSecundario.longitude,direccion:'K',id_Ruta:1}]);
-                // setMostrarUsuarios(false);
-                // setVerTransportistasPorLaDerecha(false);
-                // setVerTransportistasPorLaIzquierda(false);
+                setMostrarCompañerosCercanos(false);
+                setIniciarRecorridoDeLaTrayectoria(false);
+                setMostrarUsuarios(false);
+                setVerCompetencia(false);  
+                setVerRutasCercanas(false);
             }
         });
 
         const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
             //Esto es cuando el teclado desaparece            
+            // if (menUno[0].display == 'flex' ) {
+            //     setmenUno([{display:'none',color:colorRes}]);
+            // } else if(menDos[0].display == 'flex'){
+            //     setmenDos([{display:'none',color:colorRes}]);
+            // }else if(menTres[0].display == 'flex'){
+            //     setmenTres([{display:'none',color:colorRes}]);
+            // }else if(menCinco[0].display=='flex'){
+            //     setmenCinco([{display:'none',color:colorRes}])                    
+            // }            
         });
     
         return () => {
@@ -684,6 +696,23 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         }
     },[pedirUbicacionSegundoPlano])
 
+    const handleBackButton = () => {
+        refInputAutoComplete.current.blur();
+        setMostrarBarraSecundariaDeUbicacion(false);        
+        setFechaDeClicSalida(90);
+        //actualizar('none');
+        // Aquí puedes agregar la lógica que deseas ejecutar al presionar el botón de retroceso
+        // Por ejemplo, puedes cerrar un modal o salir de la aplicación
+        return true; // Si deseas evitar el comportamiento predeterminado del botón de retroceso (que es salir de la aplicación), devuelve "true"
+    };
+
+    useEffect(()=>{
+        BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+
+        return () => {
+        BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
+        };
+    },[])
 
   return(
     <View style={{height:(height>width)?(height-width*0.2-StatusBar.currentHeight):(height-2*StatusBar.currentHeight)*0.8,
@@ -950,7 +979,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
                         setOcultarTrayecto(false);
                         setIdRutaAMostrar(-1);
-                        setmenCuatro([{ display: 'flex',color:'#101043' }]);                        
+                        setmenCuatro([{ display: 'flex',color:'#101043' }]);
                         //setMostrarItemMenuUno(false);  
                     }
                 }}
@@ -1358,9 +1387,9 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     //     setmenCinco([{display:'none',color:'#102769'}])                    
                     // }
                     // setmenCuatro([{ display: 'flex',color:'#101043' }]);
-                    console.log("ocultarTrayecto es:"+ ocultarTrayecto);         
-                    console.log("mostrarItemMenuUno es:" + mostrarItemMenuUno);
-                    console.log("verTrayectoria es:" + verTrayectoria);
+                    // console.log("ocultarTrayecto es:"+ ocultarTrayecto);         
+                    // console.log("mostrarItemMenuUno es:" + mostrarItemMenuUno);
+                    // console.log("verTrayectoria es:" + verTrayectoria);
 
                     if(tipoDeUsuario=='Pasajero' && tipoDeSubscripcion=='C'){
                         let fechaAlPresionar=new Date();
@@ -1370,7 +1399,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                             setMostrarAnuncioRewarded(true);
                             console.log("Entro en el primer anuncio");
                             setTiempoDesdeUltimoAnuncio(tiempoTotalAlPresionar);
-                        }else if(Math.abs(tiempoTotalAlPresionar - parseInt(tiempoDesdeUltimoAnuncio))>=180){
+                        }else if(Math.abs(tiempoTotalAlPresionar - parseInt(tiempoDesdeUltimoAnuncio))>=240){
                             let random=Math.random()*100;
                             console.log("Entro en el segundo anuncio");                            
                             if(random<50){
@@ -1609,7 +1638,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                 && (tipoDeUsuario=='Transportista' || (tipoDeUsuario=='Pasajero' && 
                 (tipoDeSubscripcion=='A' ||tipoDeSubscripcion=='S'))) && <UsuarioCercanoAUnaParada modoOscuro={modoOscuro} idRuta={verParadasCercanas[0].id_Ruta} emailState={emailState} tokenState={tokenState} idParada={verParadasCercanas[0].id_Parada}
                     tipoDeUsuario={tipoDeUsuario} idUsuarioIniciado={idUsuarioIniciado}></UsuarioCercanoAUnaParada>}
-            {iniciarRecorridoDeLaTrayectoria && <SeguimientoAlTrayecto datosDeLosUsuarios={datosDeLosUsuarios} modoOscuro={modoOscuro}emailState={emailState}tokenState={tokenState}></SeguimientoAlTrayecto>}
+            {secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && !mostrarCompañerosCercanos && iniciarRecorridoDeLaTrayectoria && <SeguimientoAlTrayecto datosDeLosUsuarios={datosDeLosUsuarios} modoOscuro={modoOscuro}emailState={emailState}tokenState={tokenState}></SeguimientoAlTrayecto>}
             
         </MapView>}         
     </View>

@@ -9,18 +9,18 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
                         ,visualizarRutas,verRutasTrayecto,obtenerRutas,setVerTrayectoria,setVerRutasCercanas, setVerCompetencia,setOcultarTrayecto
                         ,identificadorKey, refCambiarLupa, setCargando,ocultarTercerMenu,menTres,emailState, tokenState, latitude, longitude
                         ,setVerParadasCercanas,setMostrarMenusBuenEstado,setmenUno,setmenDos,setmenTres,setmenCinco,setmenCuatro
-                        ,setMostrarBarraSecundariaDeUbicacion,menCinco,modoOscuro,setMostrarCompañerosCercanos
+                        ,setMostrarBarraSecundariaDeUbicacion,menCinco,modoOscuro,setMostrarCompañerosCercanos,fechaDeClicSalida, setFechaDeClicSalida
                         })=>{
 
-        const [fechaDeClicCambio, setFechaDeClicCambio]=useState(1);
-        const [fechaDeClicSalida, setFechaDeClicSalida]=useState(0);
+        const [fechaDeClicCambio, setFechaDeClicCambio]=useState(1679456668848);
 
         useEffect(()=>{
             setCargando(false);
+            setFechaDeClicSalida(91);
         },[])
 
         useEffect(()=>{
-            if(fechaDeClicSalida>fechaDeClicCambio){
+            if(fechaDeClicSalida>fechaDeClicCambio || (fechaDeClicSalida==90 && fechaDeClicCambio==1679456668848)){
 
                 let colorRes='#102769';
                 if(modoOscuro){
@@ -37,6 +37,7 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
                 setmenCuatro([{ display: 'flex',color:'#101043' }]);
                 // setMostrarBarraSecundariaDeUbicacion(false);
                 setMostrarMenusBuenEstado(false);
+                setFechaDeClicSalida(91);
             }
         },[fechaDeClicCambio,fechaDeClicSalida])
         
@@ -45,7 +46,7 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
             onTouchEnd={()=>{
                 //setTipoDeClic(1);
                 let fecha= new Date();
-                setFechaDeClicSalida(fecha.getTime());
+                setFechaDeClicSalida(fecha.getTime());                
             }}
             >
             <View style={{height:'100%',width:width,padding:0}}>
@@ -63,8 +64,8 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
                                 setIdRutaAMostrar(i+1);
                                 console.log("Si lo cambiaste");
                                 //setCambiandoDatos(false);
-                                // let fecha=new Date();
-                                // setFechaDeClicCambio(fecha);
+                                // let fecha= new Date();
+                                // setFechaDeClicSalida(fecha.getTime());
                                 //setTipoDeClic(2);
                                 setMostrarCompañerosCercanos(false);
                             }}                            

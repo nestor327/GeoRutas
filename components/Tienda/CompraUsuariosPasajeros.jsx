@@ -13,7 +13,7 @@ let purchaseErrorSuscription=null;
 const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarComprasPasajeros,setMostrarAlerte, setMensajeAlerta, width, height
                 ,setTipoDeSubscripcion,setLoguearse,setSecionIniciada,setTipoDeUsuario,setMostrarAnuncioRewarded,setmenDos,setMostrarItemMenuUno
                 ,setIdRutaAMostrar,setOcultarTrayecto,setVerRutasCercanas,eliminarAnuncios,setEliminarAnuncios,purchase,setPurchase,comprarProducto
-                ,idFacturaOApellidos,tiempoDesdeLaUltimaSuscripcion,modoOscuro})=>{
+                ,idFacturaOApellidos,tiempoDesdeLaUltimaSuscripcion,modoOscuro,iniciarRecorridoDeLaTrayectoria,setIniciarRecorridoDeLaTrayectoria})=>{
 
     const actualizarUsuarioBD=async(emails,emailState,tokenState,tiempo,apellidos)=>{
         try{
@@ -102,6 +102,9 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                     setVerRutasCercanas(false);
                     setMostrarComprasPasajeros(false);
                     setEliminarAnuncios(false);
+                    if(iniciarRecorridoDeLaTrayectoria==true){
+                        setIniciarRecorridoDeLaTrayectoria(false);
+                    }
                 }}>
                     <Image source={imagen} style={{width:30,height:30, tintColor:'#f1f1f1'}}></Image>
                 </TouchableOpacity>
@@ -162,6 +165,9 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                                     setVerRutasCercanas(false);
                                     setMostrarComprasPasajeros(false);
                                     setEliminarAnuncios(false);
+                                    if(iniciarRecorridoDeLaTrayectoria==true){
+                                        setIniciarRecorridoDeLaTrayectoria(false);
+                                    }
                                 }}                        
                             >
                             <Text style={{fontSize:17,textAlign:'center',alignContent:'center',height:37,textAlignVertical:'center'}}>

@@ -17,8 +17,8 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
             return await fetch('https://www.georutas.lat/api/NUsuariosTransporte?Email='+queryKey[1]+'&Token='+queryKey[2]).then(res=>datos=res.json())
         },{
             //staleTime:Infinity,
-            refetchInterval:4000,
-            cacheTime:1500,
+            refetchInterval:6000,
+            cacheTime:8000,
             onSuccess:()=>{
                 console.log("Yes");
                 console.log(rutasSeleccionadasCompetencia);
