@@ -253,19 +253,21 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
             {secionIniciada==false && mostrarMenu==false && <TouchableOpacity
                 style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10
                 ,marginBottom:8,height:40,alignItems:'center',justifyContent:'center'}}
+                onPressOut={()=>{
+                    setRegistrarse(true);
+                }}
                 >
-                <Text style={{color:'white',fontSize:15}} onPress={()=>{
-                setRegistrarse(true);
-                }}>Registrarse</Text>
+                <Text style={{color:'white',fontSize:15}}>Registrarse</Text>
             </TouchableOpacity>}
             {tipoDeSubscripcion=='C' && tipoDeUsuario=='Pasajero' && mostrarMenu==false && <TouchableOpacity
                 style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10
                 ,height:40,alignItems:'center',justifyContent:'center'}}
+                onPressOut={()=>{
+                    setMostrarComprasPasajeros(true);
+                    setEliminarAnuncios(true);
+                }}
                 >
-                <Text style={{color:'white',fontSize:15}} onPress={()=>{
-                setMostrarComprasPasajeros(true);
-                setEliminarAnuncios(true);
-                }}>Eliminar Anuncios</Text>
+                <Text style={{color:'white',fontSize:15}} >Eliminar Anuncios</Text>
             </TouchableOpacity>}
             {mostrarMenu==false && <TouchableOpacity
                 style={{borderWidth:2.2,borderColor:'white',width:'70%',borderRadius:10

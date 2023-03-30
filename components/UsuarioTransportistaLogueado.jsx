@@ -69,13 +69,13 @@ import getAllRutas from '../data/rutasManagua.js'
                             <Text style={{color:(!modoOscuro)?'black':'#c3c3c3', fontWeight:'500'}}>{(direccionesPorUsuarioDos=='D')?"⇛ Tú "+nombresEnElArregloFinal[0]:"⇚ Tú "+nombresEnElArregloFinal[0]}</Text>
                             <Image style={{width:30,height:30}} source={require("../assets/transportistaAzulv2.png")}></Image>
                             {(mostrarCompañerosCercanos || (Math.ceil(idUsuarioIniciado/33.0)==idRutaAMostrar)) && <Text 
-                                    style={{color:((tiempoPromedio-tiempoParaUsaurioTransportistaLogueado)>300)?"#f41c1c"
-                                                    :((tiempoPromedio-tiempoParaUsaurioTransportistaLogueado)<-300)?"#ff7f27"
+                                    style={{color:((Math.abs(tiempoPromedio-tiempoParaUsaurioTransportistaLogueado))>300)?"#f41c1c"
+                                                    :((Math.abs(tiempoPromedio-tiempoParaUsaurioTransportistaLogueado))<-300)?"#ff7f27"
                                                     :(!modoOscuro)?'black':'#c3c3c3', fontWeight:'700'}}>
-                                                        {(((tiempoPromedio-tiempoParaUsaurioTransportistaLogueado)>0)?"+":"")+
-                                                        ((Math.floor((((tiempoPromedio-tiempoParaUsaurioTransportistaLogueado))/60))>9)?Math.floor((((tiempoPromedio-tiempoParaUsaurioTransportistaLogueado))/60)):"0"
-                                                        +Math.floor((((tiempoPromedio-tiempoParaUsaurioTransportistaLogueado)-3600*(Math.floor((tiempoPromedio-tiempoParaUsaurioTransportistaLogueado)/3600)))/60)))
-                                                        +":"+(((tiempoPromedio-tiempoParaUsaurioTransportistaLogueado)%60>9)?(tiempoPromedio-tiempoParaUsaurioTransportistaLogueado)%60:"0"+(tiempoPromedio-tiempoParaUsaurioTransportistaLogueado)%60)
+                                                        {((((tiempoPromedio-tiempoParaUsaurioTransportistaLogueado))>0)?"+":"-")+
+                                                        ((Math.floor((((Math.abs(tiempoPromedio-tiempoParaUsaurioTransportistaLogueado)))/60))>9)?Math.floor((((Math.abs(tiempoPromedio-tiempoParaUsaurioTransportistaLogueado)))/60)):"0"
+                                                        +Math.floor((((Math.abs(tiempoPromedio-tiempoParaUsaurioTransportistaLogueado))-3600*(Math.floor((Math.abs(tiempoPromedio-tiempoParaUsaurioTransportistaLogueado))/3600)))/60)))
+                                                        +":"+(((Math.abs(tiempoPromedio-tiempoParaUsaurioTransportistaLogueado))%60>9)?(Math.abs(tiempoPromedio-tiempoParaUsaurioTransportistaLogueado))%60:"0"+(Math.abs(tiempoPromedio-tiempoParaUsaurioTransportistaLogueado))%60)
                                                         }
                                                 </Text>}
                         </Marker>
@@ -88,13 +88,11 @@ import getAllRutas from '../data/rutasManagua.js'
 
     return(
         <Marker coordinate={{latitude:0, longitude:0}}>
-        
         </Marker>
     )
     }catch{
         return(
             <Marker coordinate={{latitude:0, longitude:0}}>
-            
             </Marker>
         )
     }

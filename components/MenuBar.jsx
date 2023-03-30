@@ -14,7 +14,7 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                 ,verParadasCercanas,userLocation,setCoordenadasOrigenSecundario,setSecionIniciada, setTipoDeUsuario
                 ,permitirEnviarUbicacion, setMostrarBarraSecundariaDeUbicacion,refCambiarLupa,activarPrecision,setActivarPrecision
                 ,tipoDeUsuario,serMostrarVentana,cargando,setCargando,idRutaAMostrar,setMostrarMenusBuenEstado,modoOscuro,setMostrarCompañerosCercanos
-                ,mostrarVentana,setIniciarRecorridoDeLaTrayectoria
+                ,mostrarVentana,setIniciarRecorridoDeLaTrayectoria,verificarSiHayDatos
             })=>{
     
 
@@ -88,6 +88,7 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                                     setmenUno([{ display: 'flex',color:'#101043' }]);
                                     setMostrarItemMenuUno(true);
                                     setIdRutaAMostrar(-1);
+                                    verificarSiHayDatos();
                                 } else {
                                     let colorRes='#102769';
                                     if(modoOscuro){

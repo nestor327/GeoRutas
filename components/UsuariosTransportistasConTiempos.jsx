@@ -77,8 +77,8 @@ import urlDeLasImagenesEstaticas from "../data/urlDeLasImagenesDeLasRutas.js";
                                 <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{(item.direccion=='I')?"⇚"+nombresEnElArregloFinal[i]:"⇛"+nombresEnElArregloFinal[i]}</Text>
                                 <Image style={{width:25,height:25}} source={urlDeLasImagenes[(modoSimplificado)?(Math.ceil(idUsuarioIniciado/33.0)-1):idRuta-1]} ></Image>
                                 {(item.tiempo>=0 && item.tiempo!=undefined) && <Text style={{color:(!modoOscuro)?'black':'#c3c3c3', fontWeight:'700'}}>
-                                {((Math.floor((((item.tiempo))/60))>9)?Math.floor((((item.tiempo))/60)):"0"+Math.floor((((item.tiempo)-3600*(Math.floor((item.tiempo)/3600)))/60)))
-                                    +":"+(((item.tiempo)%60>9)?(item.tiempo)%60:"0"+(item.tiempo)%60)}
+                                {((Math.floor((((Math.abs(item.tiempo)))/60))>9)?Math.floor((((Math.abs(item.tiempo)))/60)):"0"+Math.floor((((Math.abs(item.tiempo))-3600*(Math.floor((Math.abs(item.tiempo))/3600)))/60)))
+                                    +":"+(((Math.abs(item.tiempo))%60>9)?(Math.abs(item.tiempo))%60:"0"+(Math.abs(item.tiempo))%60)}
                                     </Text>}
                             </Marker>
                         )

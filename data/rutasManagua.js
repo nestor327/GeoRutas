@@ -9,11 +9,11 @@ const getAllRutas=()=>{
     //     staleTime:Infinity
     // })
 
-    // const {data,error,isLoading}=useQuery(['obtenerRutas'],async({queryKey})=>{
-    //     return await fetch('https://www.georutas.lat/api/Rutas').then(res=>datos=res.json()).catch(error => datos=[]);
-    // },{
-    //     staleTime:Infinity
-    // })
+//     const {data,error,isLoading}=useQuery(['obtenerRutas'],async({queryKey})=>{
+//         return await fetch('https://www.georutas.lat/api/Rutas').then(res=>datos=res.json()).catch(error => datos=[]);
+//     },{
+//         staleTime:Infinity
+//     })
 
 // if(isLoading){
 //     //console.log("Se estan cargando las paradas");        
@@ -61,7 +61,7 @@ return([{id_Ruta:1,nombre:"6",color:"green",cantidad:33,capacidad:60},
         {id_Ruta:31,nombre:"165",color:"#71DD1C",cantidad:33,capacidad:60},
         {id_Ruta:32,nombre:"167",color:"#961CDD",cantidad:33,capacidad:60},
         {id_Ruta:33,nombre:"168",color:"#DD631C",cantidad:33,capacidad:60},
-        {id_Ruta:34,nombre:"169",color:"#283970",cantidad:33,capacidad:60},
+        {id_Ruta:34,nombre:"169",color:"#3C5BC0",cantidad:33,capacidad:60},
         {id_Ruta:35,nombre:"170",color:"#18899D",cantidad:33,capacidad:60},
         {id_Ruta:36,nombre:"172",color:"#CF8C0B",cantidad:33,capacidad:60},
         {id_Ruta:37,nombre:"175",color:"#115FAB",cantidad:33,capacidad:60},

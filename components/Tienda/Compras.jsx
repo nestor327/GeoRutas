@@ -100,9 +100,14 @@ const Compras=({datosDelUsuarioSinSuscripcion,setComprarSuscripcionT,setMostrarA
     }
 
     useEffect(()=>{
+        console.log("El tiempo desde la ultima actualizacion fue: ");
+        console.log(tiempoDesdeLaUltimaSuscripcion);
         if(purchase==true && tiempoDesdeLaUltimaSuscripcion!='0'){
             actualizarUsuarioBD([datosDelUsuarioSinSuscripcion.email],datosDelUsuarioSinSuscripcion.email,datosDelUsuarioSinSuscripcion.token,tiempoDesdeLaUltimaSuscripcion,idFacturaOApellidos);
             setPurchase(false);
+            console.log("Entro al metodo, donde manda a llamar a la actualizacion de la membresia del usuario");
+        }else{
+            console.log("NO ENTRO A ACTUALIZAR AL USUARIO CHOFER");
         }
     },[purchase,idFacturaOApellidos,datosDelUsuarioSinSuscripcion,tiempoDesdeLaUltimaSuscripcion])
 

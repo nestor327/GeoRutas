@@ -4,7 +4,8 @@ import {useEffect} from 'react';
 
 
 const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,setMostrarAlerte,setTiempoDesdeLaUltimaSuscripcion
-                ,setMostrarInformacion,datosDelUsuarioSinSuscripcion,secionIniciada,verificarCualEsElUsuarioDeLaCompra,usuarioRegistrado)=>{
+                ,setMostrarInformacion,datosDelUsuarioSinSuscripcion,secionIniciada,verificarCualEsElUsuarioDeLaCompra,usuarioRegistrado
+                ,tiempoDesdeLaUltimaSuscripcion)=>{
 
     const items=Platform.select({
         ios:[],
@@ -19,6 +20,21 @@ const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,set
     const [historial, setHistorial]=useState("");
     const [purchaseTxt, setPurchaseTxt]=useState("");
     const [idFacturaOApellidos, setIdFacturaOApellidos]=useState("GPA.4394-0891-5913-27372");
+
+    const [finalizandoTransaccion, setFinalizandoTransaccion]=useState(false);
+
+    const finalizarTransaccion=(purchaseEvent,finalizandoTransaccion)=>{
+        try{
+            if(finalizandoTransaccion==false){
+                IAP.finishTransaction({purchase:purchaseEvent, isConsumable: false, developerPayloadAndroid: ""});
+                setFinalizandoTransaccion(true);
+                console.log("Se mando a llamar al finalizador de las transacciones");
+            }            
+        }catch{
+            console.log("Ocurrio un error al intentar finalizar la transaccion");
+        }
+    }
+
     useEffect(()=>{
         if(emailState!=undefined && emailState!=null && emailState.length>8){
             try{            
@@ -45,8 +61,8 @@ const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,set
         
                 purchaseUpdateSuscription=IAP.purchaseUpdatedListener((purchaseEvent)=>{
                     const reciep=purchaseEvent.transactionReceipt;
-                    if(reciep){
-                        IAP.finishTransaction({purchase:purchaseEvent, isConsumable: false, developerPayloadAndroid: ""});
+                    if(reciep && finalizandoTransaccion==false){
+                        finalizarTransaccion(purchaseEvent,finalizandoTransaccion);
                         console.log("EL SUPUESTO PURCHASE DE LA VENTA ES: ");
                         console.log(purchaseEvent);
                         verificarCualEsElUsuarioDeLaCompra(2,emailState);
@@ -59,7 +75,9 @@ const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,set
                         fechaHoy.setMonth(month+1);
                         let tiempo=(Date.parse(fechaHoy)+(1000*60*60*24)).toString();
                         setTiempoDesdeLaUltimaSuscripcion(tiempo);
-                        setPurchase(true);                    
+                        console.log("El tiempo que intento actualizar es: ");
+                        console.log(tiempo);
+                        setPurchase(true);
                     }
                 });
                 
@@ -87,7 +105,7 @@ const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,set
 
             }
         }
-    },[emailState]);
+    },[emailState,finalizandoTransaccion]);
 
     const refrescarHistorial=async()=>{
         try{
@@ -101,7 +119,8 @@ const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,set
 
     const comprarProducto=async(producto)=>{
         try{            
-            //IAP.requestSubscription({sku:producto});            
+            //IAP.requestSubscription({sku:producto});
+            setFinalizandoTransaccion(false);
             console.log("lA MIERDA ES: ");            
             //console.log(productos);
             let subscriptionOffers = [];
