@@ -145,6 +145,7 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                 setMensajeAlerta("Su contraseña es incorrecta");
                 setMostrarAlerte(true);
             }else if(json.token.length>1){
+                
                 if(json.tipoSubscripcion=='B'  || json.tipoSubscripcion=='K'){
                     setTipoDeMenbresiaCode(json.tipoSubscripcion);
                     setMensajeAlerta("Renueve su subscripción para poder acceder");
@@ -153,7 +154,7 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                     setDatosDelUsuarioSinSuscripcion({apellidos: json.apellidos, idTablaForanea: json.idTablaForanea, 
                                                        nombres: json.nombres, tipoDeUsuario: json.tipoDeUsuario, 
                                                        tipoSubscripcion: json.tipoSubscripcion, token: json.token,email:correoUsuario.toString().toLowerCase()});
-                    return;
+                    //return;
                 }
                 setNombre(json.nombres);
                 setApellidos(json.apellidos);   
@@ -164,7 +165,11 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                 setTokenGeoRutas(json.token);
                 setTipoDeMenbresiaCode(json.tipoSubscripcion);
                 setTipoDeSubscripcion(json.tipoSubscripcion);
-                setMensajeAlerta("Has iniciado sesión");
+                if(json.tipoSubscripcion!='B'){
+                    setMensajeAlerta("Has iniciado sesión");
+                    setMostrarAlerte(true);
+                }
+                
                 //setMostrarAlerte(true);
                 setLoguearse(false);
                 setSecionIniciada(true);                
@@ -291,7 +296,7 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                 setDatosDelUsuarioSinSuscripcion({apellidos: json.apellidos, idTablaForanea: json.idTablaForanea, 
                     nombres: json.nombres, tipoDeUsuario: json.tipoDeUsuario, 
                     tipoSubscripcion: json.tipoSubscripcion, token: json.token,email:userIfno.email.toString().toLowerCase()});
-                return;
+                //return;
             }
             setNombre(json.nombres)
             setApellidos(json.apellidos); 
@@ -306,7 +311,11 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
             setTokenGeoRutas(json.token);
             setTipoDeMenbresiaCode(json.tipoSubscripcion);      
             setTipoDeSubscripcion(json.tipoSubscripcion);
-            setMensajeAlerta("Has iniciado sesión con Google");
+            if(json.tipoSubscripcion!='B'){
+                setMensajeAlerta("Has iniciado sesión con Google");
+                setMostrarAlerte(true);
+            }
+            
             //setMostrarAlerte(true);
             setLoguearse(false);
             setSecionIniciada(true);
@@ -420,7 +429,7 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                 setDatosDelUsuarioSinSuscripcion({apellidos: json.apellidos, idTablaForanea: json.idTablaForanea, 
                     nombres: json.nombres, tipoDeUsuario: json.tipoDeUsuario, 
                     tipoSubscripcion: json.tipoSubscripcion, token: json.token,email:userIfno.userID});
-                return;
+                //return;
             }
 
             setNombre(json.nombres);
@@ -437,7 +446,10 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
             setTokenGeoRutas(json.token);
             setTipoDeMenbresiaCode(json.tipoSubscripcion);   
             setTipoDeSubscripcion(json.tipoSubscripcion);
-            setMensajeAlerta("Has iniciado sesión con Facebook");
+            if(json.tipoSubscripcion!='B'){
+                setMensajeAlerta("Has iniciado sesión con Facebook");
+                setMostrarAlerte(true);
+            }            
             //setMostrarAlerte(true);
             setLoguearse(false);
             setSecionIniciada(true);

@@ -93,12 +93,12 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
                 if(datos.ok){
                     console.log(datos);
                     console.log("Se lograron actualizar todos los usuarios");
+                    setRefrescar(!refrescar);
                     let json=await datos.json();
                     console.log("El json es: "+json);
                     if(json==4){
                         setMensajeAlerta("Usuarios activados");
-                        setMostrarAlerte(true);                            
-                        setRefrescar(!refrescar);
+                        setMostrarAlerte(true);                        
                     }else if(json==2){
                         setMensajeAlerta("Inicie sesión");
                         setMostrarAlerte(true);
@@ -129,6 +129,16 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
 
         
         useEffect(()=>{
+            console.log("Cuando intentas actualizar los usuario obtienes lo siguiente");
+            console.log(purchase);
+            console.log(purchase==true);
+            console.log(idFacturaOApellidos);
+            console.log(idFacturaOApellidos!=null);
+            console.log(idFacturaOApellidos);
+            console.log(idFacturaOApellidos!=undefined);
+            console.log(tiempoDesdeLaUltimaSuscripcion);
+            console.log(tiempoDesdeLaUltimaSuscripcion!='0');
+
             if(purchase==true && idFacturaOApellidos!=null && idFacturaOApellidos!=undefined 
                     && tiempoDesdeLaUltimaSuscripcion!='0'){
                 setMensajeAlerta("Se logro realizar la compra");

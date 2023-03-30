@@ -75,8 +75,11 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
     }
 
     useEffect(()=>{
+        console.log("Desde el componente CompraUsuarioPasajeros intentas acceder a la actualizacion y los datos que obtienes al intentar hacerlo es: ");
+        console.log(purchase);
+        console.log(tiempoDesdeLaUltimaSuscripcion);
         if(purchase==true && tiempoDesdeLaUltimaSuscripcion!='0'){
-            // console.log("LA INFORMACION DEL USUARIO ES: ");
+            console.log("LA INFORMACION DEL USUARIO ES: ");
             // console.log(datosDelUsuarioSinSuscripcion);
             actualizarUsuarioBD([datosDelUsuarioSinSuscripcion.email],datosDelUsuarioSinSuscripcion.email,datosDelUsuarioSinSuscripcion.token,tiempoDesdeLaUltimaSuscripcion,idFacturaOApellidos);            
             setPurchase(false);
@@ -125,7 +128,7 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                             onPressOut={()=>{
                                 console.log("Que la verga");
                                 //actualizarUsuarioBD([datosDelUsuarioSinSuscripcion.email],datosDelUsuarioSinSuscripcion.email,datosDelUsuarioSinSuscripcion.token);
-                                setPurchase(false);
+                                //setPurchase(false);
                                 comprarProducto("suscripcionpasajero");
                             }}                                                
                                 >

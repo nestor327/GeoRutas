@@ -10,7 +10,7 @@ import {
 
   //const adUnitId = (VERSIONDELAPLICACION==1)? TestIds.REWARDED:'ca-app-pub-1889500700036964/6034338968';
   const adUnitId = 'ca-app-pub-1889500700036964/1444382919';
-  //const adUnitId = TestIds.REWARDED;
+  // const adUnitId = TestIds.REWARDED;
   
   // const rewarded = RewardedAd.createForAdRequest(adUnitId, {
   //     requestNonPersonalizedAdsOnly: true
@@ -25,18 +25,27 @@ import {
     useEffect(() => {
         // const unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
         const unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
-            setAnuncioCargado(true);          
-            setMostrarComprasPasajeros(false);            
-            //rewarded.show();
+            setAnuncioCargado(true);        
+            setMostrarAnuncioRewarded(false);              
+            enviarTiempoDesdeElUltimoAnuncio();            
+            console.log("se esta cargando");
+            rewarded.show();
         });
-        console.log("Almenos hace la peticion");  
+
+
         const unsubscribeEarned = rewarded.addAdEventListener(
           RewardedAdEventType.EARNED_REWARD,
           reward => {
-            console.log('User earned reward of ', reward);
-            setAnuncioCargado(false);
-            setMostrarAnuncioRewarded(false);
-            enviarTiempoDesdeElUltimoAnuncio();            
+            console.log('User earned reward of ');
+            console.log(reward);
+            if(reward.amount==1){
+              setAnuncioCargado(false);
+              setMostrarAnuncioRewarded(false);
+              setMostrarComprasPasajeros(false);
+              enviarTiempoDesdeElUltimoAnuncio();            
+            }else{
+              console.log("No se permite el acceso");
+            }
           },
         );
     
@@ -46,20 +55,20 @@ import {
         console.log("Intentaste inicar la vaina x2");
 
         // Unsubscribe from events on unmount
-        return () => {
-          unsubscribeLoaded();
-          unsubscribeEarned();
-        };
+        // return () => {
+        //   unsubscribeLoaded();
+        //   unsubscribeEarned();
+        // };
       }, []);
 
       if(anuncioCargado==false){
         //setMostrarAnuncioRewarded(false);
-        console.log("No se puede cargar la mierda");        
+        console.log("Not show the adds");        
         return (
           <View></View>
         );
       }else{
-        rewarded.show();
+        //rewarded.show();
       }
   };
   

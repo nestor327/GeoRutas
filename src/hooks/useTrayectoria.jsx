@@ -4,25 +4,30 @@ import getAllRutas from "../../data/rutasManagua";
 import { useQuery,queryKey } from "react-query";
 
 const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,setVisualizarRutas,
-    setTiemposRutasTrayectorias,setIconosTransportes,setIdUsuariosDeTrayectoria,verRutasTrayecto,key,emailState,tokenState)=>{
+    setTiemposRutasTrayectorias,setIconosTransportes,setIdUsuariosDeTrayectoria,verRutasTrayecto,key,emailState,tokenState,setNoseEncontraronTrayectorias)=>{
 
 
     // try{
             //Ojo si quieres respuestas diferentes, envia parametros diferentes OJOOOO
 
-    let url='https://www.georutas.lat/api/CalculoDeMenorRuta/'+coordenadasOrigen.longitude+','+coordenadasOrigen.latitude+','+coordenadasDestino.longitude+','+coordenadasDestino.latitude+'?Email='+emailState+'&Token='+tokenState;
+    let url='https://www.georutas.lat/api/CalculoDosMenorRuta/'+coordenadasOrigen.longitude+','+coordenadasOrigen.latitude+','+coordenadasDestino.longitude+','+coordenadasDestino.latitude+'?Email='+emailState+'&Token='+tokenState;
 
-    // console.log("mierda la url es: ");              
+    // console.log("mierda la url es: ");
     //             console.log(url);
     let {data, error, isLoading,isError, isSuccess,status}=useQuery(["gets",coordenadasOrigen,coordenadasDestino,emailState,tokenState],async({queryKey})=>{
-        return await fetch('https://www.georutas.lat/api/CalculoDeMenorRuta/'+queryKey[1].longitude+','+queryKey[1].latitude+','+queryKey[2].longitude+','+queryKey[2].latitude+'?Email='+queryKey[3]+'&Token='+queryKey[4]).then(res=>datos=res.json()).catch(error => data=[]);
+        return await fetch('https://www.georutas.lat/api/CalculoDosMenorRuta/'+queryKey[1].longitude+','+queryKey[1].latitude+','+queryKey[2].longitude+','+queryKey[2].latitude+'?Email='+queryKey[3]+'&Token='+queryKey[4]).then(res=>datos=res.json()).catch(error => data=[]);
                 //return await fetch('https://www.georutas.lat/api/CalculoDeMenorRuta/'+queryKey[1].latitude
                 //return await fetch('https://www.georutas.lat/api/CalculoDeMenorRuta/-86.300482,12.124742,-86.274902,12.125082').then(res=>datos=res.json()).catch(error => data=[]);
                 //return await fetch('https://www.georutas.lat/api/Rutas/'+Math.abs(Math.floor((queryKey[1].latitude)*10)-1200)%45).then(res=>datos=res.json()).catch(error => data=[]);
                 //return await fetch('https://www.georutas.lat/api/Rutas/'+Math.floor(Math.random()*45)).then(res=>datos=res.json()).catch(error => data=[]);
     },{
         refetchInterval:Infinity,
-        cacheTime:20000
+        cacheTime:20000,
+        // onSuccess:()=>{
+        //     if(data!=null && data!=undefined && data[0].id_Idetificador==-7){                
+        //         setNoseEncontraronTrayectorias(true);
+        //     }
+        // }
     });
 
     const [datosDeLosUsuarios,setDatosDeLosUsuarios]=useState([]);
@@ -124,10 +129,17 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
         }
     }
 
+    const verificarSiHayDatos=()=>{
+        if(!isLoading && data!=null && data!=undefined && data[0].id_Idetificador==-7){
+            setNoseEncontraronTrayectorias(true);
+        }
+    }
+
         return{
             data,
             obtenerRutas,
-            datosDeLosUsuarios
+            datosDeLosUsuarios,
+            verificarSiHayDatos
         }   
     // }catch{
     //     let data=[];

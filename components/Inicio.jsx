@@ -145,16 +145,23 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             return;
         }
 
-        if(usuario.token=="0" || usuario.token=="3"){
+        if(usuario.token=="0"){
             return;
+        }else if(usuario.token=="3" && tipoDeSubscripcion!='A' && tipoDeUsuario=='Pasajero'){
+            setTipoDeSubscripcion('A');
+            setTipoDeMenbresiaCode('A');
         }else if(usuario.token=="2" || usuario.token=="1"){
             setSecionIniciada(false);            
             setTipoDeUsuario("Ninguno");
             setLoguearse(true);
-        }else{
+        }else if(usuario.token=="4" && tipoDeSubscripcion!='C' && tipoDeUsuario=='Pasajero'){
+            setTipoDeSubscripcion('C');
+            setTipoDeMenbresiaCode('C');
+        }else if(usuario.token.length>10){
             setTokenState(usuario.token);
             setTokenGeoRutasCode(usuario.token);
         }
+
     }
         
     const capturarUsuarioTransportistaYDemas=async(email,token)=>{  
@@ -661,14 +668,14 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     
             if(state!=='active' && secionIniciada==true){
                 if(tipoDeUsuario=='Transportista'){                    
-                    activarTarea();
+                    activarTarea();                    
                 }
                 setEstadoAplicacion(false);
                 console.log("La tarea se activo");
                 return;
             } 
             
-            if(state=='active' && secionIniciada==true){                
+            if(state=='active' && secionIniciada==true){  
                 setEstadoAplicacion(true);                
                 console.log("La tarea se desactivo");
                 if(tipoDeUsuario=='Transportista'){
@@ -686,7 +693,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         return ()=>{
             permisosState.remove();
         }
-    },[permitirEnviarUbicacion,secionIniciada,emailState,tokenState,tipoDeUsuario])
+    },[permitirEnviarUbicacion,secionIniciada,emailState,tokenState,tipoDeUsuario,tipoDeSubscripcion])
 
 
     useEffect(()=>{
@@ -746,7 +753,10 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         backgroundColor:(!modoOscuro)?'#2060A5':'#151567',flexDirection:'row',marginLeft:'5%',borderTopRightRadius:20, 
         borderTopLeftRadius:20},mostrarBarraSecundariaDeUbicacion==false && {borderBottomRightRadius:20,borderBottomLeftRadius:20}
         ]}>
-        {((activarPrecision==false || bacgroundPermisos!='granted') && tipoDeUsuario=='Transportista') && 
+        {((
+            //Aqui ya no mostramos la ubicacion presisa si no se esta compartiendo
+            //activarPrecision==false || 
+            bacgroundPermisos!='granted') && tipoDeUsuario=='Transportista') && 
         <TouchableOpacity style={[{position:'absolute', zIndex:101, top:-28,alignItems:'center',borderColor:'red',borderWidth:1,borderRadius:10,width:'105%',left:'-2.5%'}
         ,(bacgroundPermisos!='granted' && activarPrecision==true) &&{top:width*0.4},{backgroundColor:'#00000030'}]}
             onPress={()=>{
@@ -1217,7 +1227,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                                 refMapView.current?.animateCamera({
                                     center:{...coordenadasOrigen}
                                 })
-                            }
+                            }                            
                             //setTipoDeModificacionDeLugar('Origen');
                             //refInputAutoComplete.current.blur();
                             //refInputAutoComplete.current.setAddressText(refNombreDelOrigen.current);                        
@@ -1262,14 +1272,18 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         alignItems: 'flex-start',
                         borderBottomRightRadius: 12,
                         borderBottomLeftRadius: 12,
+                        borderRadius:12,
+                        marginTop:3,
                         borderColor: '#c8c7cc',
-                        borderBottomWidth: 0.5,
+                        borderWidth: 1,
+                        borderColor: 'white',
                         color:'black',
                         alignContent:'center',
                         color:'black',
                         paddingLeft:15,
                         marginBottom:0,
-                        height:40}}
+                        height:40
+                    }}
 
                         onPress={()=>{
                             if(secionIniciada==true){
@@ -1287,10 +1301,10 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                                 refMapView.current?.animateCamera({
                                     center:{...userLocation}
                                 })
-                            }                            
+                            }
                         }}
                     >
-                        <Text style={{color:'black',fontSize:15}}>Tu ubicación</Text>
+                        <Text style={{color:(!modoOscuro)?'black':'#f1f1f1',fontSize:15}}>Tu ubicación</Text>
                     </TouchableOpacity>}
                 </View>}
 

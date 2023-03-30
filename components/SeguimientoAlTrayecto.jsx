@@ -63,7 +63,7 @@ const SeguimientoAlTrayecto=({datosDeLosUsuarios,modoOscuro,emailState,tokenStat
         return(
             data.map((item, i)=>{
                 return(
-                    (datosDeLosUsuarios[i].tiempo*2)>item.tiempoDeLlegada                     
+                    (datosDeLosUsuarios[i].tiempo*2)>Math.abs(item.tiempoDeLlegada)
                     && 
                     <Marker key={i} coordinate={{
                         latitude:item.longitude,
@@ -75,13 +75,13 @@ const SeguimientoAlTrayecto=({datosDeLosUsuarios,modoOscuro,emailState,tokenStat
                         {(item.direccion=='I') && <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{"⇚"+nombresDeLasRutas[item.id_Ruta-1].nombre}</Text>}         
                         <Image style={{width:27,height:27}} source={urlDeLosIconos[item.id_Ruta-1]}></Image>
                         <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>
-                            {(i==0)?Math.floor((item.tiempoDeLlegada)/3600)
-                                    +":"+((Math.floor((((item.tiempoDeLlegada)-3600*(Math.floor((item.tiempoDeLlegada)/3600)))/60))>9)?Math.floor((((item.tiempoDeLlegada)-3600*(Math.floor((item.tiempoDeLlegada)/3600)))/60)):"0"+Math.floor((((item.tiempoDeLlegada)-3600*(Math.floor((item.tiempoDeLlegada)/3600)))/60)))
-                                    +":"+(((item.tiempoDeLlegada)%60>9)?(item.tiempoDeLlegada)%60:"0"+(item.tiempoDeLlegada)%60)
+                            {(i==0)?Math.floor((Math.abs(item.tiempoDeLlegada))/3600)
+                                    +":"+((Math.floor((((Math.abs(item.tiempoDeLlegada))-3600*(Math.floor((Math.abs(item.tiempoDeLlegada))/3600)))/60))>9)?Math.floor((((Math.abs(item.tiempoDeLlegada))-3600*(Math.floor((Math.abs(item.tiempoDeLlegada))/3600)))/60)):"0"+Math.floor((((Math.abs(item.tiempoDeLlegada))-3600*(Math.floor((Math.abs(item.tiempoDeLlegada))/3600)))/60)))
+                                    +":"+(((Math.abs(item.tiempoDeLlegada))%60>9)?(Math.abs(item.tiempoDeLlegada))%60:"0"+(Math.abs(item.tiempoDeLlegada))%60)
                                     :
-                                    Math.floor((item.tiempoDeLlegada-data[i-1].tiempoDeLlegada)/3600)
-                                    +":"+((Math.floor((((item.tiempoDeLlegada-data[i-1].tiempoDeLlegada)-3600*(Math.floor((item.tiempoDeLlegada-data[i-1].tiempoDeLlegada)/3600)))/60))>9)?Math.floor((((item.tiempoDeLlegada-data[i-1].tiempoDeLlegada)-3600*(Math.floor((item.tiempoDeLlegada-data[i-1].tiempoDeLlegada)/3600)))/60)):"0"+Math.floor((((item.tiempoDeLlegada-data[i-1].tiempoDeLlegada)-3600*(Math.floor((item.tiempoDeLlegada-data[i-1].tiempoDeLlegada)/3600)))/60)))
-                                    +":"+(((item.tiempoDeLlegada-data[i-1].tiempoDeLlegada)%60>9)?(item.tiempoDeLlegada-data[i-1].tiempoDeLlegada)%60:"0"+(item.tiempoDeLlegada-data[i-1].tiempoDeLlegada)%60)}
+                                    Math.floor((Math.abs(item.tiempoDeLlegada)-data[i-1].tiempoDeLlegada)/3600)
+                                    +":"+((Math.floor((((Math.abs(item.tiempoDeLlegada)-data[i-1].tiempoDeLlegada)-3600*(Math.floor((Math.abs(item.tiempoDeLlegada)-data[i-1].tiempoDeLlegada)/3600)))/60))>9)?Math.floor((((Math.abs(item.tiempoDeLlegada)-data[i-1].tiempoDeLlegada)-3600*(Math.floor((Math.abs(item.tiempoDeLlegada)-data[i-1].tiempoDeLlegada)/3600)))/60)):"0"+Math.floor((((Math.abs(item.tiempoDeLlegada)-data[i-1].tiempoDeLlegada)-3600*(Math.floor((Math.abs(item.tiempoDeLlegada)-data[i-1].tiempoDeLlegada)/3600)))/60)))
+                                    +":"+(((Math.abs(item.tiempoDeLlegada)-data[i-1].tiempoDeLlegada)%60>9)?(Math.abs(item.tiempoDeLlegada)-data[i-1].tiempoDeLlegada)%60:"0"+(Math.abs(item.tiempoDeLlegada)-data[i-1].tiempoDeLlegada)%60)}
 
                             </Text>
                     </Marker>

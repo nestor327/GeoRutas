@@ -5,6 +5,8 @@ import Principal from './Principal.jsx';
 import {enableLatestRenderer} from 'react-native-maps';
 import { Platform } from 'react-native';
 import { MaxAdContentRating, MobileAds } from 'react-native-google-mobile-ads';
+import useComprasPlayStore from './src/hooks/useComprasPlayStore.jsx';
+import useLocalBd from './src/hooks/useLocalBd.jsx';
 
 
 const queryClient= new QueryClient();
@@ -40,9 +42,16 @@ export default function App(): JSX.Element{
         
   },[])
 
+
+  
   return(
       <QueryClientProvider  client={queryClient}>        
-        <Principal></Principal>        
+        <Principal 
+        // emailState={emailState} setEmailState={setEmailState} mensajeAlerta={mensajeAlerta} purchase={purchase} setPurchase={setPurchase} setMensajeAlerta={setMensajeAlerta}
+        // mostrarAlerta={mostrarAlerta} setMostrarAlerte={setMostrarAlerte} tiempoDesdeLaUltimaSuscripcion={tiempoDesdeLaUltimaSuscripcion} setTiempoDesdeLaUltimaSuscripcion={setTiempoDesdeLaUltimaSuscripcion}
+        // mostrarInformacion={mostrarInformacion} setMostrarInformacion={setMostrarInformacion} datosDelUsuarioSinSuscripcion={datosDelUsuarioSinSuscripcion} setDatosDelUsuarioSinSuscripcion={setDatosDelUsuarioSinSuscripcion}
+        // secionIniciada={secionIniciada} setSecionIniciada={setSecionIniciada} comprarProducto={comprarProducto} refrescarHistorial={refrescarHistorial} purchaseTxt={purchaseTxt} historial={historial} idFacturaOApellidos={idFacturaOApellidos}
+        ></Principal>
       </QueryClientProvider>
   )
 }
