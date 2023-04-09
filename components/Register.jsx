@@ -2,7 +2,6 @@ import * as react from 'react';
 import { View,Text, TextInput,Image, ScrollView,Keyboard,TouchableOpacity, Platform, AppState } from 'react-native';
 import imagen from '../assets/x_icon_imagen.png';
 //import * as Location from 'expo-location';
-import { useQuery } from 'react-query';
 import { setNombre,setCorreo, getApellidos, getTelefono, setTelefonoAsync } from '../data/asyncStorageData.js';
 import { StatusBar } from 'react-native';
 import { useEffect } from 'react';

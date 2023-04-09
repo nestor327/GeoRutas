@@ -10,6 +10,7 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
                         ,identificadorKey, refCambiarLupa, setCargando,ocultarTercerMenu,menTres,emailState, tokenState, latitude, longitude
                         ,setVerParadasCercanas,setMostrarMenusBuenEstado,setmenUno,setmenDos,setmenTres,setmenCinco,setmenCuatro
                         ,setMostrarBarraSecundariaDeUbicacion,menCinco,modoOscuro,setMostrarCompañerosCercanos,fechaDeClicSalida, setFechaDeClicSalida
+                        ,refMapView,setIniciarRecorridoDeLaTrayectoria,tipoDeSubscripcion,tipoDeUsuario
                         })=>{
 
         const [fechaDeClicCambio, setFechaDeClicCambio]=useState(1679456668848);
@@ -88,7 +89,8 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
                       verRutasTrayecto={verRutasTrayecto} obtenerRutas={obtenerRutas}
                       setVerTrayectoria={setVerTrayectoria}
                       setVerRutasCercanas={setVerRutasCercanas} setVerCompetencia={setVerCompetencia} setOcultarTrayecto={setOcultarTrayecto}
-                      identificadorKey={identificadorKey} refCambiarLupa={refCambiarLupa} setCargando={setCargando} setMostrarCompañerosCercanos={setMostrarCompañerosCercanos}
+                      identificadorKey={identificadorKey} refCambiarLupa={refCambiarLupa} setCargando={setCargando} setMostrarCompañerosCercanos={setMostrarCompañerosCercanos}                      
+                      setIniciarRecorridoDeLaTrayectoria={setIniciarRecorridoDeLaTrayectoria}
                       ></IntercambiosRutas>
 
                   </ScrollView>
@@ -100,8 +102,8 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
             top:(height>width)?height-width*0.8:height*0.6-height*0.2-StatusBar.currentHeight*0.8, backgroundColor: '#102769'},modoOscuro && {backgroundColor:'#151553'}]}>
                 <ScrollView>
                 {
-                    <ParadasCercaDelOrigen setFechaDeClicCambio={setFechaDeClicCambio} emailState={emailState} tokenState={tokenState} lalitude={latitude} longitude={longitude} 
-                    setVerParadasCercanas={setVerParadasCercanas} setMostrarCompañerosCercanos={setMostrarCompañerosCercanos}></ParadasCercaDelOrigen>
+                    <ParadasCercaDelOrigen tipoDeUsuario={tipoDeUsuario} tipoDeSubscripcion={tipoDeSubscripcion} refMapView={refMapView} setFechaDeClicCambio={setFechaDeClicCambio} emailState={emailState} tokenState={tokenState} lalitude={latitude} longitude={longitude} 
+                    setVerParadasCercanas={setVerParadasCercanas} setMostrarCompañerosCercanos={setMostrarCompañerosCercanos} setVerRutasCercanas={setVerRutasCercanas} setVerCompetencia={setVerCompetencia}></ParadasCercaDelOrigen>
                 }
                 </ScrollView>
             </View>}

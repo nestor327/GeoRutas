@@ -1,7 +1,7 @@
-import * as react from 'react';
+import react from 'react';
 import { View,Image,Text, TouchableHighlightBase, TouchableOpacity, StatusBar} from 'react-native';
 import styles from '../componentStyles/menuBarStyles.js';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { setTokenGeoRutasCode } from '../data/asyncStorageData.js';
 
 const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRutasTrayecto
@@ -14,11 +14,12 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                 ,verParadasCercanas,userLocation,setCoordenadasOrigenSecundario,setSecionIniciada, setTipoDeUsuario
                 ,permitirEnviarUbicacion, setMostrarBarraSecundariaDeUbicacion,refCambiarLupa,activarPrecision,setActivarPrecision
                 ,tipoDeUsuario,serMostrarVentana,cargando,setCargando,idRutaAMostrar,setMostrarMenusBuenEstado,modoOscuro,setMostrarCompañerosCercanos
-                ,mostrarVentana,setIniciarRecorridoDeLaTrayectoria,verificarSiHayDatos
+                ,mostrarVentana,setIniciarRecorridoDeLaTrayectoria,verificarSiHayDatos,tiempoDeEspera,setTiempoDeEspera
+                ,detenerInterval,setDetenerInterval,verRutasCercanas
             })=>{
     
 
-    const [verPerfil,setVerPerfil]=react.useState('none'); 
+    const [verPerfil,setVerPerfil]=useState('none'); 
     
     useEffect(()=>{
         serMostrarVentana(verPerfil);        
@@ -56,7 +57,32 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
         return false;
     }
 
-    
+
+    useEffect(()=>{
+        let k=null;
+        if(detenerInterval==false){
+            k=setInterval(() => {
+                if(tiempoDeEspera==0){
+                    setDetenerInterval(true);
+                    setVerRutasCercanas(false);
+                }else{
+                    setTiempoDeEspera(tiempoDeEspera-1);
+                    console.log(tiempoDeEspera);
+                }
+
+            }, 1000);
+        }
+        if(verRutasCercanas==false){
+            setDetenerInterval(true);
+        }else if(verParadasCercanas==true && tiempoDeEspera>0){
+            setDetenerInterval(false);
+        }
+        return(
+            ()=>{
+                clearInterval(k);
+            }
+        )
+    },[detenerInterval,tiempoDeEspera,verRutasCercanas]);
     
 
   return (

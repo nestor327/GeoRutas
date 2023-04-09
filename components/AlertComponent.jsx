@@ -16,7 +16,8 @@ const AlertComponet=({width,urlDeLaAplicacion,AlerMensaje,height,tipoDeAlert,set
     return(
         <View style={{width:'100%',height:height,position:'absolute',top:0,left:0,zIndex:240,backgroundColor:'#00000045'}}>
             <View style={{backgroundColor:'#101038',height:(height>width)?'20%':'40%',
-                    width:(height>width)?'90%':'50%',position:'absolute',top:(height>width)?'40%':'25%',left:(height>width)?'5%':'25%',zIndex:190}}>
+                    width:(height>width)?'88%':'50%',position:'absolute',top:(height>width)?'40%':'25%',left:(height>width)?'6%':'25%'
+                    ,zIndex:190,borderWidth:0.4,borderColor:'#f1f1f1'}}>
                 
                 <View style={{marginTop:'5%',marginLeft:'10%', alignItems:'flex-start',marginRight:'10%'}}>
                     <Text style={{color:'#f1f1f1',fontSize:17}}>{(tipoDeAlert=='E')?"Alerta":"Alerta"}</Text>

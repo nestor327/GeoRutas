@@ -123,16 +123,20 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                         </Image>
                     </View>
 
-                    <TouchableOpacity style={{marginTop:'5%', marginLeft:'auto',marginRight:'auto',backgroundColor:'green',
-                                                height:50,alignItems:'center',justifyContent:'center',padding:10,borderRadius:10}}
+                    <TouchableOpacity style={{marginTop:'5%', marginLeft:'auto',marginRight:'auto',backgroundColor:(eliminarAnuncios)?'green':'#2956b2',
+                                                height:50,alignItems:'center',justifyContent:'center',padding:10,borderRadius:10,width:(eliminarAnuncios)?'auto':'45%'}}
                             onPressOut={()=>{
-                                console.log("Que la verga");
+                                if(eliminarAnuncios){
+                                    comprarProducto("suscripcionpasajero");
+                                }else{
+                                    setMostrarAnuncioRewarded(true);
+                                    console.log("Estas pidiendo el anuncio");
+                                }
                                 //actualizarUsuarioBD([datosDelUsuarioSinSuscripcion.email],datosDelUsuarioSinSuscripcion.email,datosDelUsuarioSinSuscripcion.token);
                                 //setPurchase(false);
-                                comprarProducto("suscripcionpasajero");
                             }}                                                
                                 >
-                        <Text style={{fontSize:19}}>Presiona para comprar</Text>
+                        <Text style={{fontSize:19}}>{(eliminarAnuncios==true)?"Presiona para comprar":"Ver anuncio"}</Text>
                     </TouchableOpacity>
 
                     {purchase==false && <View style={{marginTop:10,marginLeft:'auto',marginRight:'auto',
@@ -142,15 +146,14 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                     </View>}
 
                     <View style={{flexDirection:'row', justifyContent:'space-around',marginHorizontal:30}}> 
-                        {eliminarAnuncios==false && <TouchableOpacity style={{marginTop:(eliminarAnuncios==false)?'7%':'3%',backgroundColor:'#2956b2'
+                        {eliminarAnuncios==false && <TouchableOpacity style={{marginTop:(eliminarAnuncios==false)?'7%':'3%',backgroundColor:'green'
                                                     ,width:'40%',height:37,borderRadius:10}}
                                 onPressOut={()=>{
-                                    setMostrarAnuncioRewarded(true);                                    
-                                    console.log("Estas pidiendo el anuncio");
+                                    comprarProducto("suscripcionpasajero");                                    
                                 }}                        
                             >
                             <Text style={{fontSize:17,textAlign:'center',alignContent:'center',height:37,textAlignVertical:'center'}}>
-                                Ver Anuncio
+                            Comprar
                             </Text>
                         </TouchableOpacity>}
                         <TouchableOpacity style={{marginTop:(eliminarAnuncios==false)?'7%':'3%',backgroundColor:'#2956b2'

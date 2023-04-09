@@ -52,7 +52,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     ,tiempoDesdeUltimoAnuncio,setMostrarAnuncioRewarded,obtenerTiempoDesdeElUltimoAnucio,setMostrarComprasPasajeros,setEliminarAnuncios
     ,setTiempoDesdeUltimoAnuncio,VERSIONDELAPLICACION,modoOscuro,setModoOscuro,mostrarCompañerosCercanos, setMostrarCompañerosCercanos
     ,tiempoParaUsaurioTransportistaLogueado, setTiempoParaUsaurioTransportistaLogueado, setTiempoPromedio, tiempoPromedio
-    ,iniciarRecorridoDeLaTrayectoria, setIniciarRecorridoDeLaTrayectoria,datosDeLosUsuarios,setFechaDeClicSalida
+    ,iniciarRecorridoDeLaTrayectoria, setIniciarRecorridoDeLaTrayectoria,datosDeLosUsuarios,setFechaDeClicSalida,mostrarComprasPasajeros
+    ,detenerInterval,setDetenerInterval,tiempoDeEspera,setTiempoDeEspera,refMapView
     })=>{
     
 
@@ -108,7 +109,6 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
 
 
-    const refMapView=useRef();
     const refFollowing=useRef(true);
     const [refChangeLocation,setrefChangeLocation]=useState({latitude:0, longitude:0});
     const refEnvioDeUbicacionesPasajero=useRef(true);
@@ -744,6 +744,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         menCuatro={menCuatro} verParadasCercanas={verParadasCercanas} setIdRutaAMostrar={setIdRutaAMostrar} setMostrarMenusBuenEstado={setMostrarMenusBuenEstado} setMostrarItemMenuUno={setMostrarItemMenuUno}
         setVerParadasCercanas={setVerParadasCercanas} setMostrarBarraSecundariaDeUbicacion={setMostrarBarraSecundariaDeUbicacion} coordenadasOrigenSecundario={coordenadasOrigenSecundario} 
         iniciarRecorridoDeLaTrayectoria={iniciarRecorridoDeLaTrayectoria} setIniciarRecorridoDeLaTrayectoria={setIniciarRecorridoDeLaTrayectoria}
+        setDetenerInterval={setDetenerInterval} setTiempoDeEspera={setTiempoDeEspera}
         ></IconosDeNavegacion>
 
 
@@ -1001,8 +1002,6 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                 }}
                 fetchDetails={true}
             />
-
-
         </View>
 
             <View onTouchEnd={()=>{
@@ -1060,7 +1059,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     style={[{width:39, height:39,marginLeft:6,marginRight:6, borderRadius:20,marginTop:6,marginBottom:6,
                     },(mostrarBarraSecundariaDeUbicacion==true) && {tintColor:'#f1f1f1',marginRight:10,marginLeft:4}]}>
                 </Image>
-            </View>
+            </View>            
     </View>
     
     {mostrarBarraSecundariaDeUbicacion==true && <View style={{width:(mostrarBarraSecundariaDeUbicacion==true)?'90%':12,zIndex:90,top:height*0.08+47-StatusBar.currentHeight
@@ -1352,10 +1351,12 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                 </Image>
         </TouchableOpacity>}
     </View>}
-        
 
-
-
+        {tipoDeUsuario=='Pasajero' && mostrarItemMenuUno==true && detenerInterval==false && <View style={{position:'absolute', backgroundColor:(!modoOscuro)?'#2060A9':'#151567',height:40,width:80,zIndex:10,right:'5%',top:'20%',
+        alignItems:'center',justifyContent:'center',borderRadius:10,borderWidth:2,borderColor:(tiempoDeEspera>=30)?'green':'red'}}>
+            <Text style={{fontWeight:'600'}}
+            >{"0"+Math.floor(tiempoDeEspera/60)+":"+[((tiempoDeEspera-60*(Math.floor(tiempoDeEspera/60)))>9)?(tiempoDeEspera-60*(Math.floor(tiempoDeEspera/60))):"0"+(tiempoDeEspera-60*(Math.floor(tiempoDeEspera/60)))]}</Text>
+        </View>}
 
         {mostrarVentana=="flex" && <Perfil VERSIONDELAPLICACION={VERSIONDELAPLICACION} setMostrarComprasPasajeros={setMostrarComprasPasajeros} height={height} setEliminarAnuncios={setEliminarAnuncios} width={width} setMostrarAnuncioRewarded={setMostrarAnuncioRewarded} sesionIniciadaConGoogle={sesionIniciadaConGoogle} registrarse={registrarse} setEditarPerfil={setEditarPerfil} setCambiarPassword={setCambiarPassword} setVerAdministrarUsuarios={setVerAdministrarUsuarios} tipoDeSubscripcion={tipoDeSubscripcion} permitirEnviarUbicacion={permitirEnviarUbicacion} secionIniciada={secionIniciada} 
             setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setRegistrarse={setRegistrarse} 
@@ -1372,8 +1373,10 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             refMapView.current=el;
         }}
 
-        initialRegion={{latitude:inicialPosition.latitude,
-                        longitude:inicialPosition.longitude
+        initialRegion={{latitude:
+                                    coordenadasDestino.latitude,//inicialPosition.latitude,
+                        longitude:
+                                    coordenadasDestino.longitude//inicialPosition.longitude
                         ,latitudeDelta:0.04,longitudeDelta:0.04}}
 
         style={{width:'100%',height:'100%',position:'absolute',top:0,left:0, zIndex:1}}
@@ -1578,7 +1581,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
 
             {secionIniciada==true && mostrarParadas==true && !mostrarCompañerosCercanos && <DireccionesSegunUbicacion emailState={emailState} tokenState={tokenState} idRuta={idRutaAMostrar}></DireccionesSegunUbicacion>}
-            {secionIniciada==true && idRutaAMostrar>0 && mostrarUsuarios==true && tipoDeUsuario=='Pasajero' && <UsuariosTransportistas emailState={emailState} tokenState={tokenState} tipoDeUsuario={tipoDeUsuario} idRuta={idRutaAMostrar} idUsuarioIniciado={idUsuarioIniciado}
+            {secionIniciada==true && idRutaAMostrar>0 && mostrarUsuarios==true && tipoDeUsuario=='Pasajero' && mostrarComprasPasajeros==false && <UsuariosTransportistas emailState={emailState} tokenState={tokenState} tipoDeUsuario={tipoDeUsuario} idRuta={idRutaAMostrar} idUsuarioIniciado={idUsuarioIniciado}
                         verTransportistasPorLaDerecha={verTransportistasPorLaDerecha} verTransportistasPorLaIzquierda={verTransportistasPorLaIzquierda} modoOscuro={modoOscuro}></UsuariosTransportistas>}
             
             {secionIniciada==true && tipoDeUsuario=='Transportista' && idRutaAMostrar>0 && mostrarUsuarios==true && !mostrarCompañerosCercanos && <UsuariosTransportistasConTiempo setTiempoPromedio={setTiempoPromedio} setTiempoParaUsaurioTransportistaLogueado={setTiempoParaUsaurioTransportistaLogueado} modoSimplificado={false}
@@ -1599,7 +1602,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=="Transportista" && verCompetencia==true && <CompetenciaTransportistas modoOscuro={modoOscuro} emailState={emailState} tokenState={tokenState} 
             tipoDeUsuario={tipoDeUsuario} idUsuarioIniciado={idUsuarioIniciado} rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}></CompetenciaTransportistas>}
 
-            {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=='Pasajero' && userLocation.latitude!=0 && verRutasCercanas==true &&  <RutasCercaDelPasajero modoOscuro={modoOscuro} emailState={emailState} tokenState={tokenState} userLocation ={userLocation}
+            {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=='Pasajero' && userLocation.latitude!=0 && verRutasCercanas==true && mostrarComprasPasajeros==false &&  <RutasCercaDelPasajero tiempoDeEspera={tiempoDeEspera} refMapView={refMapView} modoOscuro={modoOscuro} emailState={emailState} tokenState={tokenState} userLocation ={userLocation}
             rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}></RutasCercaDelPasajero>}
 
             {verParadasCercanas[0].observar==true &&
@@ -1652,7 +1655,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                 && (tipoDeUsuario=='Transportista' || (tipoDeUsuario=='Pasajero' && 
                 (tipoDeSubscripcion=='A' ||tipoDeSubscripcion=='S'))) && <UsuarioCercanoAUnaParada modoOscuro={modoOscuro} idRuta={verParadasCercanas[0].id_Ruta} emailState={emailState} tokenState={tokenState} idParada={verParadasCercanas[0].id_Parada}
                     tipoDeUsuario={tipoDeUsuario} idUsuarioIniciado={idUsuarioIniciado}></UsuarioCercanoAUnaParada>}
-            {secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && !mostrarCompañerosCercanos && iniciarRecorridoDeLaTrayectoria && <SeguimientoAlTrayecto datosDeLosUsuarios={datosDeLosUsuarios} modoOscuro={modoOscuro}emailState={emailState}tokenState={tokenState}></SeguimientoAlTrayecto>}
+            {secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && !mostrarCompañerosCercanos && iniciarRecorridoDeLaTrayectoria && <SeguimientoAlTrayecto permitirSeguirPasajero={permitirSeguirPasajero} permitirEnviarUbicacion={permitirEnviarUbicacion} refMapView={refMapView} datosDeLosUsuarios={datosDeLosUsuarios} modoOscuro={modoOscuro}emailState={emailState}tokenState={tokenState}></SeguimientoAlTrayecto>}
             
         </MapView>}         
     </View>

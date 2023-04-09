@@ -6,7 +6,8 @@ import getAllRutas from '../data/rutasManagua.js'
 
 const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRutasTrayecto,obtenerRutas
     ,setVerTrayectoria,setVerRutasCercanas,identificadorKey,refCambiarLupa
-    ,setVerCompetencia,setOcultarTrayecto,setCargando,setFechaDeClicCambio,setMostrarCompañerosCercanos})=>{
+    ,setVerCompetencia,setOcultarTrayecto,setCargando,setFechaDeClicCambio,setMostrarCompañerosCercanos
+    ,setIniciarRecorridoDeLaTrayectoria})=>{
 
     let cantidadDeTrayectos =[0];
     let datosDeLasRutas=[];
@@ -78,6 +79,10 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
                                 <View key={i} style={{alignItems:'center', marginTop:'17%'}} 
                                 onTouchEnd={()=>{  
                                     
+                                    if(identificadorKey.current!=(i+1)){
+                                        setIniciarRecorridoDeLaTrayectoria(false);                                        
+                                    }
+
                                     setCargando(true);
                                     Animated.timing(fadeAnim.current, {
                                         toValue: 1,
@@ -101,7 +106,7 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
                                     setCargando(false);
                                     let fecha= new Date();
                                     setFechaDeClicCambio(fecha.getTime());
-                                    setMostrarCompañerosCercanos(false);
+                                    setMostrarCompañerosCercanos(false);                                    
                                 }
                                 }>
                                     <Animated.View style={visualizarRutas==(i+1) && {opacity:fadeAnim.current, backgroundColor:'#1e81ce', padding:5, borderRadius:10}}

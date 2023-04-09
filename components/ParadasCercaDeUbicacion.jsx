@@ -7,7 +7,8 @@
     import RutasBarItem from '../components/RutasBarItem.jsx';
     import getAllRutas from "../data/rutasManagua.js";
 
-    const ParadasCercaDelOrigen=({lalitude,longitude,setVerParadasCercanas,emailState, tokenState,setFechaDeClicCambio,setMostrarCompañerosCercanos})=>{
+    const ParadasCercaDelOrigen=({lalitude,longitude,setVerParadasCercanas,emailState, tokenState,setFechaDeClicCambio
+        ,setMostrarCompañerosCercanos,refMapView,setVerRutasCercanas,setVerCompetencia,tipoDeSubscripcion,tipoDeUsuario})=>{
         try{
             const {data,error,isLoading}=useQuery(['obtenerParadasEnElOrigen',lalitude,longitude],async({queryKey})=>{                
                 return await fetch('https://www.georutas.lat/api/SP_PCalcularRutasQuePasanCercaDeUnPunto/'+queryKey[1]+','+queryKey[2]+'?Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());
@@ -39,6 +40,15 @@
                                 let fecha= new Date();
                                 setFechaDeClicCambio(fecha.getTime());
                                 setMostrarCompañerosCercanos(false);
+                                refMapView.current?.animateCamera({
+                                    center:{latitude:item.longitude,longitude:item.latitude}
+                                })
+
+                                if(tipoDeSubscripcion!='C' && tipoDeUsuario=='Pasajero'){
+                                    setVerRutasCercanas(false);
+                                }else if(tipoDeUsuario=='Transportista'){
+                                    setVerCompetencia(false);
+                                }
                             }}>
                                 <RutasBarItem color={coloresRuta[i]} numeroDeRuta={nombresEnElArregloFinal[i]}
                                 tiempoDeLlegada={item.tiempoDeLlegada} mostrarTiempo={true}>

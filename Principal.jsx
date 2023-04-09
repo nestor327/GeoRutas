@@ -2,7 +2,6 @@ import {useState,useEffect,useRef} from 'react';
 import { Linking, ScrollView, StatusBar, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Inicio from './components/Inicio.jsx';
 import Login from './components/Login.jsx';
-import { useQuery, queryKey } from 'react-query';
 import MenuBar from './components/MenuBar.jsx';
 import Register from './components/Register.jsx';
 import getAllRutas from './data/rutasManagua.js';
@@ -195,8 +194,10 @@ const App=(
 
       const [noSeEncontraronTrayectorias, setNoseEncontraronTrayectorias]=useState(false);
 
+      const refMapView=useRef();
+
       const {data,obtenerRutas,datosDeLosUsuarios,verificarSiHayDatos} = useTrayectoria(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,setVisualizarRutas,
-      setTiemposRutasTrayectorias,setIconosTransportes,setIdUsuariosDeTrayectoria,verRutasTrayecto,identificadorKey,emailState,tokenState,setNoseEncontraronTrayectorias);
+      setTiemposRutasTrayectorias,setIconosTransportes,setIdUsuariosDeTrayectoria,verRutasTrayecto,identificadorKey,emailState,tokenState,setNoseEncontraronTrayectorias,refMapView);
 
       const [menUno, setmenUno] = useState([{ display: 'none',color:'#102769' }]);
       const [menDos, setmenDos] = useState([{ display: 'none',color:'#102769' }]);
@@ -573,6 +574,8 @@ const App=(
         }
     },[noSeEncontraronTrayectorias])
 
+    const [tiempoDeEspera,setTiempoDeEspera]=useState(0);
+    const [detenerInterval,setDetenerInterval]=useState(true);    
 
   return (
      <View style={{height:height, width:width}}>
@@ -606,7 +609,8 @@ const App=(
         modoOscuro={modoOscuro} setModoOscuro={setModoOscuro} mostrarCompañerosCercanos={mostrarCompañerosCercanos} setMostrarCompañerosCercanos={setMostrarCompañerosCercanos} tiempoParaUsaurioTransportistaLogueado={tiempoParaUsaurioTransportistaLogueado}
         setTiempoParaUsaurioTransportistaLogueado={setTiempoParaUsaurioTransportistaLogueado} setTiempoPromedio={setTiempoPromedio} tiempoPromedio={tiempoPromedio} iniciarRecorridoDeLaTrayectoria={iniciarRecorridoDeLaTrayectoria} 
         setIniciarRecorridoDeLaTrayectoria={setIniciarRecorridoDeLaTrayectoria} datosDeLosUsuarios={datosDeLosUsuarios}
-        setFechaDeClicSalida={setFechaDeClicSalida}
+        setFechaDeClicSalida={setFechaDeClicSalida} mostrarComprasPasajeros={mostrarComprasPasajeros} detenerInterval={detenerInterval} setDetenerInterval={setDetenerInterval}
+        tiempoDeEspera={tiempoDeEspera} setTiempoDeEspera={setTiempoDeEspera} refMapView={refMapView}
         ></Inicio>
 
         {mostrarMenusBuenEstado==true && <ItemsTrayectos setOcultarLasMierdasDelPrimerMenu={setOcultarLasMierdasDelPrimerMenu} ocultarMenu={ocultarMenu} setIdRutaAMostrar={setIdRutaAMostrar} 
@@ -624,7 +628,9 @@ const App=(
         longitude={coordenadasOrigenSecundario.longitude} setVerParadasCercanas={setVerParadasCercanas}
         setMostrarMenusBuenEstado={setMostrarMenusBuenEstado} setmenUno={setmenUno} setmenDos={setmenDos} setmenTres={setmenTres}
         setmenCinco={setmenCinco}
-        menCinco={menCinco} modoOscuro={modoOscuro} setMostrarCompañerosCercanos={setMostrarCompañerosCercanos} fechaDeClicSalida={fechaDeClicSalida} setFechaDeClicSalida={setFechaDeClicSalida}
+        menCinco={menCinco} modoOscuro={modoOscuro} setMostrarCompañerosCercanos={setMostrarCompañerosCercanos} fechaDeClicSalida={fechaDeClicSalida} setFechaDeClicSalida={setFechaDeClicSalida}        
+        refMapView={refMapView} setIniciarRecorridoDeLaTrayectoria={setIniciarRecorridoDeLaTrayectoria}
+        tipoDeSubscripcion={tipoDeSubscripcion} tipoDeUsuario={tipoDeUsuario}
         >
 
         </ItemsTrayectos>}
@@ -642,7 +648,8 @@ const App=(
         activarPrecision={activarPrecision} setActivarPrecision={setActivarPrecision} tipoDeUsuario={tipoDeUsuario} 
         serMostrarVentana={serMostrarVentana} cargando={cargando} setCargando={setCargando} idRutaAMostrar={idRutaAMostrar}        
         setMostrarMenusBuenEstado={setMostrarMenusBuenEstado} modoOscuro={modoOscuro} setMostrarCompañerosCercanos={setMostrarCompañerosCercanos} mostrarVentana={mostrarVentana}
-        setIniciarRecorridoDeLaTrayectoria={setIniciarRecorridoDeLaTrayectoria} verificarSiHayDatos={verificarSiHayDatos}
+        setIniciarRecorridoDeLaTrayectoria={setIniciarRecorridoDeLaTrayectoria} verificarSiHayDatos={verificarSiHayDatos} tiempoDeEspera={tiempoDeEspera} setTiempoDeEspera={setTiempoDeEspera}
+        detenerInterval={detenerInterval} setDetenerInterval={setDetenerInterval} verRutasCercanas={verRutasCercanas}
         ></MenuBar>
   
         
@@ -667,10 +674,11 @@ const App=(
                                         height={height} width={width} setLoguearse={setLoguearse} setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setIdUsuarioIniciado={setIdUsuarioIniciado} setIdUsuarioIniciadoCode={setIdUsuarioIniciadoCode} idFacturaOApellidos={idFacturaOApellidos}></Compras>}
         {mostrarAnuncioCompleto==true && <InterstitialADS mostrarAnuncioCompleto={mostrarAnuncioCompleto} VERSIONDELAPLICACION={VERSIONDELAPLICACION} enviarTiempoDesdeElUltimoAnuncio={enviarTiempoDesdeElUltimoAnuncio} setMostrarAnuncioCompleto={setMostrarAnuncioCompleto}></InterstitialADS>}
         {mostrarAnuncioRewarded==true && <RewardedADS VERSIONDELAPLICACION={VERSIONDELAPLICACION} setMostrarComprasPasajeros={setMostrarComprasPasajeros} enviarTiempoDesdeElUltimoAnuncio={enviarTiempoDesdeElUltimoAnuncio} setMostrarAnuncioRewarded={setMostrarAnuncioRewarded}></RewardedADS>}
-        {mostrarComprasPasajeros==true && <ComprasUsuariosPasajeros iniciarRecorridoDeLaTrayectoria={iniciarRecorridoDeLaTrayectoria} setIniciarRecorridoDeLaTrayectoria={setIniciarRecorridoDeLaTrayectoria} tiempoDesdeLaUltimaSuscripcion={tiempoDesdeLaUltimaSuscripcion} idFacturaOApellidos={idFacturaOApellidos} datosDelUsuarioSinSuscripcion={datosDelUsuarioSinSuscripcion} comprarProducto={comprarProducto} purchase={purchase} setPurchase={setPurchase} setEliminarAnuncios={setEliminarAnuncios} eliminarAnuncios={eliminarAnuncios} setMostrarComprasPasajeros={setMostrarComprasPasajeros} setMostrarAlerte={setMostrarAlerte} height={height} width={width} setMensajeAlerta={setMensajeAlerta} setLoguearse={setLoguearse} setSecionIniciada={setSecionIniciada} setTipoDeSubscripcion={setTipoDeSubscripcion}
+        {mostrarComprasPasajeros==true && <ComprasUsuariosPasajeros iniciarRecorridoDeLaTrayectoria={iniciarRecorridoDeLaTrayectoria} setIniciarRecorridoDeLaTrayectoria={setIniciarRecorridoDeLaTrayectoria} tiempoDesdeLaUltimaSuscripcion={tiempoDesdeLaUltimaSuscripcion} idFacturaOApellidos={idFacturaOApellidos} datosDelUsuarioSinSuscripcion={datosDelUsuarioSinSuscripcion} comprarProducto={comprarProducto} purchase={purchase} setPurchase={setPurchase} setEliminarAnuncios={setEliminarAnuncios} 
+        eliminarAnuncios={eliminarAnuncios} setMostrarComprasPasajeros={setMostrarComprasPasajeros} setMostrarAlerte={setMostrarAlerte} height={height} width={width} setMensajeAlerta={setMensajeAlerta} setLoguearse={setLoguearse} setSecionIniciada={setSecionIniciada} setTipoDeSubscripcion={setTipoDeSubscripcion}
                                             setTipoDeUsuario={setTipoDeUsuario} setMostrarAnuncioRewarded={setMostrarAnuncioRewarded} setmenDos={setmenDos} setMostrarItemMenuUno={setMostrarItemMenuUno} setIdRutaAMostrar={setIdRutaAMostrar} setOcultarTrayecto={setOcultarTrayecto} setVerRutasCercanas={setVerRutasCercanas}
                                             modoOscuro={modoOscuro}></ComprasUsuariosPasajeros>}
-        {mostrarInformacion==true && emailState=='nestordgt27@gmail.com' && <MostrarInformacion setMostrarInformacion={setMostrarInformacion} refrescarHistorial={refrescarHistorial} height={height} width={width} historial={historial} purchase={purchaseTxt}></MostrarInformacion>}
+        {mostrarInformacion==true && (emailState=='nestordgt27@gmail.com' || emailState=='perlavanessa2008@gmail.com') && <MostrarInformacion setMostrarInformacion={setMostrarInformacion} refrescarHistorial={refrescarHistorial} height={height} width={width} historial={historial} purchase={purchaseTxt}></MostrarInformacion>}
     </View>
 
   );
