@@ -1,6 +1,5 @@
 import react, { useEffect, useState } from "react"
 import { ScrollView, StatusBar, Text, View,Image, TouchableOpacity, ActivityIndicator } from "react-native"
-import { useQuery } from "react-query"
 import { getNombre } from "../data/asyncStorageData"
 import getAllRutas from "../data/rutasManagua"
 import imagen from '../assets/x_icon_imagen.png';

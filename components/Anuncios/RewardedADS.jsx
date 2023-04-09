@@ -9,8 +9,8 @@ import {
   import { AdEventType, RewardedAd, RewardedAdEventType, TestIds } from 'react-native-google-mobile-ads';
 
   //const adUnitId = (VERSIONDELAPLICACION==1)? TestIds.REWARDED:'ca-app-pub-1889500700036964/6034338968';
-  const adUnitId = 'ca-app-pub-1889500700036964/1444382919';
-  // const adUnitId = TestIds.REWARDED;
+  //const adUnitId = 'ca-app-pub-1889500700036964/1444382919';
+  const adUnitId = TestIds.REWARDED;
   
   // const rewarded = RewardedAd.createForAdRequest(adUnitId, {
   //     requestNonPersonalizedAdsOnly: true
@@ -38,7 +38,7 @@ import {
           reward => {
             console.log('User earned reward of ');
             console.log(reward);
-            if(reward.amount==1){
+            if(reward.amount>0){
               setAnuncioCargado(false);
               setMostrarAnuncioRewarded(false);
               setMostrarComprasPasajeros(false);

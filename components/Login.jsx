@@ -2,7 +2,6 @@ import * as react from 'react'
 import { Keyboard,View,Text, TextInput,Image,StatusBar, TouchableOpacity,ActivityIndicator, Button, Linking} from 'react-native'
 import imagen from '../assets/x_icon_imagen.png';
 import {setUsuario,getUsuario,setContraseña,getContraseña, setTokenGeoRutasCode, setTipoDeMenbresiaCode, getTipoDeMenbresia, setCorreo, setTipoDeUsuarioCode, setIdUsuarioIniciadoCode, setNombre, setApellidos, setTelefono} from '../data/asyncStorageData.js'
-import { useQuery } from 'react-query';
 import { AccessToken, LoginButton } from 'react-native-fbsdk';
 import { LogBox } from 'react-native';
 LogBox.ignoreLogs(['new NativeEventEmitter']);

@@ -42,7 +42,12 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
         if(arregloDeValores==undefined || arregloDeValores.length==0 || arregloDeValores==null){
             let arreglo=[];
             for(let i=0;i<45;i++){
-                arreglo.push("✓");
+                if(i<10)
+                {
+                    arreglo.push("✓");
+                }else{
+                    arreglo.push("");
+                }
             }
             setArregloDeValores(arreglo);
             setRutasSeleccionadasCompetencia(arreglo);
@@ -186,7 +191,8 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
 
                     <ParadasFavoritas setArregloDeValores={setArregloDeValores} 
                     todasLasRutasCompetencia={todasLasRutasCompetencia} 
-                    arregloDeValores={arregloDeValores}></ParadasFavoritas>
+                    arregloDeValores={arregloDeValores} setMensajeAlerta={setMensajeAlerta} 
+                    setMostrarAlerte={setMostrarAlerte}></ParadasFavoritas>
                         
                         <View style={{flexDirection:'row',paddingTop:20,marginHorizontal:15}}>
 

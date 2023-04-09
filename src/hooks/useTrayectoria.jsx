@@ -4,7 +4,8 @@ import getAllRutas from "../../data/rutasManagua";
 import { useQuery,queryKey } from "react-query";
 
 const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,setVisualizarRutas,
-    setTiemposRutasTrayectorias,setIconosTransportes,setIdUsuariosDeTrayectoria,verRutasTrayecto,key,emailState,tokenState,setNoseEncontraronTrayectorias)=>{
+    setTiemposRutasTrayectorias,setIconosTransportes,setIdUsuariosDeTrayectoria,verRutasTrayecto,key,emailState,tokenState,setNoseEncontraronTrayectorias,
+    refMapView)=>{
 
 
     // try{
@@ -108,7 +109,13 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
                       posicionUltimoRegistro=k;
                 }
             }
-        
+            if(transportes.length>=1){
+                refMapView.current?.animateCamera({
+                    center:{latitude:transportes[0].longitudUsuarioComun,longitude:transportes[0].latitudUsuarioComun}
+                })
+            }
+
+
             arregloDatosDeLosUsuarios[arregloDatosDeLosUsuarios.length-1].tiempo=Math.abs(arregloDatosDeLosUsuarios[arregloDatosDeLosUsuarios.length-1].tiempo-
                ((Math.ceil((Math.sqrt(Math.pow((data[posicionUltimoRegistro].longitudParadaFinal-coordenadasDestino.latitude),2)+Math.pow((data[posicionUltimoRegistro].latitudParadaFinal-coordenadasDestino.longitude),2))/0.000009)/1.1))));
 
@@ -130,7 +137,7 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
     }
 
     const verificarSiHayDatos=()=>{
-        if(!isLoading && data!=null && data!=undefined && data[0].id_Idetificador==-7){
+        if(!isLoading && data!=null && data!=undefined && data[0].id_Idetificador!=undefined && data[0].id_Idetificador==-7){
             setNoseEncontraronTrayectorias(true);
         }
     }

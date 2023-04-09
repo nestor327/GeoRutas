@@ -5,7 +5,7 @@ import getAllRutas from "../data/rutasManagua";
 import { useQuery } from "react-query";
 
 
-const SeguimientoAlTrayecto=({datosDeLosUsuarios,modoOscuro,emailState,tokenState})=>{
+const SeguimientoAlTrayecto=({datosDeLosUsuarios,modoOscuro,emailState,tokenState,refMapView,permitirSeguirPasajero,permitirEnviarUbicacion})=>{
     
     console.log("Los DATOS DEL USUARIO SON");
     console.log(datosDeLosUsuarios);
@@ -41,6 +41,24 @@ const SeguimientoAlTrayecto=({datosDeLosUsuarios,modoOscuro,emailState,tokenStat
         cacheTime:6000,onSuccess:()=>{
             console.log("Es el on susces");
             console.log(data);
+            if(data!=undefined && data.length==1 && permitirSeguirPasajero==false && permitirEnviarUbicacion==false){
+                refMapView.current?.animateCamera({
+                    center:{latitude:data[0].longitude,
+                        longitude:data[0].latitude}
+                })
+            }else if(data!=undefined && data.length==2 && datosDeLosUsuarios.length==2 && permitirSeguirPasajero==false && permitirEnviarUbicacion==false){
+                if((datosDeLosUsuarios[0].tiempo*2)>Math.abs(data[0].tiempoDeLlegada)){
+                    refMapView.current?.animateCamera({
+                        center:{latitude:data[0].longitude,
+                            longitude:data[0].latitude}
+                    })  
+                }else if((datosDeLosUsuarios[1].tiempo*2)>Math.abs(data[1].tiempoDeLlegada)){
+                    refMapView.current?.animateCamera({
+                        center:{latitude:data[0].longitude,
+                            longitude:data[0].latitude}
+                    })
+                }
+            }
         },onError:()=>{
             console.log("Mierda ocurrio un error");
             console.log(data);
@@ -59,9 +77,9 @@ const SeguimientoAlTrayecto=({datosDeLosUsuarios,modoOscuro,emailState,tokenStat
 
     if(!isLoading && data!=undefined && datosDeLosUsuarios!=undefined){
         console.log("Es la data final");
-        console.log(data);
+        //console.log(data);
         return(
-            data.map((item, i)=>{
+            data.map((item, i)=>{                
                 return(
                     (datosDeLosUsuarios[i].tiempo*2)>Math.abs(item.tiempoDeLlegada)
                     && 

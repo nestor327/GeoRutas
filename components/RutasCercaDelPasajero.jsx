@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery,queryKey } from "react-query";
 import { Marker, Polyline } from "react-native-maps";
 import {Image,View,Text} from 'react-native'
@@ -9,7 +9,7 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
     
 
 
-    const RutasCercaDelPasajero=({modoOscuro,userLocation,rutasSeleccionadasCompetencia,emailState, tokenState})=>{
+    const RutasCercaDelPasajero=({modoOscuro,userLocation,rutasSeleccionadasCompetencia,emailState, tokenState,refMapView,tiempoDeEspera})=>{
 
     try{
         const {data,error,isLoading}=useQuery(['obtenerUsuariosCompetencia',emailState,tokenState],async({queryKey})=>{
@@ -22,7 +22,7 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
             onSuccess:()=>{
                 console.log("Yes");
                 console.log(rutasSeleccionadasCompetencia);
-                console.log("Yes");
+                console.log("Yes");                
             }
         })
     
@@ -36,7 +36,7 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
         if(rutasSeleccionadasCompetencia!=undefined && rutasSeleccionadasCompetencia!=null && rutasSeleccionadasCompetencia.length>0 && isLoading==false && todasLasRutas.length>0 && todasLasRutas.length>0){
     
             let arregloFinal=[];        
-            let contador=0;
+            let contador=0;            
 
             let distanciaUniversal=10000000;
             for(let t=0;t<data.length;t++){
@@ -62,9 +62,18 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
                     contador++;
                 }
             }
+
+            //console.log(arregloFinal);
     
             return(
-                   arregloFinal.map((item, i)=>{                       
+                   arregloFinal.map((item, i)=>{ 
+                    //console.log(item);             
+                            if(i==0 && tiempoDeEspera>=175){
+                                refMapView.current?.animateCamera({
+                                    center:{latitude:item.longitude,
+                                        longitude:item.latitude}
+                                })
+                            }                                     
                             if(item.estado=='A'){
                             return(
                                     <Marker key={i} coordinate={{latitude:item.longitude,

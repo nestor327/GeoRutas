@@ -17,7 +17,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
     ocultarTrayecto,permisos,askLocationPermissionSetting, setUsuarioTransportista,setCargando,emailState, tokenState,setMostrarAlerte, 
     setMensajeAlerta,setMostrarComprasPasajeros,tipoDeSubscripcion,mostrarCompañerosCercanos, setMostrarCompañerosCercanos,menCuatro,verParadasCercanas,
     setIdRutaAMostrar,setMostrarMenusBuenEstado,setMostrarItemMenuUno,setVerParadasCercanas,setMostrarBarraSecundariaDeUbicacion,coordenadasOrigenSecundario,
-    iniciarRecorridoDeLaTrayectoria, setIniciarRecorridoDeLaTrayectoria
+    iniciarRecorridoDeLaTrayectoria, setIniciarRecorridoDeLaTrayectoria,setDetenerInterval,setTiempoDeEspera
     })=>{
 
         // useEffect(()=>{
@@ -310,7 +310,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                 imagen={require('../assets/verParadas.jpg')}
             />}
 
-                {tipoDeUsuario=='Transportista' && mostrarItemMenuUno==true && verCompetencia==false && <Fab
+                {tipoDeUsuario=='Transportista' && mostrarItemMenuUno==true && verCompetencia==false && tipoDeSubscripcion=='Q' && <Fab
                     onPres={()=>{   
                         setCargando(true);             
                         setVerCompetencia(true);
@@ -323,7 +323,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                 />}
 
                 
-                {tipoDeUsuario=='Transportista' && mostrarItemMenuUno==true && verCompetencia==true && <Fab
+                {tipoDeUsuario=='Transportista' && mostrarItemMenuUno==true && verCompetencia==true && tipoDeSubscripcion=='Q' && <Fab
                     onPres={()=>{
                         setCargando(true);
                         setVerCompetencia(false);
@@ -338,10 +338,12 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         setVerRutasCercanas(true); 
                         setOcultarTrayecto(false);
                         setCargando(false);
-                        setMensajeAlerta("Para mejor comodidad, elija sus rutas favoritas en ajustes y muestre su ubicación");
+                        setMensajeAlerta("Para mejor comodidad, elija sus rutas favoritas en \"Perfil\" y muestre su ubicación");
                         setMostrarAlerte(true); 
                         if(tipoDeSubscripcion=='C'){
                             setMostrarComprasPasajeros(true);
+                            setDetenerInterval(false);
+                            setTiempoDeEspera(185);
                         }
                     }}
                         imagen={require('../assets/noVerUsuariosblue.png')}
@@ -354,7 +356,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         setVerRutasCercanas(false);
                         setCargando(false);
                     }}                
-                    imagen={require('../assets/verUsuarios.png')}
+                    imagen={require('../assets/verUsuariosblue.png')}
                 />}
 
                 {iniciarRecorridoDeLaTrayectoria && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && tipoDeUsuario=="Transportista" && <Fab
