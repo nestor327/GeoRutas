@@ -15,6 +15,8 @@ const BGPermisos=({width,height,setPedirUbicacionSegundoPlano,setMostrarAlerte})
             }}
             >
 
+                
+
         </View>
     )
 }
