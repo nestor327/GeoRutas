@@ -205,7 +205,8 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
                 <View style={{flexDirection:'row',marginTop:40,justifyContent:'center'}}>
                     <TouchableOpacity style={{height:40,width:'auto',backgroundColor:'blue',borderRadius:7,justifyContent:'center',paddingHorizontal:5}}
                         onPressOut={()=>{
-                            comprarProducto("suscripcionpremiun");
+                            //comprarProducto("suscripcionpremiun");
+                            comprarProducto("suscripcionadmin");
                             setComprando(true);
                         }}
                     >

@@ -1448,7 +1448,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         setMostrarBarraSecundariaDeUbicacion(false);
                         setCoordenadasOrigen(coords.nativeEvent.coordinate);                           
                         //RutasTrayectorias(setRutasEnElMapa);              
-                        obtenerRutas(identificadorKey.current);
+                        //obtenerRutas(identificadorKey.current);
                         setVerTrayectoria(false);
                         setOcultarMenu(false);
                         }
@@ -1475,7 +1475,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         setMostrarBarraSecundariaDeUbicacion(false);
                         setCoordenadasDestino(coords.nativeEvent.coordinate);
                         //RutasTrayectorias(setRutasEnElMapa); 
-                        obtenerRutas(identificadorKey.current);
+                        //obtenerRutas(identificadorKey.current);
                         setVerTrayectoria(false);   
                         setOcultarMenu(false);
                         // setOcultarTrayecto(!ocultarTrayecto);
