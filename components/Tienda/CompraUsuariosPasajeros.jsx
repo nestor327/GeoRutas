@@ -13,9 +13,10 @@ let purchaseErrorSuscription=null;
 const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarComprasPasajeros,setMostrarAlerte, setMensajeAlerta, width, height
                 ,setTipoDeSubscripcion,setLoguearse,setSecionIniciada,setTipoDeUsuario,setMostrarAnuncioRewarded,setmenDos,setMostrarItemMenuUno
                 ,setIdRutaAMostrar,setOcultarTrayecto,setVerRutasCercanas,eliminarAnuncios,setEliminarAnuncios,purchase,setPurchase,comprarProducto
-                ,idFacturaOApellidos,tiempoDesdeLaUltimaSuscripcion,modoOscuro,iniciarRecorridoDeLaTrayectoria,setIniciarRecorridoDeLaTrayectoria})=>{
+                ,idFacturaOApellidos,tiempoDesdeLaUltimaSuscripcion,modoOscuro,iniciarRecorridoDeLaTrayectoria,setIniciarRecorridoDeLaTrayectoria
+                ,emailState})=>{
 
-    const actualizarUsuarioBD=async(emails,emailState,tokenState,tiempo,apellidos)=>{
+    const actualizarUsuarioBD=async(emails,emailStateDos,tokenState,tiempo,apellidos)=>{
         try{
             let objeto=
                 {
@@ -38,7 +39,7 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
             // console.log("La cantidad de segundos es: "+Date.parse(new Date()));
 
 
-            let datos=await fetch('https://www.georutas.lat/api/ActualizarMenbresia?Email='+emailState+'&Token='+tokenState+'&tiempo='+tiempo+'&apellidos='+apellidos,options);
+            let datos=await fetch('https://www.georutas.lat/api/ActualizarMenbresia?Email='+emailStateDos+'&Token='+tokenState+'&tiempo='+tiempo+'&apellidos='+apellidos,options);
         
                 if(datos.ok){
                     console.log(datos);
@@ -127,7 +128,12 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                                                 height:50,alignItems:'center',justifyContent:'center',padding:10,borderRadius:10,width:(eliminarAnuncios)?'auto':'45%'}}
                             onPressOut={()=>{
                                 if(eliminarAnuncios){
-                                    comprarProducto("suscripcionpasajero");
+                                    //Con anterioridad estaba aqui//comprarProducto("suscripcionpasajero");
+                                    if(emailState=='nestordgt27@gmail.com' || emailState=='perlavanessa2008@gmail.com'){
+                                        comprarProducto("productodeprueba");
+                                    }else{
+                                        comprarProducto("productosuscripcionpasajero");
+                                    }
                                 }else{
                                     setMostrarAnuncioRewarded(true);
                                     console.log("Estas pidiendo el anuncio");
@@ -149,7 +155,13 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                         {eliminarAnuncios==false && <TouchableOpacity style={{marginTop:(eliminarAnuncios==false)?'7%':'3%',backgroundColor:'green'
                                                     ,width:'40%',height:37,borderRadius:10}}
                                 onPressOut={()=>{
-                                    comprarProducto("suscripcionpasajero");                                    
+                                    //comprarProducto("suscripcionpasajero");      
+                                    if(emailState=='nestordgt27@gmail.com' || emailState=='perlavanessa2008@gmail.com'){
+                                        comprarProducto("productodeprueba");
+                                    }else{
+                                        comprarProducto("productosuscripcionpasajero");
+                                    }
+                                    
                                 }}                        
                             >
                             <Text style={{fontSize:17,textAlign:'center',alignContent:'center',height:37,textAlignVertical:'center'}}>

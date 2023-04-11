@@ -98,8 +98,8 @@ android {
         applicationId "com.georutas"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 37
-        versionName "4.7"
+        versionCode 39
+        versionName "4.9"
         missingDimensionStrategy "store", "play"
     }
 

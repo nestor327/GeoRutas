@@ -10,8 +10,16 @@ const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,set
     const items=Platform.select({
         ios:[],
         //android:['productosubcripcionchoferes']
-        android:['suscripcionchofer','suscripcionpasajero','suscripcionpremiun']
+        //android:['suscripcionchofer','suscripcionpasajero','suscripcionpremiun']
+        android:['productodeprueba','productosubcripcionchoferes','productosuscripcionpasajero','suscripcionadmin']
     });
+    // let items=Platform.select({
+    //     ios:[],
+    //     //android:['productosubcripcionchoferes']
+    //     //android:['suscripcionchofer','suscripcionpasajero','suscripcionpremiun']
+    //     android:[]
+    // });
+    
     
     let purchaseUpdateSuscription=null;
     let purchaseErrorSuscription=null;
@@ -22,6 +30,22 @@ const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,set
     const [idFacturaOApellidos, setIdFacturaOApellidos]=useState("GPA.4394-0891-5913-27372");
 
     const [finalizandoTransaccion, setFinalizandoTransaccion]=useState(false);
+
+    const [nombreItemsAndroid, setNombreItemsAndroid]=useState([]);
+
+    const obtenerProductosDesdeLaBaseDeDatos=async ()=>{
+        let valor=await fetch("https://www.georutas.lat/api/productos");
+
+        console.log("Los datos tratados de una forma diferente son");
+        let datos= await valor.json();
+        console.log(datos);
+        setNombreItemsAndroid(datos);
+    }
+
+    useEffect(()=>{
+        console.log("Llamas a la funcion");
+        obtenerProductosDesdeLaBaseDeDatos();
+    },[])
 
     const finalizarTransaccion=(purchaseEvent,finalizandoTransaccion)=>{
         try{
@@ -36,17 +60,26 @@ const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,set
     }
 
     useEffect(()=>{
-        if(emailState!=undefined && emailState!=null && emailState.length>8){
+        if(emailState!=undefined && emailState!=null && emailState.length>8 && nombreItemsAndroid!=null 
+            && nombreItemsAndroid!=undefined && nombreItemsAndroid.length>1){
             try{            
                 IAP.initConnection().catch(()=>{
                     console.log("Ocurrio un error");
                 }).then((res)=>{
                     console.log("Los datos de la tienda son: ");
                     console.log(res);
-                    IAP.getSubscriptions({skus:items}).catch(()=>{
+                    //IAP.getSubscriptions({skus:items}).catch(()=>{
+
+                    let itemsProductsNames=[];
+
+                    for(let i=0;i<nombreItemsAndroid.length;i++){
+                        itemsProductsNames.push(nombreItemsAndroid[i].nombreProducto);
+                    }
+
+                    IAP.getProducts({skus:itemsProductsNames}).catch(()=>{
                         console.log("Ocurrio un error obteniendo los productos");
                     }).then(res=>{
-                        console.log("LAS SUSCRIPCIONES FUERON: ");
+                        console.log("LAS productos FUERON: NNNNN");
                         console.log(res);
                         setProductos(res);
                     });
@@ -105,7 +138,7 @@ const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,set
 
             }
         }
-    },[emailState,finalizandoTransaccion]);
+    },[emailState,finalizandoTransaccion,nombreItemsAndroid]);
 
     const refrescarHistorial=async()=>{
         try{
@@ -117,35 +150,49 @@ const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,set
         }
     }
 
-    const comprarProducto=async(producto)=>{
-        try{            
+    const comprarProducto=async(productoName)=>{
+        try{
+
+            let producto="";
+            for(let i=0;i<nombreItemsAndroid.length;i++){
+                if(productoName==nombreItemsAndroid[i].alias){
+                    producto=nombreItemsAndroid[i].nombreProducto;
+                }
+            }
+
+            if(producto=="" || producto==null){
+                return;
+            }
+
             //IAP.requestSubscription({sku:producto});
             setFinalizandoTransaccion(false);
             console.log("lA MIERDA ES: ");            
-            //console.log(productos);
+            console.log(productos[0].productId);
             let subscriptionOffers = [];
-            if(producto==productos[0].productId){
-                subscriptionOffers={subscriptionOffers:[{sku:producto,offerToken:(productos[0].subscriptionOfferDetails[0].offerToken),}]};
-            }else if(producto==productos[1].productId){
-                //console.log("la mierda llego hasta aqui ");                
-                subscriptionOffers={subscriptionOffers:[{sku:producto,offerToken:(productos[1].subscriptionOfferDetails[0].offerToken),}]};
-                //console.log(subscriptionOffers);
-            }else if(producto==productos[2].productId){
-                subscriptionOffers={subscriptionOffers:[{sku:producto,offerToken:(productos[2].subscriptionOfferDetails[0].offerToken),}]};
-            }else if(producto==productos[3].productId){
-                subscriptionOffers={subscriptionOffers:[{sku:producto,offerToken:(productos[3].subscriptionOfferDetails[0].offerToken),}]};
-            }
-            console.log("la mierda llego hasta aqui ");
-            console.log(subscriptionOffers);
+            // if(producto==productos[0].productId){
+            //     subscriptionOffers={subscriptionOffers:[{sku:producto,offerToken:(productos[0].subscriptionOfferDetails[0].offerToken),}]};
+            // }else if(producto==productos[1].productId){
+            //     //console.log("la mierda llego hasta aqui ");                
+            //     subscriptionOffers={subscriptionOffers:[{sku:producto,offerToken:(productos[1].subscriptionOfferDetails[0].offerToken),}]};
+            //     //console.log(subscriptionOffers);
+            // }else if(producto==productos[2].productId){
+            //     subscriptionOffers={subscriptionOffers:[{sku:producto,offerToken:(productos[2].subscriptionOfferDetails[0].offerToken),}]};
+            // }else if(producto==productos[3].productId){
+            //     subscriptionOffers={subscriptionOffers:[{sku:producto,offerToken:(productos[3].subscriptionOfferDetails[0].offerToken),}]};
+            // }
+            // console.log("la mierda llego hasta aqui ");
+            // console.log(subscriptionOffers);
 
             let posicion=-1;
             
             try{
                 
                 const info=await IAP.getPurchaseHistory().then((res)=>{
-                    console.log(res);                
                     
+                    //console.log(res);                
+                    console.log("Enviaste la mierda, pero no se base se se envio");
                     verificarCualEsElUsuarioDeLaCompra(1,emailState);
+                    console.log("Enviaste la mierda, pero no se base se se envio");
 
                     for(let y=0;y<JSON.parse(JSON.stringify(res)).length;y++){
                         // console.log(JSON.parse(JSON.parse(JSON.stringify(res))[y].dataAndroid).productId);
@@ -170,8 +217,31 @@ const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,set
 
                         let fechaActual= new Date();
                         let mes=fecha.getMonth();
+                        console.log("La fecha antes de esta mierda es:");
+                        console.log(fecha);
                         fecha.setMonth(mes+1);
                         // fecha.setHours(24);
+                        console.log("Las fechas son: ");
+                        console.log(fecha);
+                        console.log(fechaActual);console.log(fecha>fechaActual);
+                        console.log("La cantidad comprada es: ");
+                        console.log(parseInt(cantidadComprada));
+                        console.log("El empleado incluye la mierda");
+                        console.log(datosDelUsuarioSinSuscripcion.apellidos.includes('GPA') );
+                        console.log(datosDelUsuarioSinSuscripcion.apellidos.length>21);
+                        console.log("El nombre del usuario es: ");
+                        console.log(usuarioRegistrado.name);
+                        console.log(emailState);
+                        console.log(usuarioRegistrado.name.length);
+                        console.log("No se que carajos pasa pero llega hasta aqui");
+                        console.log((fecha>fechaActual && parseInt(cantidadComprada)>=1 && posicion>=0 && datosDelUsuarioSinSuscripcion.apellidos.includes('GPA') 
+                        && datosDelUsuarioSinSuscripcion.apellidos.length>21 && secionIniciada==false));
+                        console.log(usuarioRegistrado.name.toUpperCase() === (emailState).toUpperCase());
+                        console.log("2"+emailState+"2");
+                        console.log("2"+usuarioRegistrado.name+"2");
+                        
+                        console.log(usuarioRegistrado.name.length);
+
 
                         let tiempoDos=(fecha.getTime()+1000*3600*24);
 
@@ -190,6 +260,7 @@ const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,set
                                         console.log(tiempoDesdeLaVenta);
                                         console.log(tiempoDeLaVentaActual);
                                         console.log((tiempoDesdeLaVenta-tiempoDeLaVentaActual));
+                                        console.log(fecha>fechaActual && parseInt(cantidadComprada)>=1);
                             if(fecha>fechaActual && parseInt(cantidadComprada)>=1 
                             //&& Math.abs((tiempoDesdeLaVenta-tiempoDeLaVentaActual))>=345600000
                             ){
@@ -214,7 +285,9 @@ const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,set
 
                 });
                 console.log("HASTA AQUI NO LLEGO");
-                var purchase = await IAP.requestSubscription(subscriptionOffers);
+                console.log("La mierda que intentas comprar es: "+producto);
+                //var purchase = await IAP.requestSubscription(subscriptionOffers);
+                var purchase = await IAP.requestPurchase({sku:producto});
 
             }catch{
                 console.log("OCURRIO UN ERROR EN EL PRIMER TRY");

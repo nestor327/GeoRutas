@@ -137,9 +137,11 @@ const Compras=({datosDelUsuarioSinSuscripcion,setComprarSuscripcionT,setMostrarA
                                                 height:50,alignItems:'center',justifyContent:'center',padding:10,borderRadius:10}}
                             onPressOut={()=>{
                                 console.log("Que la verga");
+                                console.log("Estas intentando comprar desde aqui: ");
                                 //actualizarUsuarioBD([datosDelUsuarioSinSuscripcion.email],datosDelUsuarioSinSuscripcion.email,datosDelUsuarioSinSuscripcion.token);
                                 setPurchase(false);
-                                comprarProducto("suscripcionchofer");
+                                //Con anterioridad destaba por aqui//comprarProducto("suscripcionchofer");
+                                comprarProducto("productosubcripcionchoferes");
                                 //comprarProducto("suscripcionpasajero");
                                 //comprarProducto("suscripciondeprueba");
                             }}                                                
