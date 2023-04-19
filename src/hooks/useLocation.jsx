@@ -115,19 +115,25 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
     },[permisos])
 
 
-    const getCurrentLocation=()=>{
+    const getCurrentLocation= ()=>{
         return new Promise((resolve, reject)=>{
             if(isMounted.current==true){
                 if(permisos=='granted'){
                     Geolocation.getCurrentPosition(
                         ({coords})=>{
                             resolve({latitude:coords.latitude,longitude:coords.longitude});
+                            console.log("Intentaste o lo lograste");
                         },
                         ()=>{
-                            (err)=>{reject({err})};
+                            (err)=>{
+                                reject({err})
+                                console.log("Mierda un error");
+                        };
                         },
                         {
-                            enableHighAccuracy:true
+                            timeout:10000,
+                            //maximumAge:10000,
+                            enableHighAccuracy:true                            
                         }
                         )
                 }else{
@@ -145,7 +151,7 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
                     ({coords})=>{
                         setUserLocation({latitude:coords.latitude,longitude:coords.longitude});
                         //let fecha= new Date();
-                        //console.log("Los segundos mientras sigues al usuario es: "+fecha.getSeconds());
+                        console.log("Los segundos mientras sigues al usuario es: ");
                     },
                     ()=>{
                         (err)=>{console.log("Entraste al watch del usuario")};
@@ -244,8 +250,8 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
             Geolocation.getCurrentPosition(
                 ({coords})=>{
                     resolve({latitude:coords.latitude,longitude:coords.longitude});   
-                    // console.log("Los putos datos que estas enviando son: ");                 
-                    // console.log({latitude:coords.latitude,longitude:coords.longitude});
+                    console.log("Los putos datos que estas enviando son: ");                 
+                    console.log({latitude:coords.latitude,longitude:coords.longitude});
                     // console.log("La latitude es :"+coords.latitude);
                     // console.log("La longitude es :"+coords.longitude);
                     // let fechaG= new Date();
@@ -278,8 +284,8 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
                 }
                 ,
                 {
-                    timeout: 36000000,
-                    maximumAge: 3600000000,
+                    timeout: 3600,
+                    maximumAge: 3600,
                     enableHighAccuracy: true,
                 }
             )

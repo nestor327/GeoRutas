@@ -70,9 +70,10 @@ return([{id_Ruta:1,nombre:"6",color:"green",cantidad:33,capacidad:60},
         {id_Ruta:40,nombre:"262",color:"#0CA622",cantidad:33,capacidad:60},
         {id_Ruta:41,nombre:"266",color:"#0E9FBC",cantidad:33,capacidad:60},
         {id_Ruta:42,nombre:"MR4",color:"#C83C23",cantidad:33,capacidad:60},
-        {id_Ruta:43,nombre:"VAN",color:"#D65D27",cantidad:33,capacidad:60},
-        {id_Ruta:44,nombre:"ESQ",color:"#27A5D6",cantidad:33,capacidad:60},
-        {id_Ruta:45,nombre:"SIS",color:"#6AB019",cantidad:33,capacidad:60}]);
+        // {id_Ruta:43,nombre:"VAN",color:"#D65D27",cantidad:33,capacidad:60},
+        // {id_Ruta:44,nombre:"ESQ",color:"#27A5D6",cantidad:33,capacidad:60},
+        // {id_Ruta:45,nombre:"SIS",color:"#6AB019",cantidad:33,capacidad:60}
+        ]);
 
 }
 export default getAllRutas

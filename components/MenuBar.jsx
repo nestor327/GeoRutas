@@ -65,18 +65,21 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                 if(tiempoDeEspera==0){
                     setDetenerInterval(true);
                     setVerRutasCercanas(false);
+                    setIdRutaAMostrar(-1);
+                    setIniciarRecorridoDeLaTrayectoria(false);
                 }else{
                     setTiempoDeEspera(tiempoDeEspera-1);
-                    console.log(tiempoDeEspera);
+                    //console.log(tiempoDeEspera);
                 }
 
             }, 1000);
         }
-        if(verRutasCercanas==false){
-            setDetenerInterval(true);
-        }else if(verParadasCercanas==true && tiempoDeEspera>0){
-            setDetenerInterval(false);
-        }
+
+        // if(verRutasCercanas==false){
+        //     setDetenerInterval(true);
+        // }else if(verParadasCercanas==true && tiempoDeEspera>0){
+        //     setDetenerInterval(false);
+        // }
         return(
             ()=>{
                 clearInterval(k);

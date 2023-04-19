@@ -68,7 +68,7 @@ import getAllRutas from '../data/rutasManagua.js'
                         >
                             <Text style={{color:(!modoOscuro)?'black':'#c3c3c3', fontWeight:'500'}}>{(direccionesPorUsuarioDos=='D')?"⇛ Tú "+nombresEnElArregloFinal[0]:"⇚ Tú "+nombresEnElArregloFinal[0]}</Text>
                             <Image style={{width:30,height:30}} source={require("../assets/transportistaAzulv2.png")}></Image>
-                            {(mostrarCompañerosCercanos || (Math.ceil(idUsuarioIniciado/33.0)==idRutaAMostrar)) && <Text 
+                            {/* {(mostrarCompañerosCercanos || (Math.ceil(idUsuarioIniciado/33.0)==idRutaAMostrar)) && <Text 
                                     style={{color:((Math.abs(tiempoPromedio-tiempoParaUsaurioTransportistaLogueado))>300)?"#f41c1c"
                                                     :((Math.abs(tiempoPromedio-tiempoParaUsaurioTransportistaLogueado))<-300)?"#ff7f27"
                                                     :(!modoOscuro)?'black':'#c3c3c3', fontWeight:'700'}}>
@@ -77,7 +77,7 @@ import getAllRutas from '../data/rutasManagua.js'
                                                         +Math.floor((((Math.abs(tiempoPromedio-tiempoParaUsaurioTransportistaLogueado))-3600*(Math.floor((Math.abs(tiempoPromedio-tiempoParaUsaurioTransportistaLogueado))/3600)))/60)))
                                                         +":"+(((Math.abs(tiempoPromedio-tiempoParaUsaurioTransportistaLogueado))%60>9)?(Math.abs(tiempoPromedio-tiempoParaUsaurioTransportistaLogueado))%60:"0"+(Math.abs(tiempoPromedio-tiempoParaUsaurioTransportistaLogueado))%60)
                                                         }
-                                                </Text>}
+                                                </Text>} */}
                         </Marker>
                     
                 )    

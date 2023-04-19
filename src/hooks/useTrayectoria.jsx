@@ -24,6 +24,10 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
     },{
         refetchInterval:Infinity,
         cacheTime:20000,
+        onError:(res)=>{
+            console.log("Ocurrio un error y este es: ");
+            console.log(res);
+        }
         // onSuccess:()=>{
         //     if(data!=null && data!=undefined && data[0].id_Idetificador==-7){                
         //         setNoseEncontraronTrayectorias(true);
@@ -38,7 +42,9 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
     const todasLasRutas=getAllRutas();
     
     if(!isLoading){
-        //console.log(data);
+        // console.log("Ya cargo la mierda");
+        // console.log(data);
+        // console.log("Y la data fue la anterior");
 //         console.log(coordenadasOrigen);
 //         console.log(coordenadasDestino);
 //         {"latitude": 12.13461313426314, "longitude": -86.243103928864}
@@ -137,7 +143,9 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
     }
 
     const verificarSiHayDatos=()=>{
-        if(!isLoading && data!=null && data!=undefined && data[0].id_Idetificador!=undefined && data[0].id_Idetificador==-7){
+        console.log("La data de los trayectos son:");
+        console.log(data);
+        if(!isLoading && data!=null && data!=undefined && ((data[0]!=undefined && data[0].id_Idetificador!=undefined && data[0].id_Idetificador==-7) || (data.length!=undefined && data.length==0))){
             setNoseEncontraronTrayectorias(true);
         }
     }
