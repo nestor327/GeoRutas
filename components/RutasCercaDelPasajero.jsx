@@ -68,7 +68,7 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
             return(
                    arregloFinal.map((item, i)=>{ 
                     //console.log(item);             
-                            if(i==0 && tiempoDeEspera>=175){
+                            if(i==0 && tiempoDeEspera>=115){
                                 refMapView.current?.animateCamera({
                                     center:{latitude:item.longitude,
                                         longitude:item.latitude}

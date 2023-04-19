@@ -39,6 +39,12 @@
         onSuccess:()=>{
             setMostrarSniperCargando(true);            
             setCargando(false);
+            console.log("La mierda si se ejecuto y el primer dato de la linea es_ ");
+            if(data!=undefined && data.length>0){
+                console.log(data[0]);
+            }else{
+                console.log("Aun no hay ni mierda");
+            }
         }
         
     })
@@ -54,7 +60,8 @@
 
     if(isLoading==false && !error){
 
-        
+        //console.log("La data es: ");
+        //console.log(data);        
         let coordenadas=[]
 
         if(data!=null && data.length!=0 && data!=undefined && data[0].id_Coordenada==-2){
@@ -73,7 +80,7 @@
             coordenadas.push({latitude: data[y].longitude, longitude: data[y].latitude})
         }
         
-        
+        console.log(coordenadas[0]);
         return(
             <Polyline strokeColor={color} strokeWidth={2} coordinates={coordenadas}></Polyline>
         )

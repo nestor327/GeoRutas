@@ -19,15 +19,16 @@ import {
     requestNonPersonalizedAdsOnly: true
   });
 
-  const RewardedADS = ({VERSIONDELAPLICACION,setMostrarAnuncioRewarded,enviarTiempoDesdeElUltimoAnuncio,setMostrarComprasPasajeros}) => {
+  const RewardedADS = ({VERSIONDELAPLICACION,setMostrarAnuncioRewarded,enviarTiempoDesdeElUltimoAnuncio
+                      ,setMostrarComprasPasajeros,setTiempoDeEspera,setDetenerInterval}) => {
     
     const [anuncioCargado, setAnuncioCargado]=useState(false);
     useEffect(() => {
         // const unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
         const unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
-            setAnuncioCargado(true);        
-            setMostrarAnuncioRewarded(false);              
-            enviarTiempoDesdeElUltimoAnuncio();            
+            setAnuncioCargado(true);
+            setMostrarAnuncioRewarded(false);
+            enviarTiempoDesdeElUltimoAnuncio();
             console.log("se esta cargando");
             rewarded.show();
         });
@@ -43,6 +44,9 @@ import {
               setMostrarAnuncioRewarded(false);
               setMostrarComprasPasajeros(false);
               enviarTiempoDesdeElUltimoAnuncio();            
+              setDetenerInterval(false);
+              setTiempoDeEspera(120);
+              console.log("El tiempo si se actualizo si no lo ves algo paso ahi");
             }else{
               console.log("No se permite el acceso");
             }

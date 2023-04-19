@@ -425,12 +425,15 @@ const App=(
 
     const [iniciarRecorridoDeLaTrayectoria, setIniciarRecorridoDeLaTrayectoria]=useState(false);
 
+    const [tiempoDeEspera,setTiempoDeEspera]=useState(0);
+    const [detenerInterval,setDetenerInterval]=useState(true);
+
     useEffect(()=>{
         SplashScreen.hide();
         if(emailState.length>2 && secionIniciada==true){
             refrescarToken(emailState,tokenState);
             // console.log("ESTAS HACIENDO UNA PETICION AL TOKEN");
-            if((tipoDeUsuario=='Pasajero' && tipoDeSubscripcion=='C') && (iniciarRecorridoDeLaTrayectoria==true || idRutaAMostrar>0)){
+            if((tipoDeUsuario=='Pasajero' && tipoDeSubscripcion=='C') && (iniciarRecorridoDeLaTrayectoria==true || idRutaAMostrar>0) && detenerInterval==true){
 
                 setDatosDelUsuarioSinSuscripcion({apellidos: "Des", idTablaForanea: 0, nombres: "Des", tipoDeUsuario: "P",
                 tipoSubscripcion: "C", token: tokenState, email:emailState});
@@ -574,8 +577,6 @@ const App=(
         }
     },[noSeEncontraronTrayectorias])
 
-    const [tiempoDeEspera,setTiempoDeEspera]=useState(0);
-    const [detenerInterval,setDetenerInterval]=useState(true);    
 
   return (
      <View style={{height:height, width:width}}>
@@ -673,7 +674,7 @@ const App=(
         {comprarSuscripcionT==true && <Compras tiempoDesdeLaUltimaSuscripcion={tiempoDesdeLaUltimaSuscripcion} purchase={purchase} setPurchase={setPurchase} comprarProducto={comprarProducto} setTipoDeSubscripcion={setTipoDeSubscripcion} setTokenGeoRutas={setTokenGeoRutas} setTokenState={setTokenState} setEmailState={setEmailState} datosDelUsuarioSinSuscripcion={datosDelUsuarioSinSuscripcion} setComprarSuscripcionT={setComprarSuscripcionT} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} 
                                         height={height} width={width} setLoguearse={setLoguearse} setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setIdUsuarioIniciado={setIdUsuarioIniciado} setIdUsuarioIniciadoCode={setIdUsuarioIniciadoCode} idFacturaOApellidos={idFacturaOApellidos}></Compras>}
         {mostrarAnuncioCompleto==true && <InterstitialADS mostrarAnuncioCompleto={mostrarAnuncioCompleto} VERSIONDELAPLICACION={VERSIONDELAPLICACION} enviarTiempoDesdeElUltimoAnuncio={enviarTiempoDesdeElUltimoAnuncio} setMostrarAnuncioCompleto={setMostrarAnuncioCompleto}></InterstitialADS>}
-        {mostrarAnuncioRewarded==true && <RewardedADS VERSIONDELAPLICACION={VERSIONDELAPLICACION} setMostrarComprasPasajeros={setMostrarComprasPasajeros} enviarTiempoDesdeElUltimoAnuncio={enviarTiempoDesdeElUltimoAnuncio} setMostrarAnuncioRewarded={setMostrarAnuncioRewarded}></RewardedADS>}
+        {mostrarAnuncioRewarded==true && <RewardedADS setTiempoDeEspera={setTiempoDeEspera} setDetenerInterval={setDetenerInterval} VERSIONDELAPLICACION={VERSIONDELAPLICACION} setMostrarComprasPasajeros={setMostrarComprasPasajeros} enviarTiempoDesdeElUltimoAnuncio={enviarTiempoDesdeElUltimoAnuncio} setMostrarAnuncioRewarded={setMostrarAnuncioRewarded}></RewardedADS>}
         {mostrarComprasPasajeros==true && <ComprasUsuariosPasajeros emailState={emailState} iniciarRecorridoDeLaTrayectoria={iniciarRecorridoDeLaTrayectoria} setIniciarRecorridoDeLaTrayectoria={setIniciarRecorridoDeLaTrayectoria} tiempoDesdeLaUltimaSuscripcion={tiempoDesdeLaUltimaSuscripcion} idFacturaOApellidos={idFacturaOApellidos} datosDelUsuarioSinSuscripcion={datosDelUsuarioSinSuscripcion} comprarProducto={comprarProducto} purchase={purchase} setPurchase={setPurchase} setEliminarAnuncios={setEliminarAnuncios} 
         eliminarAnuncios={eliminarAnuncios} setMostrarComprasPasajeros={setMostrarComprasPasajeros} setMostrarAlerte={setMostrarAlerte} height={height} width={width} setMensajeAlerta={setMensajeAlerta} setLoguearse={setLoguearse} setSecionIniciada={setSecionIniciada} setTipoDeSubscripcion={setTipoDeSubscripcion}
                                             setTipoDeUsuario={setTipoDeUsuario} setMostrarAnuncioRewarded={setMostrarAnuncioRewarded} setmenDos={setmenDos} setMostrarItemMenuUno={setMostrarItemMenuUno} setIdRutaAMostrar={setIdRutaAMostrar} setOcultarTrayecto={setOcultarTrayecto} setVerRutasCercanas={setVerRutasCercanas}

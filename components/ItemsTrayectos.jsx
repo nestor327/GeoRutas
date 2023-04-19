@@ -59,24 +59,32 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
                 <ScrollView
                 >
                 {
-                    todasLasRutasData.map((item,i)=>{
-                        return(                            
-                            <View key={i} onTouchEnd={()=>{
-                                setIdRutaAMostrar(i+1);
-                                console.log("Si lo cambiaste");
-                                //setCambiandoDatos(false);
-                                // let fecha= new Date();
-                                // setFechaDeClicSalida(fecha.getTime());
-                                //setTipoDeClic(2);
-                                setMostrarCompañerosCercanos(false);
-                            }}                            
-                            >
-                            { i>=0 && <RutasBarItem color={item.color} numeroDeRuta={item.nombre}
-                                tiempoDeLlegada={'1231'}>
-                                </RutasBarItem>            }           
+                    todasLasRutasData.map((item,i)=>{                        
+                        if((i+1)!=25)
+                            {
+                                return(                            
+                                <View key={i} onTouchEnd={()=>{                                    
+                                    setIdRutaAMostrar(item.id_Ruta);
+                                    console.log("Si lo cambiaste");
+                                    console.log("El nombre de la mierda es: ");
+                                    console.log(item.nombre);
+                                    //setCambiandoDatos(false);
+                                    // let fecha= new Date();
+                                    // setFechaDeClicSalida(fecha.getTime());
+                                    //setTipoDeClic(2);
+                                    setMostrarCompañerosCercanos(false);
+                                    setVerRutasCercanas(false);
+                                }}                            
+                                >
+                                { i>=0 && <RutasBarItem color={item.color} numeroDeRuta={item.nombre}
+                                    tiempoDeLlegada={'1231'}>
+                                    </RutasBarItem>            }           
+    
+                                </View>
+                            )   
+                        }
 
-                            </View>
-                        )})}
+                        })}
                 </ScrollView>
             </View>
 

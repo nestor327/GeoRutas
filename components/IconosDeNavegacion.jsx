@@ -17,7 +17,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
     ocultarTrayecto,permisos,askLocationPermissionSetting, setUsuarioTransportista,setCargando,emailState, tokenState,setMostrarAlerte, 
     setMensajeAlerta,setMostrarComprasPasajeros,tipoDeSubscripcion,mostrarCompañerosCercanos, setMostrarCompañerosCercanos,menCuatro,verParadasCercanas,
     setIdRutaAMostrar,setMostrarMenusBuenEstado,setMostrarItemMenuUno,setVerParadasCercanas,setMostrarBarraSecundariaDeUbicacion,coordenadasOrigenSecundario,
-    iniciarRecorridoDeLaTrayectoria, setIniciarRecorridoDeLaTrayectoria,setDetenerInterval,setTiempoDeEspera
+    iniciarRecorridoDeLaTrayectoria, setIniciarRecorridoDeLaTrayectoria,setDetenerInterval,setTiempoDeEspera,detenerInterval
     })=>{
 
         // useEffect(()=>{
@@ -246,7 +246,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         askLocationPermissionSetting();
                         return;
                     }
-                    followUseLocation(25);
+                    followUseLocation(15);
                     setPermitirSeguirPasajero(true);
                     setCargando(false);
                 }}
@@ -340,10 +340,11 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         setCargando(false);
                         setMensajeAlerta("Para mejor comodidad, elija sus rutas favoritas en \"Perfil\" y muestre su ubicación");
                         setMostrarAlerte(true); 
-                        if(tipoDeSubscripcion=='C'){
+                        setIdRutaAMostrar(-1);
+                        if(tipoDeSubscripcion=='C' && detenerInterval==true){
                             setMostrarComprasPasajeros(true);
-                            setDetenerInterval(false);
-                            setTiempoDeEspera(185);
+                            //setDetenerInterval(false);
+                            //setTiempoDeEspera(185);
                         }
                     }}
                         imagen={require('../assets/noVerUsuariosblue.png')}
@@ -411,12 +412,14 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         setVerRutasCercanas(false);  
                         setVerCompetencia(false);    
                         setOcultarTrayecto(true);  
-                        if(tipoDeSubscripcion=='C'){
+                        if(tipoDeSubscripcion=='C' && detenerInterval==true){
                             setMostrarComprasPasajeros(true);
+                        }else{
+                            setMensajeAlerta("Has iniciado el recorrido");
+                            setMostrarAlerte(true);                       
                         }
 
-                        setMensajeAlerta("Has iniciado el recorrido");
-                        setMostrarAlerte(true);                        
+
                         setCargando(false);
                     }}
                     imagen={require('../assets/cambioDetrayectoriaCuatro.jpg')}

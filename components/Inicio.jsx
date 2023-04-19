@@ -235,12 +235,16 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     const centrePosition=async()=>{
         //AQUI VA LA LLAMADA A LA UBICACION DE DONDE SE ENCUENTRA EL USUARIO
 
+        console.log("Estas entrando aqui");
         const {latitude,longitude}=await getCurrentLocation();        
-            
+        console.log("Las mierdas son: "+latitude+", "+longitude);
+        refFollowing.current=true;
         refMapView.current?.animateCamera({
             center:{latitude,longitude}
+            
         })
-
+        console.log("Tocas esta mierda");
+        console.log(userLocation);
         refFollowing.current=true;
         console.log("A la gran puta");
 
@@ -744,7 +748,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         menCuatro={menCuatro} verParadasCercanas={verParadasCercanas} setIdRutaAMostrar={setIdRutaAMostrar} setMostrarMenusBuenEstado={setMostrarMenusBuenEstado} setMostrarItemMenuUno={setMostrarItemMenuUno}
         setVerParadasCercanas={setVerParadasCercanas} setMostrarBarraSecundariaDeUbicacion={setMostrarBarraSecundariaDeUbicacion} coordenadasOrigenSecundario={coordenadasOrigenSecundario} 
         iniciarRecorridoDeLaTrayectoria={iniciarRecorridoDeLaTrayectoria} setIniciarRecorridoDeLaTrayectoria={setIniciarRecorridoDeLaTrayectoria}
-        setDetenerInterval={setDetenerInterval} setTiempoDeEspera={setTiempoDeEspera}
+        setDetenerInterval={setDetenerInterval} setTiempoDeEspera={setTiempoDeEspera} detenerInterval={detenerInterval}
         ></IconosDeNavegacion>
 
 
@@ -1204,7 +1208,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     </TouchableOpacity>
 
                     {tipoDeModificacionDeLugar=='Destino' && refNombreDelOrigen.current!='Desconocido' &&
-                    refNombreDelOrigen.current!='Tu ubicación' && <TouchableOpacity
+                    refNombreDelOrigen.current!='Tú ultima ubicación' && <TouchableOpacity
                     style={{                        
                         justifyContent: 'center',
                         alignItems: 'flex-start',
@@ -1291,19 +1295,19 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                                     askLocationPermissionSetting();
                                     return;
                                 }
-                                refNombreDelOrigen.current='Tu ubicación';
+                                refNombreDelOrigen.current='Tú ultima ubicación';
                                 setVerRecomendacionesDeUbicacion(false);
                                 const {latitude,longitude}=getCurrentLocation();
                                 
                                 setCoordenadasOrigen(userLocation);
     
                                 refMapView.current?.animateCamera({
-                                    center:{...userLocation}
+                                    center:{latitude,longitude}
                                 })
                             }
                         }}
                     >
-                        <Text style={{color:(!modoOscuro)?'black':'#f1f1f1',fontSize:15}}>Tu ubicación</Text>
+                        <Text style={{color:(!modoOscuro)?'black':'#f1f1f1',fontSize:15}}>Tú ultima ubicación</Text>
                     </TouchableOpacity>}
                 </View>}
 
@@ -1352,7 +1356,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         </TouchableOpacity>}
     </View>}
 
-        {tipoDeUsuario=='Pasajero' && mostrarItemMenuUno==true && detenerInterval==false && <View style={{position:'absolute', backgroundColor:(!modoOscuro)?'#2060A9':'#151567',height:40,width:80,zIndex:10,right:'5%',top:'20%',
+        {tipoDeUsuario=='Pasajero' && detenerInterval==false && <View style={{position:'absolute', backgroundColor:(!modoOscuro)?'#2060A9':'#151567',height:40,width:80,zIndex:10,right:'5%',top:'20%',
         alignItems:'center',justifyContent:'center',borderRadius:10,borderWidth:2,borderColor:(tiempoDeEspera>=30)?'green':'red'}}>
             <Text style={{fontWeight:'600'}}
             >{"0"+Math.floor(tiempoDeEspera/60)+":"+[((tiempoDeEspera-60*(Math.floor(tiempoDeEspera/60)))>9)?(tiempoDeEspera-60*(Math.floor(tiempoDeEspera/60))):"0"+(tiempoDeEspera-60*(Math.floor(tiempoDeEspera/60)))]}</Text>
@@ -1655,7 +1659,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                 && (tipoDeUsuario=='Transportista' || (tipoDeUsuario=='Pasajero' && 
                 (tipoDeSubscripcion=='A' ||tipoDeSubscripcion=='S'))) && <UsuarioCercanoAUnaParada modoOscuro={modoOscuro} idRuta={verParadasCercanas[0].id_Ruta} emailState={emailState} tokenState={tokenState} idParada={verParadasCercanas[0].id_Parada}
                     tipoDeUsuario={tipoDeUsuario} idUsuarioIniciado={idUsuarioIniciado}></UsuarioCercanoAUnaParada>}
-            {secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && !mostrarCompañerosCercanos && iniciarRecorridoDeLaTrayectoria && <SeguimientoAlTrayecto permitirSeguirPasajero={permitirSeguirPasajero} permitirEnviarUbicacion={permitirEnviarUbicacion} refMapView={refMapView} datosDeLosUsuarios={datosDeLosUsuarios} modoOscuro={modoOscuro}emailState={emailState}tokenState={tokenState}></SeguimientoAlTrayecto>}
+            {mostrarComprasPasajeros==false && secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && !mostrarCompañerosCercanos && iniciarRecorridoDeLaTrayectoria && <SeguimientoAlTrayecto permitirSeguirPasajero={permitirSeguirPasajero} permitirEnviarUbicacion={permitirEnviarUbicacion} refMapView={refMapView} datosDeLosUsuarios={datosDeLosUsuarios} modoOscuro={modoOscuro}emailState={emailState}tokenState={tokenState}></SeguimientoAlTrayecto>}
             
         </MapView>}         
     </View>

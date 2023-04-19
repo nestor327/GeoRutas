@@ -114,7 +114,7 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                 </TouchableOpacity>
                         <View style={{marginLeft:'auto',marginRight:'auto',marginTop:'15%'}}>
                             <Text style={{fontSize:33,fontWeight:'bold', color:'#f1f1f1',textAlign:'center',marginHorizontal:20}}>{(eliminarAnuncios==false)?"Acceso Denegado":"Eliminar los anuncios"}</Text>
-                            <Text style={{fontSize:14, color:'#f1f1f199',marginHorizontal:20,marginTop:10,textAlign:'center'}}>{(eliminarAnuncios==false)?"Si quieres acceder, mira un anuncio o compra una suscripción":
+                            <Text style={{fontSize:14, color:'#f1f1f199',marginHorizontal:20,marginTop:10,textAlign:'center'}}>{(eliminarAnuncios==false)?"Si quieres acceder, mira un anuncio, comparte tu ubicación o compra una suscripción":
                                             "Compra una suscripción para eliminar los anuncios y tener acceso a todas las funciones de la aplicación"}</Text>
                         </View>
 
@@ -142,13 +142,25 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                                 //setPurchase(false);
                             }}                                                
                                 >
-                        <Text style={{fontSize:19}}>{(eliminarAnuncios==true)?"Presiona para comprar":"Ver anuncio"}</Text>
+                        <Text style={{fontSize:19, color:'#f1f1f1',alignItems:'center'}}>{(eliminarAnuncios==true)?"Presiona para comprar":"Ver anuncio"}</Text>
                     </TouchableOpacity>
+
+                    {/* {eliminarAnuncios==false && <TouchableOpacity style={{marginTop:'2.5%', marginLeft:'auto',marginRight:'auto'
+                                                ,backgroundColor:(eliminarAnuncios)?'green':'#2956b2',height:40,alignItems:'center'
+                                                ,justifyContent:'center',borderRadius:10,padding:10,width:'auto'}}
+                            onPressOut={()=>{
+                                
+                                console.log("Compartiendo Ubicacion");
+                                
+                            }}                                                
+                                >
+                        <Text style={{fontSize:17, color:'#f1f1f1',height:30}}>{"Compartir Ubicación"}</Text>
+                    </TouchableOpacity>} */}
 
                     {purchase==false && <View style={{marginTop:10,marginLeft:'auto',marginRight:'auto',
                                                 alignItems:'center',justifyContent:'center',padding:10,borderRadius:10, 
                                                 alignContent:'center',paddingHorizontal:'10%'}}>
-                        {<Text style={{textAlign:'center'}}>Accede a todas las funciones de la aplicación y elimina los anuncios al comprar esta suscripción</Text>}
+                        {<Text style={{textAlign:'center',color:'#f1f1f199'}}>Accede a todas las funciones de la aplicación y elimina los anuncios al comprar una suscripción</Text>}
                     </View>}
 
                     <View style={{flexDirection:'row', justifyContent:'space-around',marginHorizontal:30}}> 
@@ -164,7 +176,7 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                                     
                                 }}                        
                             >
-                            <Text style={{fontSize:17,textAlign:'center',alignContent:'center',height:37,textAlignVertical:'center'}}>
+                            <Text style={{fontSize:17,textAlign:'center',alignContent:'center',height:37,textAlignVertical:'center', color:'#f1f1f1'}}>
                             Comprar
                             </Text>
                         </TouchableOpacity>}
@@ -188,7 +200,7 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                                     }
                                 }}                        
                             >
-                            <Text style={{fontSize:17,textAlign:'center',alignContent:'center',height:37,textAlignVertical:'center'}}>
+                            <Text style={{fontSize:17,textAlign:'center',alignContent:'center',height:37,textAlignVertical:'center', color:'#f1f1f1'}}>
                                 Cancelar
                             </Text>
                         </TouchableOpacity>
