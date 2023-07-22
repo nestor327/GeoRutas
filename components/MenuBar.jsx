@@ -15,7 +15,7 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                 ,permitirEnviarUbicacion, setMostrarBarraSecundariaDeUbicacion,refCambiarLupa,activarPrecision,setActivarPrecision
                 ,tipoDeUsuario,serMostrarVentana,cargando,setCargando,idRutaAMostrar,setMostrarMenusBuenEstado,modoOscuro,setMostrarCompañerosCercanos
                 ,mostrarVentana,setIniciarRecorridoDeLaTrayectoria,verificarSiHayDatos,tiempoDeEspera,setTiempoDeEspera
-                ,detenerInterval,setDetenerInterval,verRutasCercanas
+                ,detenerInterval,setDetenerInterval,verRutasCercanas,setMostrarLaLineaDeLaRutaQueComparte
             })=>{
     
 
@@ -175,6 +175,7 @@ const MenuBar=({setLoguearse,setRegistrarse,ocultarMenu,rutasEnElMapa,rutasTraye
                                 setMostrarBarraSecundariaDeUbicacion(false);
                                 setMostrarMenusBuenEstado(true);                                
                                 setIniciarRecorridoDeLaTrayectoria(false);
+                                setMostrarLaLineaDeLaRutaQueComparte(true);
                             }else{
                                 setLoguearse(true);
                             }

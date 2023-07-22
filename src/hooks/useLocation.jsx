@@ -4,10 +4,11 @@ import Geolocation from "@react-native-community/geolocation";
 import usePermissionsContext from "./usePermissionsContext.jsx";
 import { AppState } from "react-native";
 import { PermissionStatus,PERMISSIONS, request, check,openSettings } from "react-native-permissions";
-import { getActualizando, getCantidadDeActualizando, setActualizando, setCantidadDeActualizando } from "../../data/asyncStorageData.js";
+import { getActualizando, getCantidadDeActualizando, setActualizando, setCantidadDeActualizando, setCompartiendoUbicacionParaElTransportista, setIdUsuarioTransportistaQueComparten } from "../../data/asyncStorageData.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, direccionesPorUsuario,userLocation,setUserLocation,activarPrecision)=>{
+const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, direccionesPorUsuario,userLocation,setUserLocation,activarPrecision,
+                    setId_usuarioTransportistaQueComparte, setCompartiendoUbicacionComoPasajero,setMostrarRutaASeleccionar,setMostrarComprasPasajeros,setIdRutaAMostrar)=>{
     
     const [permisos,setPermisos]=useState('unavailable');
     const [bacgroundPermisos,setBacgroundPermisos]=useState('unavailable');
@@ -186,7 +187,7 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
             }
 
         try{
-            let datos=await fetch('https://www.georutas.lat/api/NUsuariosTransporte?Email='+emailState+'&Token='+tokenState,
+            let datos=await fetch('https://georutas.somee.com/api/NUsuariosTransporte?Email='+emailState+'&Token='+tokenState,
             {
                 method:"PUT",
                 headers:{
@@ -285,7 +286,7 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
                 ,
                 {
                     timeout: 3600,
-                    maximumAge: 3600,
+                    //maximumAge: 3600,
                     enableHighAccuracy: true,
                 }
             )
@@ -309,7 +310,7 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
 
         let datos=null;
         try{
-            datos=await fetch('https://www.georutas.lat/api/ActualizacionDelBackendParadas?latitude='+userLocationReal.latitude+'&longitude='+userLocationReal.longitude+'&Email='+emailState+'&Token='+tokenState+'&tipoEnvio='+tipoDeEnvio,
+            datos=await fetch('https://georutas.somee.com/api/ActualizacionDelBackendParadas?latitude='+userLocationReal.latitude+'&longitude='+userLocationReal.longitude+'&Email='+emailState+'&Token='+tokenState+'&tipoEnvio='+tipoDeEnvio,
             {
                 method:"GET",
                 headers:{
@@ -334,7 +335,7 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
     const actualizarTiemposDeLasParadas= async(id_Ruta,emailState,tokenState)=>{
         let datos=null;
         try{
-            datos=await fetch('https://www.georutas.lat/api/NActualizacionDeTiempos/'+id_Ruta+'?Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());
+            datos=await fetch('https://georutas.somee.com/api/NActualizacionDeTiempos/'+id_Ruta+'?Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());
             console.log(datos);
             console.log("Los datos son los anteriosres");
         }catch{
@@ -342,6 +343,59 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
             console.log(datos);
         }
     }
+    
+    const enviarUbicacionComoUnPasajero=async(emailState, tokenState,id_RutaComparte,id_usuarioComparte)=>{
+        try{
+            console.log("Intentas capturar la puta ubicacion");
+            let userLocationReal=(await new Promise(async (resolve) => {
+                Geolocation.getCurrentPosition(
+                    ({coords})=>{
+                        resolve({latitude:coords.latitude,longitude:coords.longitude});
+                        setUserLocation({latitude:coords.latitude,longitude:coords.longitude});
+                    },()=>{
+                        //
+                    }
+                    ,
+                    {
+                        timeout: 3600,
+                        //maximumAge: 3600,
+                        enableHighAccuracy: true,
+                    }
+                )
+            }));
+
+
+            //userLocationReal={latitude:12.136772, longitude:-86.270412}
+
+            let datos=await fetch("https://georutas.somee.com/api/CompartiendoUbocacionTresPasajero?Email="+emailState+"&token="+tokenState+"&latitudeUsuario="+userLocationReal.latitude+"&longitudeUsuario="+userLocationReal.longitude+"&idRutaQueComparte="+id_RutaComparte+"&idUsuarioAlQueComparte="+id_usuarioComparte).then(res=>datos=res.json());
+            
+            console.log("Los datos arrojados por el fetch son: ");
+            console.log(datos);
+            console.log("El id del usaurio que supuestamente estas compartiendo es: ");
+            console.log(id_usuarioComparte);
+            if(datos>0){
+                if(datos!=id_usuarioComparte){
+                    setId_usuarioTransportistaQueComparte(datos);
+                    setIdUsuarioTransportistaQueComparten(datos.toString());
+                }
+            }else if(datos==-3){
+                //Aqui no hay pedo, es posible que otra persona este compartiendo la ubicacion, ahi lo dejamos sin problemas
+            }else if(datos==-2){
+                //Mandamos una alerta informando que esta fuera del rrecorrido de la ruta que selecciono
+                //Informar de la cantidad de faltas que lleva y que si pasa de las 10 en el mismo dia la va a cagar, cuenra bloqueada...
+                setCompartiendoUbicacionComoPasajero(false);
+                setCompartiendoUbicacionParaElTransportista("0");
+                setMostrarRutaASeleccionar(false);
+                setMostrarComprasPasajeros(false);
+                setIdRutaAMostrar(-1);
+                setIdUsuarioTransportistaQueComparten("-1");
+            }
+
+        }catch{
+            console.log("Ocurrio un error al intentar enviar la mierda");
+        }
+    }
+
     return{
         permisos,
         hasLocation,
@@ -359,7 +413,8 @@ const useLocation=(permitirEnviarUbicacion, tipoDeUsuario, idUsuarioIniciado, di
         checkBacgroundLocationPermission,
         bacgroundPermisos,
         setBacgroundPermisos,
-        actualizarTiemposDeLasParadas
+        actualizarTiemposDeLasParadas,
+        enviarUbicacionComoUnPasajero
     };
 }
 

@@ -419,3 +419,95 @@ export const setIdUsuarioIniciadoCode= async (idUsuario) => {
     }
   return true;
 }
+
+
+export const setIdUsuarioTransportistaQueComparten= async (idUsuario) => {
+    try{
+        await AsyncStorage.setItem('idUsuarioTransportistaQueComparten',idUsuario);
+    }catch (e){
+        console.log("No se LOGRO GUARDAR EL ID DEL PUTO USUARIO");
+    }
+  return true;
+}
+
+export const getIdUsuarioTransportistaQueComparten = async (setIdUsuario) => {   
+    try{
+        const value=await AsyncStorage.getItem('idUsuarioTransportistaQueComparten');
+
+        console.log("El id del usaurio compartido que se obtiene es: "+value);
+
+        if(value==null){
+            setIdUsuario(-1);      
+        }else{
+            setIdUsuario(parseInt(value));
+        }
+        
+          
+    }catch (e){
+        console.log("No se encontro el id del usuario");
+        setIdUsuario(-1);
+    }
+  return true;
+}
+
+export const setCompartiendoUbicacionParaElTransportista= async (valorDeVerdad) => {
+    try{
+        await AsyncStorage.setItem('estaCompartiendoUbicacionElPasajero',valorDeVerdad);
+        console.log("Se actualizo la mierda, el valor fue: "+valorDeVerdad);
+    }catch (e){
+        console.log("No se logro actualizar el dato de que se esta compartiendo la ubicacion del usuario pasajero");
+    }
+  return true;
+}
+
+export const getCompartiendoUbicacionParaElTransportista = async (setValorDeVerdad) => {   
+    try{
+        const value=await AsyncStorage.getItem('estaCompartiendoUbicacionElPasajero');
+
+        console.log("Al intentar ver si se esta compartiendo la ubicacion o no del pasajero, obtienes: "+value);
+
+        if(value==null){
+            setValorDeVerdad(0);      
+        }else if(value=="1"){
+            setValorDeVerdad(true);
+        }else{
+            setValorDeVerdad(false);
+        }
+          
+    }catch (e){
+        console.log("No se encontro el id del usuario");
+        setValorDeVerdad(false);
+    }
+  return true;
+}
+
+
+export const setIdRutaDelUsuarioQueComparten= async (idRuta) => {
+    try{
+        await AsyncStorage.setItem('idRutaDelUsuarioQueComparten',idRuta);
+    }catch (e){
+        console.log("No se logro actualizar el dato de que se esta compartiendo la ubicacion del usuario pasajero");
+    }
+  return true;
+}
+
+export const getIdRutaDelUsuarioQueComparten = async (setIdRutaQueComparte) => {   
+    //try{
+        const value=await AsyncStorage.getItem('idRutaDelUsuarioQueComparten');
+
+        console.log("Al intentar obtener el id de la ruta que comparten obtienes: "+value);
+
+        if(value==null){
+            setIdRutaQueComparte(-1);
+        }else if(parseInt(value)>0){
+            setIdRutaQueComparte(parseInt(value));
+        }else{
+            setIdRutaQueComparte(-1);
+        }
+          
+    //}catch (e){
+        //console.log("No se encontro el id de la ruta del usuario");
+        //setIdRutaQueComparte(-1);
+    //}
+  return true;
+}

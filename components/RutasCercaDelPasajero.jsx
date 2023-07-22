@@ -14,7 +14,7 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
     try{
         const {data,error,isLoading}=useQuery(['obtenerUsuariosCompetencia',emailState,tokenState],async({queryKey})=>{
             //return await fetch('https://georutas.somee.com/api/UsuariosTransporte').then(res=>datos=res.json())
-            return await fetch('https://www.georutas.lat/api/NUsuariosTransporte?Email='+queryKey[1]+'&Token='+queryKey[2]).then(res=>datos=res.json())
+            return await fetch('https://georutas.somee.com/api/NUsuariosTransporte?Email='+queryKey[1]+'&Token='+queryKey[2]).then(res=>datos=res.json())
         },{
             //staleTime:Infinity,
             refetchInterval:6000,

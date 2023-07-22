@@ -17,7 +17,7 @@ const CompetenciaTransportistas=({tipoDeUsuario,idUsuarioIniciado,setCargando,ru
 
 try{        
     const {data,error,isLoading,isSuccess}=useQuery(['obtenerUsuariosCompetencia',emailState,tokenState],async({queryKey})=>{
-        return await fetch('https://www.georutas.lat/api/NUsuariosTransporte?Email='+queryKey[1]+'&Token='+queryKey[2]).then(res=>datos=res.json())
+        return await fetch('https://georutas.somee.com/api/NUsuariosTransporte?Email='+queryKey[1]+'&Token='+queryKey[2]).then(res=>datos=res.json())
     },{
         //staleTime:Infinity,
         refetchInterval:6000,

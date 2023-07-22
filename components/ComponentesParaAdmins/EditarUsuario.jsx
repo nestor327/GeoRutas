@@ -39,7 +39,7 @@ const EditarUsuario=({height,width,setEditarInfoDelChofer,emailDelChoferEditar,c
         let datos="";
 
         try{
-            let res=await fetch('https://www.georutas.lat/api/CambiarPassword',options);
+            let res=await fetch('https://georutas.somee.com/api/CambiarPassword',options);
             if(res.ok){                
                 datos=await res.json();                
             }else{
@@ -113,7 +113,7 @@ const EditarUsuario=({height,width,setEditarInfoDelChofer,emailDelChoferEditar,c
                     body: JSON.stringify(objeto)
                     };
 
-                let datos=await fetch('https://www.georutas.lat/api/UsuariosCoperativas?Email='+emailState+'&Token='+tokenState,options);
+                let datos=await fetch('https://georutas.somee.com/api/UsuariosCoperativas?Email='+emailState+'&Token='+tokenState,options);
 
                 if(datos.ok){
                     let json=await datos.json();

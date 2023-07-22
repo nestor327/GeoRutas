@@ -9,7 +9,7 @@ import urlDeLasImagenesEstaticas from '../data/urlDeLasImagenesDeLasRutas';
 const UsuarioCercanoAUnaParada=({idRuta,emailState,tokenState,idParada,tipoDeUsuario,idUsuarioIniciado,modoOscuro})=>{
     //try{
         const {data,error,isLoading}=useQuery(['obtenerUsuarioCercanoAUnaParada',idRuta,emailState,tokenState,idParada],async({queryKey})=>{
-            return await fetch('https://www.georutas.lat/api/NUsuarioTransporteCercaDeUnaParada?Id_Ruta='+queryKey[1]+'&Id_Parada='+queryKey[4]+'&Email='+queryKey[2]+'&Token='+queryKey[3]).then(res=>datos=res.json())
+            return await fetch('https://georutas.somee.com/api/NUsuarioTransporteCercaDeUnaParada?Id_Ruta='+queryKey[1]+'&Id_Parada='+queryKey[4]+'&Email='+queryKey[2]+'&Token='+queryKey[3]).then(res=>datos=res.json())
         },{
             //staleTime:Infinity,
             refetchInterval:4000,

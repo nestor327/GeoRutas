@@ -14,8 +14,8 @@ import urlDeLasImagenesEstaticas from "../data/urlDeLasImagenesDeLasRutas.js";
     try{
         const {data,error,isLoading}=useQuery(['obtenerUsuariosTransportistasConTiempo',idUsuarioIniciado,emailState,tokenState,idRuta,modoSimplificado],async({queryKey})=>{
             
-            return await fetch((Math.ceil(idUsuarioIniciado/33.0)==queryKey[4] || queryKey[5]==true)?'https://www.georutas.lat/api/NUsuarioTransporteConTiemposDeDiferencia?Email='+queryKey[2]+'&Token='+queryKey[3]+'&IdUsuarioTransporte='+queryKey[1]
-                                :'https://www.georutas.lat/api/NUsuarioTransporteParaUnaRuta/'+queryKey[4]+'?Email='+queryKey[2]+'&Token='+queryKey[3]).then(res=> datos=res.json() )
+            return await fetch((Math.ceil(idUsuarioIniciado/33.0)==queryKey[4] || queryKey[5]==true)?'https://georutas.somee.com/api/NUsuarioTransporteConTiemposDeDiferencia?Email='+queryKey[2]+'&Token='+queryKey[3]+'&IdUsuarioTransporte='+queryKey[1]
+                                :'https://georutas.somee.com/api/NUsuarioTransporteParaUnaRuta/'+queryKey[4]+'?Email='+queryKey[2]+'&Token='+queryKey[3]).then(res=> datos=res.json() )
         },{
             //staleTime:10000,
             refetchInterval:4000,

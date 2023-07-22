@@ -4,7 +4,7 @@ import { TouchableOpacity } from 'react-native';
 import * as IAP from 'react-native-iap'
 import { Platform,Alert } from 'react-native';
 import { useEffect, useState } from 'react';
-import imagen from '../../assets/x_icon_imagen.png'
+import imagen from '../../assets/x_icon_imagen.png';
 import { setTipoDeMenbresiaCode } from '../../data/asyncStorageData';
 
 let purchaseUpdateSuscription=null;
@@ -14,7 +14,7 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                 ,setTipoDeSubscripcion,setLoguearse,setSecionIniciada,setTipoDeUsuario,setMostrarAnuncioRewarded,setmenDos,setMostrarItemMenuUno
                 ,setIdRutaAMostrar,setOcultarTrayecto,setVerRutasCercanas,eliminarAnuncios,setEliminarAnuncios,purchase,setPurchase,comprarProducto
                 ,idFacturaOApellidos,tiempoDesdeLaUltimaSuscripcion,modoOscuro,iniciarRecorridoDeLaTrayectoria,setIniciarRecorridoDeLaTrayectoria
-                ,emailState})=>{
+                ,emailState,setMostrarRutaASeleccionar})=>{
 
     const actualizarUsuarioBD=async(emails,emailStateDos,tokenState,tiempo,apellidos)=>{
         try{
@@ -39,7 +39,7 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
             // console.log("La cantidad de segundos es: "+Date.parse(new Date()));
 
 
-            let datos=await fetch('https://www.georutas.lat/api/ActualizarMenbresia?Email='+emailStateDos+'&Token='+tokenState+'&tiempo='+tiempo+'&apellidos='+apellidos,options);
+            let datos=await fetch('https://georutas.somee.com/api/ActualizarMenbresia?Email='+emailStateDos+'&Token='+tokenState+'&tiempo='+tiempo+'&apellidos='+apellidos,options);
         
                 if(datos.ok){
                     console.log(datos);
@@ -124,7 +124,19 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                         </Image>
                     </View>
 
-                    <TouchableOpacity style={{marginTop:'5%', marginLeft:'auto',marginRight:'auto',backgroundColor:(eliminarAnuncios)?'green':'#2956b2',
+                    {eliminarAnuncios==false && <TouchableOpacity style={{marginTop:'5%', marginLeft:'auto',marginRight:'auto'
+                                                ,backgroundColor:(eliminarAnuncios)?'green':'#2956b2',height:40,alignItems:'center'
+                                                ,justifyContent:'center',borderRadius:10,padding:10,width:'auto'}}
+                            onPressOut={()=>{
+                                
+                                console.log("Compartiendo Ubicacion");
+                                setMostrarRutaASeleccionar(true);
+                            }}                                                
+                                >
+                        <Text style={{fontSize:18, color:'#f1f1f1',height:30}}>{"Compartir Ubicación"}</Text>
+                    </TouchableOpacity>}
+
+                    <TouchableOpacity style={{marginTop:'2.5%', marginLeft:'auto',marginRight:'auto',backgroundColor:(eliminarAnuncios)?'green':'#2956b2',
                                                 height:50,alignItems:'center',justifyContent:'center',padding:10,borderRadius:10,width:(eliminarAnuncios)?'auto':'45%'}}
                             onPressOut={()=>{
                                 if(eliminarAnuncios){
@@ -144,18 +156,6 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                                 >
                         <Text style={{fontSize:19, color:'#f1f1f1',alignItems:'center'}}>{(eliminarAnuncios==true)?"Presiona para comprar":"Ver anuncio"}</Text>
                     </TouchableOpacity>
-
-                    {/* {eliminarAnuncios==false && <TouchableOpacity style={{marginTop:'2.5%', marginLeft:'auto',marginRight:'auto'
-                                                ,backgroundColor:(eliminarAnuncios)?'green':'#2956b2',height:40,alignItems:'center'
-                                                ,justifyContent:'center',borderRadius:10,padding:10,width:'auto'}}
-                            onPressOut={()=>{
-                                
-                                console.log("Compartiendo Ubicacion");
-                                
-                            }}                                                
-                                >
-                        <Text style={{fontSize:17, color:'#f1f1f1',height:30}}>{"Compartir Ubicación"}</Text>
-                    </TouchableOpacity>} */}
 
                     {purchase==false && <View style={{marginTop:10,marginLeft:'auto',marginRight:'auto',
                                                 alignItems:'center',justifyContent:'center',padding:10,borderRadius:10, 

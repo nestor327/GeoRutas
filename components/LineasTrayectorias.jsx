@@ -7,7 +7,7 @@ import { Polyline } from "react-native-maps";
         try{
             const {data,error,isLoading}=useQuery(['obtenerLineas',iconoTrayectoItem,emailState, tokenState],async({queryKey})=>{
                 //return await fetch('https://georutas.somee.com/api/SP_PObtenerCoordendasDeLineaDeLaRutaEntreParadas/'+queryKey[1].latitudParadaUsuarioComun
-                return await fetch('https://www.georutas.lat/api/SP_PObtenerCoordendasDeLineaDeLaRutaEntreParadas/'+queryKey[1].latitudParadaUsuarioComun+','+queryKey[1].longitudParadaUsuarioComun
+                return await fetch('https://georutas.somee.com/api/SP_PObtenerCoordendasDeLineaDeLaRutaEntreParadas/'+queryKey[1].latitudParadaUsuarioComun+','+queryKey[1].longitudParadaUsuarioComun
                 +','+queryKey[1].id_ParadaUsuarioComun+','+queryKey[1].id_ParadaFinal+'?Email='+queryKey[2]+'&Token='+queryKey[3]).then(res=>datos=res.json())
             },{
                 staleTime:Infinity,

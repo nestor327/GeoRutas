@@ -34,7 +34,7 @@ const useComprasPlayStore=(emailState,purchase, setPurchase,setMensajeAlerta,set
     const [nombreItemsAndroid, setNombreItemsAndroid]=useState([]);
 
     const obtenerProductosDesdeLaBaseDeDatos=async ()=>{
-        let valor=await fetch("https://www.georutas.lat/api/productos");
+        let valor=await fetch("https://georutas.somee.com/api/productos");
 
         console.log("Los datos tratados de una forma diferente son");
         let datos= await valor.json();

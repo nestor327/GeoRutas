@@ -133,7 +133,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
         let datos="";
 
         try{
-            let res=await fetch('https://www.georutas.lat/api/Registro',options);
+            let res=await fetch('https://georutas.somee.com/api/Registro',options);
             if(res.ok){                
                 datos=await res.json();                
             }else{
@@ -188,7 +188,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
                 body: JSON.stringify(objeto)
             };
 
-            let datos=await fetch('https://www.georutas.lat/api/EditarPerfil?Token='+tokenState,options);
+            let datos=await fetch('https://georutas.somee.com/api/EditarPerfil?Token='+tokenState,options);
 
             if(datos.ok){
                 let json=await datos.json();

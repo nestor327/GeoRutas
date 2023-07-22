@@ -17,7 +17,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
     ocultarTrayecto,permisos,askLocationPermissionSetting, setUsuarioTransportista,setCargando,emailState, tokenState,setMostrarAlerte, 
     setMensajeAlerta,setMostrarComprasPasajeros,tipoDeSubscripcion,mostrarCompañerosCercanos, setMostrarCompañerosCercanos,menCuatro,verParadasCercanas,
     setIdRutaAMostrar,setMostrarMenusBuenEstado,setMostrarItemMenuUno,setVerParadasCercanas,setMostrarBarraSecundariaDeUbicacion,coordenadasOrigenSecundario,
-    iniciarRecorridoDeLaTrayectoria, setIniciarRecorridoDeLaTrayectoria,setDetenerInterval,setTiempoDeEspera,detenerInterval
+    iniciarRecorridoDeLaTrayectoria, setIniciarRecorridoDeLaTrayectoria,setDetenerInterval,setTiempoDeEspera,detenerInterval,compartiendoUbicacionComoPasajero
     })=>{
 
         // useEffect(()=>{
@@ -51,7 +51,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                     //let usuarioTransportista= await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json());
                     let usuarioTransportista={};
                     try{
-                        usuarioTransportista= await fetch('https://www.georutas.lat/api/NUsuariosTransporte/'+idUsuarioIniciado.toString()+'?Email='+emailState+'&Token='+tokenState).then(res=>dat=res.json());
+                        usuarioTransportista= await fetch('https://georutas.somee.com/api/NUsuariosTransporte/'+idUsuarioIniciado.toString()+'?Email='+emailState+'&Token='+tokenState).then(res=>dat=res.json());
                     }catch{
                         usuarioTransportista={};
                     }
@@ -68,7 +68,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
 
                 //let datos=await fetch('https://georutas.somee.com/api/UsuariosTransporte',{
                     try{
-                        let datos=await fetch('https://www.georutas.lat/api/NUsuariosTransporte?Email='+emailState+'&Token='+tokenState,
+                        let datos=await fetch('https://georutas.somee.com/api/NUsuariosTransporte?Email='+emailState+'&Token='+tokenState,
                         {
                             method:"PUT",
                             headers:{
@@ -156,7 +156,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                     //let usuarioTransportista= await fetch('https://georutas.somee.com/api/UsuariosTransporte/'+idUsuarioIniciado).then(res=>dat=res.json())
                     let usuarioTransportista={};
                     try{
-                        usuarioTransportista= await fetch('https://www.georutas.lat/api/NUsuariosTransporte/'+idUsuarioIniciado.toString()+'?Email='+emailState+'&Token='+tokenState).then(res=>dat=res.json());
+                        usuarioTransportista= await fetch('https://georutas.somee.com/api/NUsuariosTransporte/'+idUsuarioIniciado.toString()+'?Email='+emailState+'&Token='+tokenState).then(res=>dat=res.json());
                     }catch{
                         usuarioTransportista={};
                     }
@@ -170,7 +170,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                     //let datos=await fetch('https://georutas.somee.com/api/UsuariosTransporte',{
 
                     try{
-                        let datos=await fetch('https://www.georutas.lat/api/NUsuariosTransporte?Email='+emailState+'&Token='+tokenState,
+                        let datos=await fetch('https://georutas.somee.com/api/NUsuariosTransporte?Email='+emailState+'&Token='+tokenState,
                         {
                             method:"PUT",
                             headers:{
@@ -341,7 +341,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         setMensajeAlerta("Para mejor comodidad, elija sus rutas favoritas en \"Perfil\" y muestre su ubicación");
                         setMostrarAlerte(true); 
                         setIdRutaAMostrar(-1);
-                        if(tipoDeSubscripcion=='C' && detenerInterval==true){
+                        if(tipoDeSubscripcion=='C' && detenerInterval==true && compartiendoUbicacionComoPasajero==false){
                             setMostrarComprasPasajeros(true);
                             //setDetenerInterval(false);
                             //setTiempoDeEspera(185);
@@ -412,7 +412,7 @@ const IconosDeNavegacion=({setPermitirEnviarUbicacion,idUsuarioIniciado,setMostr
                         setVerRutasCercanas(false);  
                         setVerCompetencia(false);    
                         setOcultarTrayecto(true);  
-                        if(tipoDeSubscripcion=='C' && detenerInterval==true){
+                        if(tipoDeSubscripcion=='C' && detenerInterval==true && compartiendoUbicacionComoPasajero==false){
                             setMostrarComprasPasajeros(true);
                         }else{
                             setMensajeAlerta("Has iniciado el recorrido");

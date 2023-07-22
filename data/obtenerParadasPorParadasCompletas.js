@@ -7,7 +7,7 @@ const obtenerParadasPorParadasCompletas=()=>{
 try{
     const {data,error,isLoading}=useQuery(['obtenerParadasConDireccionCompletas'],async({queryKey})=>{
         //return await fetch('https://georutas.somee.com/api/Paradas').then(res=>datos=res.json())
-        return await fetch('https://www.georutas.lat/api/Paradas').then(res=>datos=res.json())
+        return await fetch('https://georutas.somee.com/api/Paradas').then(res=>datos=res.json())
     },{
         staleTime:Infinity,
         cacheTime:3600000
