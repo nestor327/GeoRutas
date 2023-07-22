@@ -23,12 +23,15 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import BackgroundService from 'react-native-background-actions';
 import Geolocation from '@react-native-community/geolocation';
 import { PermissionStatus,PERMISSIONS, request, check,openSettings } from "react-native-permissions";
-import { getPermitirEnvio, getRutasParadasValue, setRutasParadasValue, setTokenGeoRutasCode } from '../data/asyncStorageData.js';
+import { getCompartiendoUbicacionParaElTransportista, getIdRutaDelUsuarioQueComparten, getIdUsuarioTransportistaQueComparten, getPermitirEnvio, getRutasParadasValue, setCompartiendoUbicacionParaElTransportista, setRutasParadasValue, setTokenGeoRutasCode } from '../data/asyncStorageData.js';
 import Cargando from './Cargando.jsx';
 import UsuarioCercanoAUnaParada from './UsuarioCercanoAUnaParada.jsx';
 import styles from '../componentStyles/mapviewStyles.js';
 import UsuariosTransportistasConTiempo from './UsuariosTransportistasConTiempos.jsx';
 import SeguimientoAlTrayecto from './SeguimientoAlTrayecto.jsx';
+import RutaSeleccionadaUsuarioPasajero from './ComponentesParaPasajeros/RutaSeleccionadaUsuarioPasajero.jsx';
+import RutaDelUsuarioQueComparte from './ComponentesParaPasajeros/RutaDelUsuarioQueComparte.jsx';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoordenadasOrigen,tipoDeUsuario
     ,setVerTrayectoria,setOcultarMenu,coordenadasOrigen,coordenadasDestino,setCoordenadasDestino,verTrayectoria,iconosTransportes,tiemposRutasTrayectorias
@@ -53,7 +56,12 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     ,setTiempoDesdeUltimoAnuncio,VERSIONDELAPLICACION,modoOscuro,setModoOscuro,mostrarCompañerosCercanos, setMostrarCompañerosCercanos
     ,tiempoParaUsaurioTransportistaLogueado, setTiempoParaUsaurioTransportistaLogueado, setTiempoPromedio, tiempoPromedio
     ,iniciarRecorridoDeLaTrayectoria, setIniciarRecorridoDeLaTrayectoria,datosDeLosUsuarios,setFechaDeClicSalida,mostrarComprasPasajeros
-    ,detenerInterval,setDetenerInterval,tiempoDeEspera,setTiempoDeEspera,refMapView
+    ,detenerInterval,setDetenerInterval,tiempoDeEspera,setTiempoDeEspera,refMapView,idDeLaRutaALaQueComparteElPasajero
+    ,mostrarLaLineaDeLaRutaQueComparte,compartiendoUbicacionComoPasajero,setCompartiendoUbicacionComoPasajero,setMostrarRutaASeleccionar
+    ,permisos, hasLocation, stopFollowUserLocation, inicialPosition, getCurrentLocation, followUseLocation, actualizarUbicacionEnElBackEnd,
+    siguiendoAlUsuario, askLocationPermission, askLocationPermissionSetting, askLocationBacgroundPermission, checkLocationPermission,
+    checkBacgroundLocationPermission, bacgroundPermisos, setBacgroundPermisos,enviarUbicacionComoUnPasajero,id_usuarioTransportistaQueComparte
+    ,setUsaurioPasajeroCompartiendoSuUbicacion,setIdDeLaRutaALaQueComparteElPasajero,setId_usuarioTransportistaQueComparte,setMostrarLaLineaDeLaRutaQueComparte
     })=>{
     
 
@@ -63,23 +71,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     //     setVerRutasTrayecto,setTiemposRutasTrayectorias,setIconosTransportes,setIdUsuariosDeTrayectoria,verRutasTrayecto);
 
 
-    const { permisos,
-            hasLocation,
-            stopFollowUserLocation,
-            inicialPosition,
-            getCurrentLocation,
-            followUseLocation,            
-            actualizarUbicacionEnElBackEnd,
-            siguiendoAlUsuario,
-            askLocationPermission,
-            askLocationPermissionSetting,
-            askLocationBacgroundPermission,
-            checkLocationPermission,
-            checkBacgroundLocationPermission,
-            bacgroundPermisos,
-            setBacgroundPermisos,
-            actualizarTiemposDeLasParadas
-        }=useLocation(permitirEnviarUbicacion,tipoDeUsuario,idUsuarioIniciado,direccionesPorUsuario,userLocation,setUserLocatio,activarPrecision);
+    
 
     
     const [mostrarUsuarios, setMostrarUsuarios]=useState(false);
@@ -125,7 +117,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         //%  %  
         //%25 %25
         try{
-            let url='https://www.georutas.lat/api/RefrescarToken?Email='+email+'&Token='+token;
+            let url='https://georutas.somee.com/api/RefrescarToken?Email='+email+'&Token='+token;
             
             //Al momento de guardarlo en la base de datos, no debes de guardarlo con la misma estructura
 
@@ -168,7 +160,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         
         let usuario=null;
         try{
-            let url='https://www.georutas.lat/api/NUsuariosTransporte/'+idUsuarioIniciado.toString()+'?Email='+email+'&Token='+token;
+            let url='https://georutas.somee.com/api/NUsuariosTransporte/'+idUsuarioIniciado.toString()+'?Email='+email+'&Token='+token;
             
             usuario=await fetch(url).then(res=>dat=res.json());
             
@@ -197,7 +189,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             let paradasRutas=[];
 
             try{
-                paradasRutas=await fetch('https://www.georutas.lat/api/RutasParada?IdRuta='+usuario.id_Ruta+'&Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());        
+                paradasRutas=await fetch('https://georutas.somee.com/api/RutasParada?IdRuta='+usuario.id_Ruta+'&Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());        
             }catch{
                 paradasRutas=[];
             }        
@@ -208,7 +200,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
             let paradasComple=[];
             try{
-                paradasComple=await fetch('https://www.georutas.lat/api/Paradas/Email?Email='+email+'&token='+token).then(res=>datos=res.json());
+                paradasComple=await fetch('https://georutas.somee.com/api/Paradas/Email?Email='+email+'&token='+token).then(res=>datos=res.json());
             }catch{
                 paradasComple=[];
             }
@@ -220,7 +212,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             let lineaDeLaR=[];
 
             try{
-                lineaDeLaR=await fetch('https://www.georutas.lat/api/Coordenadas/'+usuario.id_Ruta+'?email='+email+'&token='+token).then(res=>datos=res.json());
+                lineaDeLaR=await fetch('https://georutas.somee.com/api/Coordenadas/'+usuario.id_Ruta+'?email='+email+'&token='+token).then(res=>datos=res.json());
             }catch{
                 lineaDeLaR=[];
             }
@@ -258,7 +250,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             console.log("El email es: "+email);
             console.log("El token es: "+token);
             try{
-                let datos=await fetch('https://www.georutas.lat/api/NUsuariosTransporte?Email='+email+'&Token='+token,
+                let datos=await fetch('https://georutas.somee.com/api/NUsuariosTransporte?Email='+email+'&Token='+token,
                 {
                     method:"PUT",
                     headers:{
@@ -627,10 +619,43 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                         if(usuarioTransportista.id_Ruta!=null && usuarioTransportista.id_Ruta!=undefined && ((fecha.getMinutes()) + usuarioTransportista.id_Ruta)%30==0 && idUsuarioIniciado%33<15){
                             actualizarTiemposDeLasParadas(usuarioTransportista.id_Ruta,emailState,tokenState);
                         }
+                    }else if(tipoDeUsuario=='Pasajero' && compartiendoUbicacionComoPasajero==true){
+                        
+                        console.log("Se esta compartiendo la ubicacion como un pasajero");
+                        console.log("Los datos que envias son: ");
+                        console.log(emailState);
+                        console.log(tokenState);
+                        console.log(idDeLaRutaALaQueComparteElPasajero);
+                        console.log(id_usuarioTransportistaQueComparte);
+                        console.log("Fin de los datos");
+
+                        enviarUbicacionComoUnPasajero(emailState, tokenState,idDeLaRutaALaQueComparteElPasajero,id_usuarioTransportistaQueComparte);
+                        
+                        //console.log("Y todavia pasa hasta aqui");
+
+                        try{
+                            const value=await AsyncStorage.getItem('estaCompartiendoUbicacionElPasajero');
+                    
+                            if(value==null){
+                                //Ni verga
+                            }else if(value=="1"){
+                                //Ni verga
+                            }else{
+                                console.log("La mierda se detuvo porque el valor de la mierda arrojada fue: "+value);
+                                let detener=await BackgroundService.stop();                                
+                            }
+                              
+                        }catch (e){
+                            console.log("Ocurrio un error buscando si la mierda se estaba compartiendo o no");                            
+                        }
+
                     }else{
                         console.log("Se cancelo la tarea en segundo plano");
+                        console.log(tipoDeUsuario=='Pasajero' && compartiendoUbicacionComoPasajero==true);
+                        console.log(tipoDeUsuario);
+                        console.log(compartiendoUbicacionComoPasajero);
                         let detener=await BackgroundService.stop();
-                    }        
+                    }
                 }
                 await sleep(delay);
             }
@@ -667,13 +692,14 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
     useEffect(()=>{
         //console.log("Estas en el UseEffet numero 12");
+        console.log("Entras al useEffet y resulta que el id de la ruta es: "+idDeLaRutaALaQueComparteElPasajero);
     
         const permisosState=AppState.addEventListener('change',async(state)=>{
     
             if(state!=='active' && secionIniciada==true){
-                if(tipoDeUsuario=='Transportista'){                    
+                //if(tipoDeUsuario=='Transportista'){                    
                     activarTarea();                    
-                }
+                //}
                 setEstadoAplicacion(false);
                 console.log("La tarea se activo");
                 return;
@@ -685,9 +711,17 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                 if(tipoDeUsuario=='Transportista'){
                     verificarMenbresia(emailState,tokenState,tipoDeUsuario);
                     desactivarTarea();
-                }else if(tipoDeUsuario=='Pasajero'){
+                }else if(tipoDeUsuario=='Pasajero'){                    
                     verificarMenbresia(emailState,tokenState,tipoDeUsuario);
                     obtenerTiempoDesdeElUltimoAnucio();
+                    getCompartiendoUbicacionParaElTransportista(setUsaurioPasajeroCompartiendoSuUbicacion);
+                    getIdRutaDelUsuarioQueComparten(setIdDeLaRutaALaQueComparteElPasajero);
+                    getIdUsuarioTransportistaQueComparten(setId_usuarioTransportistaQueComparte);
+                    desactivarTarea();
+                    console.log("Todas las peticiones se hcienron al final");
+                    if(compartiendoUbicacionComoPasajero==true){
+                        setMostrarLaLineaDeLaRutaQueComparte(true);
+                    }
                 }
             }
 
@@ -697,7 +731,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         return ()=>{
             permisosState.remove();
         }
-    },[permitirEnviarUbicacion,secionIniciada,emailState,tokenState,tipoDeUsuario,tipoDeSubscripcion])
+    },[permitirEnviarUbicacion,secionIniciada,emailState,tokenState,tipoDeUsuario,tipoDeSubscripcion,
+        idDeLaRutaALaQueComparteElPasajero,id_usuarioTransportistaQueComparte,compartiendoUbicacionComoPasajero])
 
 
     useEffect(()=>{
@@ -729,7 +764,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     <View style={{height:(height>width)?(height-width*0.2-StatusBar.currentHeight):(height-2*StatusBar.currentHeight)*0.8,
     width:'100%', backgroundColor:'#2060A5'}}>
         
-        {cargando==true && <Cargando height={height}></Cargando>}        
+        {cargando==true && <Cargando height={height}></Cargando>}
         
         <IconosDeNavegacion
         setPermitirEnviarUbicacion={setPermitirEnviarUbicacion} idUsuarioIniciado={idUsuarioIniciado} setMostrarUsuarios={setMostrarUsuarios}
@@ -748,7 +783,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         menCuatro={menCuatro} verParadasCercanas={verParadasCercanas} setIdRutaAMostrar={setIdRutaAMostrar} setMostrarMenusBuenEstado={setMostrarMenusBuenEstado} setMostrarItemMenuUno={setMostrarItemMenuUno}
         setVerParadasCercanas={setVerParadasCercanas} setMostrarBarraSecundariaDeUbicacion={setMostrarBarraSecundariaDeUbicacion} coordenadasOrigenSecundario={coordenadasOrigenSecundario} 
         iniciarRecorridoDeLaTrayectoria={iniciarRecorridoDeLaTrayectoria} setIniciarRecorridoDeLaTrayectoria={setIniciarRecorridoDeLaTrayectoria}
-        setDetenerInterval={setDetenerInterval} setTiempoDeEspera={setTiempoDeEspera} detenerInterval={detenerInterval}
+        setDetenerInterval={setDetenerInterval} setTiempoDeEspera={setTiempoDeEspera} detenerInterval={detenerInterval} compartiendoUbicacionComoPasajero={compartiendoUbicacionComoPasajero}
         ></IconosDeNavegacion>
 
 
@@ -767,7 +802,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             onPress={()=>{
                 if(activarPrecision==false){
                     serMostrarVentana('flex');
-                }else if(bacgroundPermisos!='granted'){                    
+                }else if(bacgroundPermisos!='granted'){
                     serMostrarVentana('flex');
                     setMensajeAlerta("\"Permite\" que la aplicacion tenga acceso \"Siempre\" a la \"Localizacion\" con el boton verde que se muestra a continuacion");
                     setMostrarAlerte(true);                    
@@ -1356,10 +1391,40 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         </TouchableOpacity>}
     </View>}
 
-        {tipoDeUsuario=='Pasajero' && detenerInterval==false && <View style={{position:'absolute', backgroundColor:(!modoOscuro)?'#2060A9':'#151567',height:40,width:80,zIndex:10,right:'5%',top:'20%',
+        {tipoDeUsuario=='Pasajero' && detenerInterval==false && compartiendoUbicacionComoPasajero==false && <View style={{position:'absolute', backgroundColor:(!modoOscuro)?'#2060A9':'#151567',height:40,width:80,zIndex:10,right:'5%',top:'20%',
         alignItems:'center',justifyContent:'center',borderRadius:10,borderWidth:2,borderColor:(tiempoDeEspera>=30)?'green':'red'}}>
             <Text style={{fontWeight:'600'}}
             >{"0"+Math.floor(tiempoDeEspera/60)+":"+[((tiempoDeEspera-60*(Math.floor(tiempoDeEspera/60)))>9)?(tiempoDeEspera-60*(Math.floor(tiempoDeEspera/60))):"0"+(tiempoDeEspera-60*(Math.floor(tiempoDeEspera/60)))]}</Text>
+        </View>}
+
+        {compartiendoUbicacionComoPasajero==true && <View style={{position:'absolute', backgroundColor:(!modoOscuro)?'#2060A9':'#151567',width:'auto',zIndex:10,right:'5%',top:'20%',
+        alignItems:'center',justifyContent:'center',borderRadius:10,borderWidth:2,borderColor:(tiempoDeEspera>=30)?'green':'green',paddingHorizontal:5,paddingTop:5}}>
+            <TouchableOpacity styles={{alignItems:'center'}}
+                onPress={()=>{
+                    setIdRutaAMostrar(-1);
+                    setCompartiendoUbicacionComoPasajero(false);
+                    setCompartiendoUbicacionParaElTransportista("0");
+                    setMostrarRutaASeleccionar(false);
+                    setMostrarComprasPasajeros(false);                
+                    setMensajeAlerta("Has dejado de compartir tu ubicación");
+                    setMostrarAlerte(true);
+                    setVerRutasCercanas(false);
+                    setIniciarRecorridoDeLaTrayectoria(false);
+                    setVerTrayectoria(false);
+                    console.log("Porque mierda esta pasando esto..,");
+                }}
+            >
+                <Text style={{fontWeight:'900',textAlign:'center',color:'#f1f1f1',textDecorationLine:'underline',marginBottom:3}} >Presiona para salir</Text>
+                
+                <View style={{flexDirection:'row',justifyContent:'space-around'}}>
+                    <ActivityIndicator size={'small'} color={'green'}></ActivityIndicator>
+                    <View>
+                        <Text style={{fontWeight:'600',textAlign:'center',color:'#f1f1f1',marginLeft:2}} >Compartiendo</Text>
+                        <Text style={{fontWeight:'600',textAlign:'center',color:'#f1f1f1'}} >Ubicacion</Text>
+                    </View>
+                </View>
+                
+            </TouchableOpacity>
         </View>}
 
         {mostrarVentana=="flex" && <Perfil VERSIONDELAPLICACION={VERSIONDELAPLICACION} setMostrarComprasPasajeros={setMostrarComprasPasajeros} height={height} setEliminarAnuncios={setEliminarAnuncios} width={width} setMostrarAnuncioRewarded={setMostrarAnuncioRewarded} sesionIniciadaConGoogle={sesionIniciadaConGoogle} registrarse={registrarse} setEditarPerfil={setEditarPerfil} setCambiarPassword={setCambiarPassword} setVerAdministrarUsuarios={setVerAdministrarUsuarios} tipoDeSubscripcion={tipoDeSubscripcion} permitirEnviarUbicacion={permitirEnviarUbicacion} secionIniciada={secionIniciada} 
@@ -1369,8 +1434,11 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             tipoDeUsuario={tipoDeUsuario} permisosEnSegundoPlano={bacgroundPermisos} setPermisosEnSegundoPlano={setBacgroundPermisos}
             todasLasRutasCompetencia={todasLasRutasCompetencia} rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}
             setTodasLasRutasCompetencia={setTodasLasRutasCompetencia} setRutasSeleccionadasCompetencia={setRutasSeleccionadasCompetencia}
-            setMensajeAlerta={setMensajeAlerta} setMostrarAlerte={setMostrarAlerte} setMostrarAnuncioCompleto={setMostrarAnuncioCompleto} modoOscuro={modoOscuro} setModoOscuro={setModoOscuro}></Perfil>}
-        
+            setMensajeAlerta={setMensajeAlerta} setMostrarAlerte={setMostrarAlerte} setMostrarAnuncioCompleto={setMostrarAnuncioCompleto} modoOscuro={modoOscuro} setModoOscuro={setModoOscuro}
+            setCompartiendoUbicacionComoPasajero={setCompartiendoUbicacionComoPasajero} setMostrarRutaASeleccionar={setMostrarRutaASeleccionar}            
+            ></Perfil>}
+
+
          {<MapView
 
         ref={(el)=>{
@@ -1585,8 +1653,8 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
 
             {secionIniciada==true && mostrarParadas==true && !mostrarCompañerosCercanos && <DireccionesSegunUbicacion emailState={emailState} tokenState={tokenState} idRuta={idRutaAMostrar}></DireccionesSegunUbicacion>}
-            {secionIniciada==true && idRutaAMostrar>0 && mostrarUsuarios==true && tipoDeUsuario=='Pasajero' && mostrarComprasPasajeros==false && <UsuariosTransportistas emailState={emailState} tokenState={tokenState} tipoDeUsuario={tipoDeUsuario} idRuta={idRutaAMostrar} idUsuarioIniciado={idUsuarioIniciado}
-                        verTransportistasPorLaDerecha={verTransportistasPorLaDerecha} verTransportistasPorLaIzquierda={verTransportistasPorLaIzquierda} modoOscuro={modoOscuro}></UsuariosTransportistas>}
+            {secionIniciada==true && idRutaAMostrar>0 && mostrarUsuarios==true && tipoDeUsuario=='Pasajero' && mostrarComprasPasajeros==false && <UsuariosTransportistas id_usuarioTransportistaQueComparte={id_usuarioTransportistaQueComparte} emailState={emailState} tokenState={tokenState} tipoDeUsuario={tipoDeUsuario} idRuta={idRutaAMostrar} idUsuarioIniciado={idUsuarioIniciado}
+                        verTransportistasPorLaDerecha={verTransportistasPorLaDerecha} verTransportistasPorLaIzquierda={verTransportistasPorLaIzquierda} modoOscuro={modoOscuro} compartiendoUbicacionComoPasajero={compartiendoUbicacionComoPasajero}></UsuariosTransportistas>}
             
             {secionIniciada==true && tipoDeUsuario=='Transportista' && idRutaAMostrar>0 && mostrarUsuarios==true && !mostrarCompañerosCercanos && <UsuariosTransportistasConTiempo setTiempoPromedio={setTiempoPromedio} setTiempoParaUsaurioTransportistaLogueado={setTiempoParaUsaurioTransportistaLogueado} modoSimplificado={false}
                             emailState={emailState} tokenState={tokenState} tipoDeUsuario={tipoDeUsuario} idRuta={idRutaAMostrar} idUsuarioIniciado={idUsuarioIniciado}
@@ -1599,7 +1667,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
             {secionIniciada==true && mostrarCompañerosCercanos && tipoDeUsuario=='Transportista' &&
                 <LineaDeUnaRuta emailState={emailState} tokenState={tokenState} setCargando={setCargando} setMostrarSniperCargando={setMostrarSniperCargando} idRuta={Math.ceil(idUsuarioIniciado/33.0)} ></LineaDeUnaRuta>
             }
-            {secionIniciada==true && idRutaAMostrar>0 && !mostrarCompañerosCercanos &&
+            {secionIniciada==true && idRutaAMostrar>0 && !mostrarCompañerosCercanos && 
                 <LineaDeUnaRuta emailState={emailState} tokenState={tokenState} setCargando={setCargando} setMostrarSniperCargando={setMostrarSniperCargando} idRuta={idRutaAMostrar} ></LineaDeUnaRuta>
             }
 
@@ -1660,6 +1728,11 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                 (tipoDeSubscripcion=='A' ||tipoDeSubscripcion=='S'))) && <UsuarioCercanoAUnaParada modoOscuro={modoOscuro} idRuta={verParadasCercanas[0].id_Ruta} emailState={emailState} tokenState={tokenState} idParada={verParadasCercanas[0].id_Parada}
                     tipoDeUsuario={tipoDeUsuario} idUsuarioIniciado={idUsuarioIniciado}></UsuarioCercanoAUnaParada>}
             {mostrarComprasPasajeros==false && secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && !mostrarCompañerosCercanos && iniciarRecorridoDeLaTrayectoria && <SeguimientoAlTrayecto permitirSeguirPasajero={permitirSeguirPasajero} permitirEnviarUbicacion={permitirEnviarUbicacion} refMapView={refMapView} datosDeLosUsuarios={datosDeLosUsuarios} modoOscuro={modoOscuro}emailState={emailState}tokenState={tokenState}></SeguimientoAlTrayecto>}
+            {idDeLaRutaALaQueComparteElPasajero>0 && compartiendoUbicacionComoPasajero==true && <RutaSeleccionadaUsuarioPasajero enviarUbicacionComoUnPasajero={enviarUbicacionComoUnPasajero} mostrarLaLineaDeLaRutaQueComparte={mostrarLaLineaDeLaRutaQueComparte} modoOscuro={modoOscuro} idDeLaRutaALaQueComparteElPasajero={idDeLaRutaALaQueComparteElPasajero} emailState={emailState} tokenState={tokenState}
+            userLocation={userLocation} id_usuarioTransportistaQueComparte={id_usuarioTransportistaQueComparte} idRutaAMostrar={idRutaAMostrar}></RutaSeleccionadaUsuarioPasajero>}
+
+            {idDeLaRutaALaQueComparteElPasajero>0 && compartiendoUbicacionComoPasajero==true && <RutaDelUsuarioQueComparte compartiendoUbicacionComoPasajero={compartiendoUbicacionComoPasajero} emailState={emailState} tokenState={tokenState} idDeLaRutaALaQueComparteElPasajero={idDeLaRutaALaQueComparteElPasajero} id_usuarioTransportistaQueComparte={id_usuarioTransportistaQueComparte}
+            enviarUbicacionComoUnPasajero={enviarUbicacionComoUnPasajero} userLocation={userLocation} modoOscuro={modoOscuro}></RutaDelUsuarioQueComparte>}
             
         </MapView>}         
     </View>

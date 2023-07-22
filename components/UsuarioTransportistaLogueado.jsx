@@ -17,7 +17,7 @@ import getAllRutas from '../data/rutasManagua.js'
 
         const {data,error,isLoading}=useQuery(['obtenerTodosLosUsuarioComunes',idUsuarioIniciado,emailState,tokenState],async({queryKey})=>{
             //return await fetch('https://georutas.somee.com/api/UsuariosTransporte').then(res=>datos=res.json())
-            return await fetch('https://www.georutas.lat/api/NUsuariosTransporte/'+queryKey[1]+'?Email='+queryKey[2]+'&Token='+queryKey[3]).then(res=>datos=res.json())
+            return await fetch('https://georutas.somee.com/api/NUsuariosTransporte/'+queryKey[1]+'?Email='+queryKey[2]+'&Token='+queryKey[3]).then(res=>datos=res.json())
             
         },{
             refetchInterval:4000,

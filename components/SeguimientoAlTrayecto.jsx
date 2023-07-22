@@ -35,7 +35,7 @@ const SeguimientoAlTrayecto=({datosDeLosUsuarios,modoOscuro,emailState,tokenStat
             },
             body: JSON.stringify(objeto)
         }
-        return await fetch('https://www.georutas.lat/api/NUsuarioTransporteSeguimientoDeLaTrayectoria?Email='+queryKey[1]+'&Token='+queryKey[2],options).then(res=>datos=res.json())
+        return await fetch('https://georutas.somee.com/api/NUsuarioTransporteSeguimientoDeLaTrayectoria?Email='+queryKey[1]+'&Token='+queryKey[2],options).then(res=>datos=res.json())
     },{
         refetchInterval:4000,
         cacheTime:6000,onSuccess:()=>{

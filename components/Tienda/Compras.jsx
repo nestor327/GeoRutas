@@ -42,7 +42,7 @@ const Compras=({datosDelUsuarioSinSuscripcion,setComprarSuscripcionT,setMostrarA
             // console.log("La cantidad de segundos es: "+Date.parse(new Date()));
 
 
-            let datos=await fetch('https://www.georutas.lat/api/ActualizarMenbresia?Email='+emailState+'&Token='+tokenState+'&tiempo='+tiempo+'&apellidos='+apellidos,options);
+            let datos=await fetch('https://georutas.somee.com/api/ActualizarMenbresia?Email='+emailState+'&Token='+tokenState+'&tiempo='+tiempo+'&apellidos='+apellidos,options);
         
                 if(datos.ok){
                     console.log(datos);

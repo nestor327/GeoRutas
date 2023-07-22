@@ -10,11 +10,11 @@ import getAllRutas from '../data/rutasManagua.js'
 import urlDeLasImagenesEstaticas from "../data/urlDeLasImagenesDeLasRutas.js";
     
     const UsuariosTransportistas=({tipoDeUsuario,idRuta,idUsuarioIniciado,verTransportistasPorLaDerecha,verTransportistasPorLaIzquierda
-            ,emailState, tokenState,modoOscuro})=>{
+            ,emailState, tokenState,modoOscuro,id_usuarioTransportistaQueComparte,compartiendoUbicacionComoPasajero})=>{
 
     try{
         const {data,error,isLoading}=useQuery(['obtenerUsuariosTransportistas',idRuta,emailState,tokenState],async({queryKey})=>{
-            return await fetch('https://www.georutas.lat/api/NUsuarioTransporteParaUnaRuta/'+queryKey[1]+'?Email='+queryKey[2]+'&Token='+queryKey[3]).then(res=>datos=res.json())
+            return await fetch('https://georutas.somee.com/api/NUsuarioTransporteParaUnaRuta/'+queryKey[1]+'?Email='+queryKey[2]+'&Token='+queryKey[3]).then(res=>datos=res.json())
         },{
             //staleTime:10000,
             refetchInterval:4000,
@@ -56,7 +56,8 @@ import urlDeLasImagenesEstaticas from "../data/urlDeLasImagenesDeLasRutas.js";
                     ((verTransportistasPorLaIzquierda==true && item.direccion=='I')
                         || (verTransportistasPorLaDerecha==true && item.direccion=='D'))){                        
                     return(
-                            <Marker key={i} coordinate={{latitude:item.longitude,
+                            ((compartiendoUbicacionComoPasajero==true && id_usuarioTransportistaQueComparte!=item.id_UsuarioTransporte)
+                            || compartiendoUbicacionComoPasajero==false) && <Marker key={i} coordinate={{latitude:item.longitude,
                             longitude:item.latitude,
                             latitudeDelta:0.02,
                             longitudeDelta:0.05}}
@@ -64,7 +65,7 @@ import urlDeLasImagenesEstaticas from "../data/urlDeLasImagenesDeLasRutas.js";
                             >
                                 <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{(item.direccion=='I')?"⇚"+nombresEnElArregloFinal[i]:"⇛"+nombresEnElArregloFinal[i]}</Text>
                                 <Image style={{width:25,height:25}} source={urlDeLasImagenes[idRuta-1]} ></Image>
-                            </Marker>                    
+                            </Marker>
                         )
                     }
                 })

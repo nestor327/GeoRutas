@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { View,Text,Image, TouchableOpacity, ScrollView, TextInputBase, BackHandler} from 'react-native'
 import imagen from '../assets/x_icon_imagen.png';
-import { getNombre,getCorreo, setTokenGeoRutasCode } from '../data/asyncStorageData.js';
+import { getNombre,getCorreo, setTokenGeoRutasCode, setCompartiendoUbicacionParaElTransportista } from '../data/asyncStorageData.js';
 import { check, openSettings, PERMISSIONS, request } from 'react-native-permissions';
 import RutasBarItem from './RutasBarItem';
 import ParadasFavoritas from './ParadasFavoritas';
@@ -17,7 +17,7 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
     setRutasSeleccionadasCompetencia, tipoDeSubscripcion,setVerAdministrarUsuarios,setCambiarPassword,
     setEditarPerfil,registrarse,setMostrarAlerte,setMensajeAlerta,setMostrarAnuncioCompleto,
     setMostrarAnuncioRewarded,width,setEliminarAnuncios,height,setMostrarComprasPasajeros,
-    VERSIONDELAPLICACION,modoOscuro,setModoOscuro})=>{
+    VERSIONDELAPLICACION,modoOscuro,setModoOscuro,setCompartiendoUbicacionComoPasajero,setMostrarRutaASeleccionar})=>{
 
 
     const [nombre,setnombre]=useState();
@@ -248,7 +248,11 @@ const Perfil=({permitirEnviarUbicacion,secionIniciada,actualizar,tipoDePerfil,se
                         setSecionIniciada(false);
                         setTipoDeUsuario("Ninguno");
                         setTokenGeoRutasCode("");
-                        setLoguearse(true);                        
+                        setLoguearse(true);
+                        setCompartiendoUbicacionComoPasajero(false);
+                        setCompartiendoUbicacionParaElTransportista("0");
+                        setMostrarRutaASeleccionar(false);
+                        setMostrarComprasPasajeros(false);
                     }else{
                         setLoguearse(true);
                     }

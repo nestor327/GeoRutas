@@ -66,7 +66,7 @@ const CambiarPassword=({height,width,setCambiarPassword,setMostrarAlerte, setMen
 
         let datos=null;
         try{
-            let res=await fetch('https://www.georutas.lat/api/CambiarPassword/'+codigoEnvio+','+email.toLowerCase(),options);
+            let res=await fetch('https://georutas.somee.com/api/CambiarPassword/'+codigoEnvio+','+email.toLowerCase(),options);
             if(res.ok){
                 datos=await res.json();
             }else{
@@ -118,7 +118,7 @@ const CambiarPassword=({height,width,setCambiarPassword,setMostrarAlerte, setMen
 
         let datos=null;
         try{
-            let res=await fetch('https://www.georutas.lat/api/CambiarPassword/'+email.toLowerCase(),options);
+            let res=await fetch('https://georutas.somee.com/api/CambiarPassword/'+email.toLowerCase(),options);
             if(res.ok){
                 datos=await res.json();
             }else{
@@ -175,9 +175,9 @@ const CambiarPassword=({height,width,setCambiarPassword,setMostrarAlerte, setMen
         let datos="";
 
         try{
-            let res=await fetch('https://www.georutas.lat/api/CambiarPassword',options);
+            let res=await fetch('https://georutas.somee.com/api/CambiarPassword',options);
             if(res.ok){                
-                datos=await res.json();                
+                datos=await res.json();
             }else{
                 setMensajeAlerta("Ocurrió un error, vuelva a intentarlo");
                 setMostrarAlerte(true);

@@ -20,7 +20,7 @@ import {
   });
 
   const RewardedADS = ({VERSIONDELAPLICACION,setMostrarAnuncioRewarded,enviarTiempoDesdeElUltimoAnuncio
-                      ,setMostrarComprasPasajeros,setTiempoDeEspera,setDetenerInterval}) => {
+                      ,setMostrarComprasPasajeros,setTiempoDeEspera,setDetenerInterval,compartiendoUbicacionComoPasajero}) => {
     
     const [anuncioCargado, setAnuncioCargado]=useState(false);
     useEffect(() => {
@@ -44,8 +44,10 @@ import {
               setMostrarAnuncioRewarded(false);
               setMostrarComprasPasajeros(false);
               enviarTiempoDesdeElUltimoAnuncio();            
-              setDetenerInterval(false);
-              setTiempoDeEspera(120);
+              if(compartiendoUbicacionComoPasajero==false){
+                setDetenerInterval(false);
+                setTiempoDeEspera(120);
+              }
               console.log("El tiempo si se actualizo si no lo ves algo paso ahi");
             }else{
               console.log("No se permite el acceso");

@@ -1,5 +1,5 @@
 import React, { useEffect,useRef,useState } from "react";
-import { View,Image,TextInput,Text, ScrollView, TouchableOpacity, ActivityIndicator, Animated } from "react-native";
+import { View,Image,TextInput,Text, ScrollView, TouchableOpacity, ActivityIndicator, Animated, Alert } from "react-native";
 import RutasBarItem from "./RutasBarItem.jsx";
 import getAllRutas from '../data/rutasManagua.js'
 
@@ -7,7 +7,7 @@ import getAllRutas from '../data/rutasManagua.js'
 const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRutasTrayecto,obtenerRutas
     ,setVerTrayectoria,setVerRutasCercanas,identificadorKey,refCambiarLupa
     ,setVerCompetencia,setOcultarTrayecto,setCargando,setFechaDeClicCambio,setMostrarCompañerosCercanos
-    ,setIniciarRecorridoDeLaTrayectoria})=>{
+    ,setIniciarRecorridoDeLaTrayectoria,setMostrarLaLineaDeLaRutaQueComparte,verRutasTiempoReal, setVerRutasTiempoReal})=>{
 
     let cantidadDeTrayectos =[0];
     let datosDeLasRutas=[];
@@ -30,6 +30,7 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
     cantidadDeTrayectos.pop();
 
     const fadeAnim=useRef(new Animated.Value(1));
+    const [arregloVacio, setArregloVacio]=useState([12]);
 
    
     const RutasDelTrayecto=({rutasTrayectoria})=>{
@@ -71,7 +72,7 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
     }else{
         const [mostrariItems, setMostrarItems]=useState(false);
         return(
-            <View >
+            <View>
                 <ScrollView>
                     {
                         cantidadDeTrayectos.map((item, i)=>{
@@ -106,7 +107,9 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
                                     setCargando(false);
                                     let fecha= new Date();
                                     setFechaDeClicCambio(fecha.getTime());
-                                    setMostrarCompañerosCercanos(false);                                    
+                                    setMostrarCompañerosCercanos(false);  
+                                    setMostrarLaLineaDeLaRutaQueComparte(false);
+                                    //(i==0)?setVerRutasTiempoReal(!verRutasTiempoReal):"";
                                 }
                                 }>
                                     <Animated.View style={visualizarRutas==(i+1) && {opacity:fadeAnim.current, backgroundColor:'#1e81ce', padding:5, borderRadius:10}}
@@ -117,6 +120,7 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
                                                 duration: 100,
                                                 useNativeDriver: true
                                             }).start();
+                                            //setVerRutasTiempoReal(!verRutasTiempoReal);
                                             
                                         }}    
                                         onTouchCancel={()=>{
@@ -127,7 +131,7 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
                                             }).start();
                                         }}
                                     >
-                                        <Image source={require("../assets/rutasChulada5.png")} style={{height:50,width:50, borderRadius:25}}/>                                                             
+                                        <Image source={(verRutasTiempoReal)?require("../assets/rutasChulada5SoloTrayecto.png"):require("../assets/rutasChulada5.png")} style={{height:50,width:50, borderRadius:25}}/>                                                             
                                      </Animated.View>
                                      
                                      <Text style={{color:'white'}} >Ruta: {i+1}</Text>

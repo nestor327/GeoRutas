@@ -33,7 +33,7 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
         console.log("La mierda posee el id "+idRuta);
         try{
             let value=null;
-            value=await fetch('https://www.georutas.lat/api/UsuariosCoperativas?idRuta='+idRuta+'&Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());
+            value=await fetch('https://georutas.somee.com/api/UsuariosCoperativas?idRuta='+idRuta+'&Email='+emailState+'&Token='+tokenState).then(res=>datos=res.json());
             setData(value);            
             //console.log(value[0]);
             if(value.length>2){
@@ -86,7 +86,7 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
             console.log("La cantidad de segundos es: "+Date.parse(new Date()));
 
 
-            let datos=await fetch('https://www.georutas.lat/api/ActualizarMenbresia?Email='+emailState+'&Token='+tokenState+'&tiempo='
+            let datos=await fetch('https://georutas.somee.com/api/ActualizarMenbresia?Email='+emailState+'&Token='+tokenState+'&tiempo='
                     +tiempoDesdeLaUltimaSuscripcion+'&apellidos='+apellidos,options);
         
                 if(datos.ok){

@@ -98,9 +98,13 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
         let datos=null;
         
         try{            
-            datos=await fetch('https://www.georutas.lat/api/Acceso',options);            
+            console.log("Solicitando los datos");
+            datos=await fetch('https://georutas.somee.com/api/Acceso',options);
+            console.log("Solicitando los datos");
         }catch (e){
             datos=null;
+            console.log("El error encontrado fue: ");
+            console.log(e);
         }
 
 
@@ -226,7 +230,7 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
         console.log("Llega hasta aqui y obtienes");
         try{
             console.log("asdasd");
-            datos=await fetch('https://www.georutas.lat/api/RegistrosExternos',options);
+            datos=await fetch('https://georutas.somee.com/api/RegistrosExternos',options);
             console.log("asdasd");
         }catch (er){
             datos=null;
@@ -259,7 +263,7 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
 
             if(json.respuesta!="1"){
                 try{
-                    datos=await fetch('https://www.georutas.lat/api/RegistrosExternos',options);
+                    datos=await fetch('https://georutas.somee.com/api/RegistrosExternos',options);
                     respuestaLeida=false;
                 }catch (er){
                     datos=null;
@@ -362,7 +366,7 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
 
         let datos=null;
         try{
-            datos=await fetch('https://www.georutas.lat/api/RegistrosExternos',options);
+            datos=await fetch('https://georutas.somee.com/api/RegistrosExternos',options);
         }catch (er){
             datos=null;
         }
@@ -391,7 +395,7 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
 
             if(json.respuesta!="1"){
                 try{
-                    datos=await fetch('https://www.georutas.lat/api/RegistrosExternos',options);
+                    datos=await fetch('https://georutas.somee.com/api/RegistrosExternos',options);
                     respuestaLeida=false;
                 }catch (er){
                     datos=null;
@@ -595,6 +599,9 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
                                     console.log("ERROR IS: " + JSON.stringify(e));
                                     if(e.message=="NETWORK_ERROR"){
                                         setMensajeAlerta("Revise su conexión a internet");
+                                        setMostrarAlerte(true);
+                                    }else if(e.message=="DEVELOPER_ERROR"){
+                                        setMensajeAlerta("El inicio de sesión con Google no está disponible.");
                                         setMostrarAlerte(true);
                                     }
                                 })

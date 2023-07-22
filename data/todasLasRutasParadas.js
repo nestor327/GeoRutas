@@ -10,7 +10,7 @@
         try{
             const {data,error,isLoading}=useQuery(['obtenerTodasLasRutasParadas',email,token],async({queryKey})=>{
                 //return await fetch('https://georutas.somee.com/api/RutasParada').then(res=>datos=res.json())
-                return await fetch('https://www.georutas.lat/api/RutasParada/Email?Email='+email+'&token='+token).then(res=>datos=res.json())
+                return await fetch('https://georutas.somee.com/api/RutasParada/Email?Email='+email+'&token='+token).then(res=>datos=res.json())
             },{
                 staleTime:Infinity,
                 cacheTime:3600000
