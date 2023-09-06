@@ -62,6 +62,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
     siguiendoAlUsuario, askLocationPermission, askLocationPermissionSetting, askLocationBacgroundPermission, checkLocationPermission,
     checkBacgroundLocationPermission, bacgroundPermisos, setBacgroundPermisos,enviarUbicacionComoUnPasajero,id_usuarioTransportistaQueComparte
     ,setUsaurioPasajeroCompartiendoSuUbicacion,setIdDeLaRutaALaQueComparteElPasajero,setId_usuarioTransportistaQueComparte,setMostrarLaLineaDeLaRutaQueComparte
+    ,verRutasTiempoReal,todasLasRutasData
     })=>{
     
 
@@ -233,7 +234,6 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         refFollowing.current=true;
         refMapView.current?.animateCamera({
             center:{latitude,longitude}
-            
         })
         console.log("Tocas esta mierda");
         console.log(userLocation);
@@ -784,6 +784,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
         setVerParadasCercanas={setVerParadasCercanas} setMostrarBarraSecundariaDeUbicacion={setMostrarBarraSecundariaDeUbicacion} coordenadasOrigenSecundario={coordenadasOrigenSecundario} 
         iniciarRecorridoDeLaTrayectoria={iniciarRecorridoDeLaTrayectoria} setIniciarRecorridoDeLaTrayectoria={setIniciarRecorridoDeLaTrayectoria}
         setDetenerInterval={setDetenerInterval} setTiempoDeEspera={setTiempoDeEspera} detenerInterval={detenerInterval} compartiendoUbicacionComoPasajero={compartiendoUbicacionComoPasajero}
+        verRutasTiempoReal={verRutasTiempoReal}
         ></IconosDeNavegacion>
 
 
@@ -1568,6 +1569,7 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
 
             {!iniciarRecorridoDeLaTrayectoria && secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && !mostrarCompañerosCercanos &&
+                    verRutasTiempoReal==true &&
                     iconosTransportes.map((item, i)=>{
                         return(
                             <Marker key={i} coordinate={{
@@ -1653,28 +1655,28 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
 
 
             {secionIniciada==true && mostrarParadas==true && !mostrarCompañerosCercanos && <DireccionesSegunUbicacion emailState={emailState} tokenState={tokenState} idRuta={idRutaAMostrar}></DireccionesSegunUbicacion>}
-            {secionIniciada==true && idRutaAMostrar>0 && mostrarUsuarios==true && tipoDeUsuario=='Pasajero' && mostrarComprasPasajeros==false && <UsuariosTransportistas id_usuarioTransportistaQueComparte={id_usuarioTransportistaQueComparte} emailState={emailState} tokenState={tokenState} tipoDeUsuario={tipoDeUsuario} idRuta={idRutaAMostrar} idUsuarioIniciado={idUsuarioIniciado}
+            {secionIniciada==true && idRutaAMostrar>0 && mostrarUsuarios==true && tipoDeUsuario=='Pasajero' && mostrarComprasPasajeros==false && <UsuariosTransportistas todasLasRutasData={todasLasRutasData} id_usuarioTransportistaQueComparte={id_usuarioTransportistaQueComparte} emailState={emailState} tokenState={tokenState} tipoDeUsuario={tipoDeUsuario} idRuta={idRutaAMostrar} idUsuarioIniciado={idUsuarioIniciado}
                         verTransportistasPorLaDerecha={verTransportistasPorLaDerecha} verTransportistasPorLaIzquierda={verTransportistasPorLaIzquierda} modoOscuro={modoOscuro} compartiendoUbicacionComoPasajero={compartiendoUbicacionComoPasajero}></UsuariosTransportistas>}
             
-            {secionIniciada==true && tipoDeUsuario=='Transportista' && idRutaAMostrar>0 && mostrarUsuarios==true && !mostrarCompañerosCercanos && <UsuariosTransportistasConTiempo setTiempoPromedio={setTiempoPromedio} setTiempoParaUsaurioTransportistaLogueado={setTiempoParaUsaurioTransportistaLogueado} modoSimplificado={false}
+            {secionIniciada==true && tipoDeUsuario=='Transportista' && idRutaAMostrar>0 && mostrarUsuarios==true && !mostrarCompañerosCercanos && <UsuariosTransportistasConTiempo todasLasRutasData={todasLasRutasData} setTiempoPromedio={setTiempoPromedio} setTiempoParaUsaurioTransportistaLogueado={setTiempoParaUsaurioTransportistaLogueado} modoSimplificado={false}
                             emailState={emailState} tokenState={tokenState} tipoDeUsuario={tipoDeUsuario} idRuta={idRutaAMostrar} idUsuarioIniciado={idUsuarioIniciado}
                         verTransportistasPorLaDerecha={verTransportistasPorLaDerecha} verTransportistasPorLaIzquierda={verTransportistasPorLaIzquierda} modoOscuro={modoOscuro}></UsuariosTransportistasConTiempo>}
                         
-            {mostrarCompañerosCercanos && secionIniciada==true && tipoDeUsuario=='Transportista' && <UsuariosTransportistasConTiempo setTiempoPromedio={setTiempoPromedio} setTiempoParaUsaurioTransportistaLogueado={setTiempoParaUsaurioTransportistaLogueado} modoSimplificado={true}
+            {mostrarCompañerosCercanos && secionIniciada==true && tipoDeUsuario=='Transportista' && <UsuariosTransportistasConTiempo todasLasRutasData={todasLasRutasData} setTiempoPromedio={setTiempoPromedio} setTiempoParaUsaurioTransportistaLogueado={setTiempoParaUsaurioTransportistaLogueado} modoSimplificado={true}
                             emailState={emailState} tokenState={tokenState} tipoDeUsuario={tipoDeUsuario} idRuta={idRutaAMostrar} idUsuarioIniciado={idUsuarioIniciado}
                         verTransportistasPorLaDerecha={verTransportistasPorLaDerecha} verTransportistasPorLaIzquierda={verTransportistasPorLaIzquierda} modoOscuro={modoOscuro}></UsuariosTransportistasConTiempo>}
                         
             {secionIniciada==true && mostrarCompañerosCercanos && tipoDeUsuario=='Transportista' &&
-                <LineaDeUnaRuta emailState={emailState} tokenState={tokenState} setCargando={setCargando} setMostrarSniperCargando={setMostrarSniperCargando} idRuta={Math.ceil(idUsuarioIniciado/33.0)} ></LineaDeUnaRuta>
+                <LineaDeUnaRuta todasLasRutasData={todasLasRutasData} emailState={emailState} tokenState={tokenState} setCargando={setCargando} setMostrarSniperCargando={setMostrarSniperCargando} idRuta={Math.ceil(idUsuarioIniciado/33.0)} ></LineaDeUnaRuta>
             }
             {secionIniciada==true && idRutaAMostrar>0 && !mostrarCompañerosCercanos && 
-                <LineaDeUnaRuta emailState={emailState} tokenState={tokenState} setCargando={setCargando} setMostrarSniperCargando={setMostrarSniperCargando} idRuta={idRutaAMostrar} ></LineaDeUnaRuta>
+                <LineaDeUnaRuta todasLasRutasData={todasLasRutasData} emailState={emailState} tokenState={tokenState} setCargando={setCargando} setMostrarSniperCargando={setMostrarSniperCargando} idRuta={idRutaAMostrar} ></LineaDeUnaRuta>
             }
 
-            {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=="Transportista" && verCompetencia==true && <CompetenciaTransportistas modoOscuro={modoOscuro} emailState={emailState} tokenState={tokenState} 
+            {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=="Transportista" && verCompetencia==true && <CompetenciaTransportistas todasLasRutasData={todasLasRutasData} modoOscuro={modoOscuro} emailState={emailState} tokenState={tokenState} 
             tipoDeUsuario={tipoDeUsuario} idUsuarioIniciado={idUsuarioIniciado} rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}></CompetenciaTransportistas>}
 
-            {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=='Pasajero' && userLocation.latitude!=0 && verRutasCercanas==true && mostrarComprasPasajeros==false &&  <RutasCercaDelPasajero tiempoDeEspera={tiempoDeEspera} refMapView={refMapView} modoOscuro={modoOscuro} emailState={emailState} tokenState={tokenState} userLocation ={userLocation}
+            {mostrarItemMenuUno==true && secionIniciada==true && tipoDeUsuario=='Pasajero' && userLocation.latitude!=0 && verRutasCercanas==true && mostrarComprasPasajeros==false &&  <RutasCercaDelPasajero todasLasRutasData={todasLasRutasData} tiempoDeEspera={tiempoDeEspera} refMapView={refMapView} modoOscuro={modoOscuro} emailState={emailState} tokenState={tokenState} userLocation ={userLocation}
             rutasSeleccionadasCompetencia={rutasSeleccionadasCompetencia}></RutasCercaDelPasajero>}
 
             {verParadasCercanas[0].observar==true &&
@@ -1721,17 +1723,17 @@ export default Inicio=({setLoguearse, setRegistrarse,mostrarItemMenuUno,setCoord
                     </View>
                 )
             })}  
-            {secionIniciada==true && idUsuarioIniciado>0 && permitirEnviarUbicacion==true && tipoDeUsuario=="Transportista" && <UsuarioTransportistaLogueado tiempoPromedio={tiempoPromedio} mostrarCompañerosCercanos={mostrarCompañerosCercanos} tiempoParaUsaurioTransportistaLogueado={tiempoParaUsaurioTransportistaLogueado} modoOscuro={modoOscuro} emailState={emailState} tokenState={tokenState} activarPrecision={activarPrecision} direccionesPorUsuario={direccionesPorUsuario}
+            {secionIniciada==true && idUsuarioIniciado>0 && permitirEnviarUbicacion==true && tipoDeUsuario=="Transportista" && <UsuarioTransportistaLogueado todasLasRutasData={todasLasRutasData} tiempoPromedio={tiempoPromedio} mostrarCompañerosCercanos={mostrarCompañerosCercanos} tiempoParaUsaurioTransportistaLogueado={tiempoParaUsaurioTransportistaLogueado} modoOscuro={modoOscuro} emailState={emailState} tokenState={tokenState} activarPrecision={activarPrecision} direccionesPorUsuario={direccionesPorUsuario}
             setDireccionPorUsuario={setDireccionPorUsuario} idUsuarioIniciado={idUsuarioIniciado} userLocation={userLocation} idRutaAMostrar={idRutaAMostrar}></UsuarioTransportistaLogueado>}
             {verParadasCercanas[0].observar==true && verParadasCercanas[0].id_Parada>0
                 && (tipoDeUsuario=='Transportista' || (tipoDeUsuario=='Pasajero' && 
-                (tipoDeSubscripcion=='A' ||tipoDeSubscripcion=='S'))) && <UsuarioCercanoAUnaParada modoOscuro={modoOscuro} idRuta={verParadasCercanas[0].id_Ruta} emailState={emailState} tokenState={tokenState} idParada={verParadasCercanas[0].id_Parada}
+                (tipoDeSubscripcion=='A' ||tipoDeSubscripcion=='S'))) && <UsuarioCercanoAUnaParada todasLasRutasData={todasLasRutasData} modoOscuro={modoOscuro} idRuta={verParadasCercanas[0].id_Ruta} emailState={emailState} tokenState={tokenState} idParada={verParadasCercanas[0].id_Parada}
                     tipoDeUsuario={tipoDeUsuario} idUsuarioIniciado={idUsuarioIniciado}></UsuarioCercanoAUnaParada>}
-            {mostrarComprasPasajeros==false && secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && !mostrarCompañerosCercanos && iniciarRecorridoDeLaTrayectoria && <SeguimientoAlTrayecto permitirSeguirPasajero={permitirSeguirPasajero} permitirEnviarUbicacion={permitirEnviarUbicacion} refMapView={refMapView} datosDeLosUsuarios={datosDeLosUsuarios} modoOscuro={modoOscuro}emailState={emailState}tokenState={tokenState}></SeguimientoAlTrayecto>}
-            {idDeLaRutaALaQueComparteElPasajero>0 && compartiendoUbicacionComoPasajero==true && <RutaSeleccionadaUsuarioPasajero enviarUbicacionComoUnPasajero={enviarUbicacionComoUnPasajero} mostrarLaLineaDeLaRutaQueComparte={mostrarLaLineaDeLaRutaQueComparte} modoOscuro={modoOscuro} idDeLaRutaALaQueComparteElPasajero={idDeLaRutaALaQueComparteElPasajero} emailState={emailState} tokenState={tokenState}
+            {mostrarComprasPasajeros==false && secionIniciada==true && ocultarTrayecto==true && mostrarItemMenuUno==true && verTrayectoria==true && !mostrarCompañerosCercanos && iniciarRecorridoDeLaTrayectoria && <SeguimientoAlTrayecto todasLasRutasData={todasLasRutasData} permitirSeguirPasajero={permitirSeguirPasajero} permitirEnviarUbicacion={permitirEnviarUbicacion} refMapView={refMapView} datosDeLosUsuarios={datosDeLosUsuarios} modoOscuro={modoOscuro}emailState={emailState}tokenState={tokenState}></SeguimientoAlTrayecto>}
+            {idDeLaRutaALaQueComparteElPasajero>0 && compartiendoUbicacionComoPasajero==true && <RutaSeleccionadaUsuarioPasajero todasLasRutasData={todasLasRutasData} enviarUbicacionComoUnPasajero={enviarUbicacionComoUnPasajero} mostrarLaLineaDeLaRutaQueComparte={mostrarLaLineaDeLaRutaQueComparte} modoOscuro={modoOscuro} idDeLaRutaALaQueComparteElPasajero={idDeLaRutaALaQueComparteElPasajero} emailState={emailState} tokenState={tokenState}
             userLocation={userLocation} id_usuarioTransportistaQueComparte={id_usuarioTransportistaQueComparte} idRutaAMostrar={idRutaAMostrar}></RutaSeleccionadaUsuarioPasajero>}
 
-            {idDeLaRutaALaQueComparteElPasajero>0 && compartiendoUbicacionComoPasajero==true && <RutaDelUsuarioQueComparte compartiendoUbicacionComoPasajero={compartiendoUbicacionComoPasajero} emailState={emailState} tokenState={tokenState} idDeLaRutaALaQueComparteElPasajero={idDeLaRutaALaQueComparteElPasajero} id_usuarioTransportistaQueComparte={id_usuarioTransportistaQueComparte}
+            {idDeLaRutaALaQueComparteElPasajero>0 && compartiendoUbicacionComoPasajero==true && <RutaDelUsuarioQueComparte todasLasRutasData={todasLasRutasData} compartiendoUbicacionComoPasajero={compartiendoUbicacionComoPasajero} emailState={emailState} tokenState={tokenState} idDeLaRutaALaQueComparteElPasajero={idDeLaRutaALaQueComparteElPasajero} id_usuarioTransportistaQueComparte={id_usuarioTransportistaQueComparte}
             enviarUbicacionComoUnPasajero={enviarUbicacionComoUnPasajero} userLocation={userLocation} modoOscuro={modoOscuro}></RutaDelUsuarioQueComparte>}
             
         </MapView>}         

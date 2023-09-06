@@ -164,7 +164,7 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                     </View>}
 
                     <View style={{flexDirection:'row', justifyContent:'space-around',marginHorizontal:30}}> 
-                        {eliminarAnuncios==false && <TouchableOpacity style={{marginTop:(eliminarAnuncios==false)?'7%':'3%',backgroundColor:'green'
+                        {eliminarAnuncios==false && <TouchableOpacity style={{marginTop:(eliminarAnuncios==false)?'3%':'3%',backgroundColor:'green'
                                                     ,width:'40%',height:37,borderRadius:10}}
                                 onPressOut={()=>{
                                     //comprarProducto("suscripcionpasajero");      
@@ -180,7 +180,7 @@ const ComprasUsuariosPasajeros=({datosDelUsuarioSinSuscripcion,setMostrarCompras
                             Comprar
                             </Text>
                         </TouchableOpacity>}
-                        <TouchableOpacity style={{marginTop:(eliminarAnuncios==false)?'7%':'3%',backgroundColor:'#2956b2'
+                        <TouchableOpacity style={{marginTop:(eliminarAnuncios==false)?'3%':'3%',backgroundColor:'#2956b2'
                                                     ,width:'40%',height:37,borderRadius:10}}
                                 onPressOut={()=>{
                                     let colorRes='#102769';

@@ -6,10 +6,9 @@ import { useQuery,queryKey } from "react-query";
 import { Marker, Polyline } from "react-native-maps";
 import {Image,View,Text, LogBox} from 'react-native'
 import obtenerParadasPorParadas from "../data/obtencionDeLasParadasPorRuta.js";
-import getAllRutas from '../data/rutasManagua.js'
 import urlDeLasImagenesEstaticas from "../data/urlDeLasImagenesDeLasRutas.js";
     
-    const UsuariosTransportistas=({tipoDeUsuario,idRuta,idUsuarioIniciado,verTransportistasPorLaDerecha,verTransportistasPorLaIzquierda
+    const UsuariosTransportistas=({todasLasRutasData,tipoDeUsuario,idRuta,idUsuarioIniciado,verTransportistasPorLaDerecha,verTransportistasPorLaIzquierda
             ,emailState, tokenState,modoOscuro,id_usuarioTransportistaQueComparte,compartiendoUbicacionComoPasajero})=>{
 
     try{
@@ -32,7 +31,7 @@ import urlDeLasImagenesEstaticas from "../data/urlDeLasImagenesDeLasRutas.js";
             //console.log(data);
         }
     
-        let rutasDeManagua=getAllRutas();
+        let rutasDeManagua=todasLasRutasData;
         const urlDeLasImagenes=urlDeLasImagenesEstaticas();
     
         if(!error && isLoading==false && rutasDeManagua.length>0 && urlDeLasImagenes.length>0 && data!=null && data!=undefined && data.length>1 ){
@@ -44,7 +43,7 @@ import urlDeLasImagenesEstaticas from "../data/urlDeLasImagenesDeLasRutas.js";
             
             for(let y=0;y<data.length;y++){
     
-                nombresEnElArregloFinal.push(rutasDeManagua.filter(elemento => elemento.id_Ruta==data[y].id_Ruta)[0].nombre);
+                nombresEnElArregloFinal.push(rutasDeManagua.length>0?(rutasDeManagua.filter(elemento => elemento.id_Ruta==data[y].id_Ruta)[0].nombre):"---");
                 
                 direccionesPorUsuario.push(data[y].direccion);
             }

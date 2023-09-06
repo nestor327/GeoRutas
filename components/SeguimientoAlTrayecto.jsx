@@ -1,11 +1,10 @@
 import { Marker } from "react-native-maps";
 import {Image,Text} from 'react-native';
 import urlDeLasImagenesEstaticas from "../data/urlDeLasImagenesDeLasRutas";
-import getAllRutas from "../data/rutasManagua";
 import { useQuery } from "react-query";
 
 
-const SeguimientoAlTrayecto=({datosDeLosUsuarios,modoOscuro,emailState,tokenState,refMapView,permitirSeguirPasajero,permitirEnviarUbicacion})=>{
+const SeguimientoAlTrayecto=({todasLasRutasData,datosDeLosUsuarios,modoOscuro,emailState,tokenState,refMapView,permitirSeguirPasajero,permitirEnviarUbicacion})=>{
     
     console.log("Los DATOS DEL USUARIO SON");
     console.log(datosDeLosUsuarios);
@@ -66,7 +65,7 @@ const SeguimientoAlTrayecto=({datosDeLosUsuarios,modoOscuro,emailState,tokenStat
     })
 
     let urlDeLosIconos=urlDeLasImagenesEstaticas();
-    let nombresDeLasRutas=getAllRutas();
+    let nombresDeLasRutas=todasLasRutasData;
 
 
     let datosFiltrados=[];
@@ -89,8 +88,8 @@ const SeguimientoAlTrayecto=({datosDeLosUsuarios,modoOscuro,emailState,tokenStat
                         latitudeDelta:0.02,
                         longitudeDelta:0.05
                     }} style={{alignItems:'center'}}>
-                        {(item.direccion=='D') && <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{"⇛"+nombresDeLasRutas[item.id_Ruta-1].nombre}</Text>}
-                        {(item.direccion=='I') && <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{"⇚"+nombresDeLasRutas[item.id_Ruta-1].nombre}</Text>}         
+                        {(item.direccion=='D') && <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{"⇛"+(nombresDeLasRutas.length>0)?nombresDeLasRutas[item.id_Ruta-1].nombre:"---"}</Text>}
+                        {(item.direccion=='I') && <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{"⇚"+(nombresDeLasRutas.length>0)?nombresDeLasRutas[item.id_Ruta-1].nombre:"---"}</Text>}
                         <Image style={{width:27,height:27}} source={urlDeLosIconos[item.id_Ruta-1]}></Image>
                         <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>
                             {(i==0)?Math.floor((Math.abs(item.tiempoDeLlegada))/3600)

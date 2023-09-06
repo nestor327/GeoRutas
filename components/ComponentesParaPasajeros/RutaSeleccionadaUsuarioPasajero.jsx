@@ -1,13 +1,12 @@
-import { Image, View,Text } from "react-native"
-import { Marker,Polyline } from "react-native-maps"
-import { useQuery } from "react-query"
-import urlDeLasImagenesEstaticas from "../../data/urlDeLasImagenesDeLasRutas"
-import getAllRutas from "../../data/rutasManagua"
-import { useEffect } from "react"
+import { Image, View,Text } from "react-native";
+import { Marker,Polyline } from "react-native-maps";
+import { useQuery } from "react-query";
+import urlDeLasImagenesEstaticas from "../../data/urlDeLasImagenesDeLasRutas";
+import { useEffect } from "react";
 
 
 
-const RutaSeleccionadaUsuarioPasajero=({idDeLaRutaALaQueComparteElPasajero,emailState,tokenState,userLocation,modoOscuro,mostrarLaLineaDeLaRutaQueComparte
+const RutaSeleccionadaUsuarioPasajero=({todasLasRutasData,idDeLaRutaALaQueComparteElPasajero,emailState,tokenState,userLocation,modoOscuro,mostrarLaLineaDeLaRutaQueComparte
                                         ,enviarUbicacionComoUnPasajero,id_usuarioTransportistaQueComparte,idRutaAMostrar})=>{
 
     // try{
@@ -26,7 +25,7 @@ const RutaSeleccionadaUsuarioPasajero=({idDeLaRutaALaQueComparteElPasajero,email
             //console.log(data);
             let coordenadas=[]
             let todasLasUrls=urlDeLasImagenesEstaticas();
-            let todasLasRutas=getAllRutas();
+            let todasLasRutas=todasLasRutasData;
             
 
             if(data!=null && data.length!=0 && data!=undefined && data[0].id_Coordenada==-2){
@@ -48,7 +47,7 @@ const RutaSeleccionadaUsuarioPasajero=({idDeLaRutaALaQueComparteElPasajero,email
             console.log("Esto implica que la linea de la ruta que comparte deberia de estar disponible");
 
             return(
-                mostrarLaLineaDeLaRutaQueComparte==true && idRutaAMostrar!=idDeLaRutaALaQueComparteElPasajero && <Polyline lineDashPattern={[10,2]} strokeColor={todasLasRutas.filter(elem => elem.id_Ruta==idDeLaRutaALaQueComparteElPasajero)[0].color} strokeWidth={2.5} coordinates={coordenadas}></Polyline>
+                mostrarLaLineaDeLaRutaQueComparte==true && idRutaAMostrar!=idDeLaRutaALaQueComparteElPasajero && <Polyline lineDashPattern={[10,2]} strokeColor={(todasLasRutas.length>0)?(todasLasRutas.filter(elem => elem.id_Ruta==idDeLaRutaALaQueComparteElPasajero)[0].color):"#102769"} strokeWidth={2.5} coordinates={coordenadas}></Polyline>
             )
         }
     // }catch{

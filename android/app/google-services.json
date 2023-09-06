@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "782293643903",
+    "project_id": "georutascli",
+    "storage_bucket": "georutascli.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:782293643903:android:523a73b00068e5f4c2054a",
+        "android_client_info": {
+          "package_name": "com.georutas"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "782293643903-5ccpevnmd56qundqe7bafuvmsf8rsqrp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.georutas",
+            "certificate_hash": "8c1c01fbb848b73a628a27aba3e343d4845e0345"
+          }
+        },
+        {
+          "client_id": "782293643903-qdv5fq1v7qu27k1s780md3da1fj10nme.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.georutas",
+            "certificate_hash": "c0171e72b794f7e74f66b5e61aa1d311642c879f"
+          }
+        },
+        {
+          "client_id": "782293643903-o4tvcr4j6t6b29heukogqmcbvu5o46ef.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTb5HcC6_TgHethbJ75mfDdpJR41aNrdE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "782293643903-2dah8i7c8u2nve204m6f324heg8fn5af.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

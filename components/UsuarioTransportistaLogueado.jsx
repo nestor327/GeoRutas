@@ -5,12 +5,11 @@ import { useQuery } from "react-query";
 import { Marker } from "react-native-maps";
 import obtenerParadasPorParadas from '../data/obtencionDeLasParadasPorRuta.js';
 import { View,Text,Image } from "react-native";
-import getAllRutas from '../data/rutasManagua.js'
 
 
 //Este componente posee errores, revisalo luego
 
-    const UsuarioTransportistaLogueado=({emailState,tokenState,usuario,direccionesPorUsuario,setDireccionPorUsuario,idUsuarioIniciado,userLocation,activarPrecision,modoOscuro,tiempoParaUsaurioTransportistaLogueado
+    const UsuarioTransportistaLogueado=({todasLasRutasData,emailState,tokenState,usuario,direccionesPorUsuario,setDireccionPorUsuario,idUsuarioIniciado,userLocation,activarPrecision,modoOscuro,tiempoParaUsaurioTransportistaLogueado
         ,mostrarCompañerosCercanos,idRutaAMostrar, tiempoPromedio})=>{
         try{
             let direccionesPorUsuarioDos='K';
@@ -34,7 +33,7 @@ import getAllRutas from '../data/rutasManagua.js'
     }
     //let paradas=obtenerParadasPorParadas(UsuarioEncontrado.id_Ruta);
     //console.log("El id que pasas es: "+UsuarioEncontrado.id_Ruta);
-    let rutasDeManagua=getAllRutas();
+    let rutasDeManagua=todasLasRutasData;
     let UsuarioEncontrado={};
     //console.log("No Entro");
     //console.log("La cantidad de paradas es: "+paradas.length);

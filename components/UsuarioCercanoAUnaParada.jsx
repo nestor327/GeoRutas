@@ -3,10 +3,9 @@
 import {View,Image,Text} from 'react-native';
 import { Marker } from 'react-native-maps';
 import { useQuery } from 'react-query';
-import getAllRutas from '../data/rutasManagua';
 import urlDeLasImagenesEstaticas from '../data/urlDeLasImagenesDeLasRutas';
 
-const UsuarioCercanoAUnaParada=({idRuta,emailState,tokenState,idParada,tipoDeUsuario,idUsuarioIniciado,modoOscuro})=>{
+const UsuarioCercanoAUnaParada=({todasLasRutasData,idRuta,emailState,tokenState,idParada,tipoDeUsuario,idUsuarioIniciado,modoOscuro})=>{
     //try{
         const {data,error,isLoading}=useQuery(['obtenerUsuarioCercanoAUnaParada',idRuta,emailState,tokenState,idParada],async({queryKey})=>{
             return await fetch('https://georutas.somee.com/api/NUsuarioTransporteCercaDeUnaParada?Id_Ruta='+queryKey[1]+'&Id_Parada='+queryKey[4]+'&Email='+queryKey[2]+'&Token='+queryKey[3]).then(res=>datos=res.json())
@@ -16,7 +15,7 @@ const UsuarioCercanoAUnaParada=({idRuta,emailState,tokenState,idParada,tipoDeUsu
             cacheTime:4000
         })
 
-        let rutasDeManagua=getAllRutas();
+        let rutasDeManagua=todasLasRutasData;
         const urlDeLasImagenes=urlDeLasImagenesEstaticas();
 
         if(isLoading==false){
@@ -31,8 +30,8 @@ const UsuarioCercanoAUnaParada=({idRuta,emailState,tokenState,idParada,tipoDeUsu
                 longitudeDelta:0.05}}
                 style={{alignItems:'center'}}
                 >
-                    {((tipoDeUsuario=='Transportista' && data.id_UsuarioTransporte!=idUsuarioIniciado) || tipoDeUsuario=='Pasajero') && <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{(data.direccion=='I')?"⇚"+rutasDeManagua[idRuta-1].nombre:"⇛"+rutasDeManagua[idRuta-1].nombre}</Text>}
-                    {(tipoDeUsuario=='Transportista' && data.id_UsuarioTransporte==idUsuarioIniciado) && <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{(data.direccion=='I')?"Tú ⇚"+rutasDeManagua[idRuta-1].nombre:"Tú ⇛"+rutasDeManagua[idRuta-1].nombre}</Text>}
+                    {((tipoDeUsuario=='Transportista' && data.id_UsuarioTransporte!=idUsuarioIniciado) || tipoDeUsuario=='Pasajero') && <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{(data.direccion=='I')?"⇚"+((rutasDeManagua.length>0)?rutasDeManagua[idRuta-1].nombre:"---"):"⇛"+((rutasDeManagua.length>0)?rutasDeManagua[idRuta-1].nombre:"---")}</Text>}
+                    {(tipoDeUsuario=='Transportista' && data.id_UsuarioTransporte==idUsuarioIniciado) && <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{(data.direccion=='I')?"Tú ⇚"+((rutasDeManagua.length>0)?rutasDeManagua[idRuta-1].nombre:"---"):"Tú ⇛"+((rutasDeManagua.length>0)?rutasDeManagua[idRuta-1].nombre:"---")}</Text>}
                     <Image style={{width:25,height:25}} source={urlDeLasImagenes[idRuta-1]} ></Image>
                     <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{Math.floor(data.tiempoDeLlegada/3600)
                                                 +":"+((Math.floor(((data.tiempoDeLlegada-3600*(Math.floor(data.tiempoDeLlegada/3600)))/60))>9)?Math.floor(((data.tiempoDeLlegada-3600*(Math.floor(data.tiempoDeLlegada/3600)))/60)):"0"+Math.floor(((data.tiempoDeLlegada-3600*(Math.floor(data.tiempoDeLlegada/3600)))/60)))+":"

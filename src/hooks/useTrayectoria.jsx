@@ -3,9 +3,9 @@ import {useState} from 'react';
 import getAllRutas from "../../data/rutasManagua";
 import { useQuery,queryKey } from "react-query";
 
-const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,setVisualizarRutas,
+const useTrayectoria=(todasLasRutasData,coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,setVisualizarRutas,
     setTiemposRutasTrayectorias,setIconosTransportes,setIdUsuariosDeTrayectoria,verRutasTrayecto,key,emailState,tokenState,setNoseEncontraronTrayectorias,
-    refMapView)=>{
+    refMapView,verRutasTiempoReal)=>{
 
 
     // try{
@@ -16,7 +16,7 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
     // console.log("mierda la url es: ");
     //             console.log(url);
     let {data, error, isLoading,isError, isSuccess,status}=useQuery(["gets",coordenadasOrigen,coordenadasDestino,emailState,tokenState],async({queryKey})=>{
-        return await fetch('https://georutas.somee.com/api/CalculoDosMenorRuta/'+queryKey[1].longitude+','+queryKey[1].latitude+','+queryKey[2].longitude+','+queryKey[2].latitude+'?Email='+queryKey[3]+'&Token='+queryKey[4]).then(res=>datos=res.json()).catch(error => data=[]);
+        return await fetch(((verRutasTiempoReal)?'https://georutas.somee.com/api/CalculoDosMenorRuta/':'https://georutas.somee.com/api/CalculoTresMenorRuta/')+queryKey[1].longitude+','+queryKey[1].latitude+','+queryKey[2].longitude+','+queryKey[2].latitude+'?Email='+queryKey[3]+'&Token='+queryKey[4]).then(res=>datos=res.json()).catch(error => data=[]);
                 //return await fetch('https://georutas.somee.com/api/CalculoDeMenorRuta/'+queryKey[1].latitude
                 //return await fetch('https://georutas.somee.com/api/CalculoDeMenorRuta/-86.300482,12.124742,-86.274902,12.125082').then(res=>datos=res.json()).catch(error => data=[]);
                 //return await fetch('https://georutas.somee.com/api/Rutas/'+Math.abs(Math.floor((queryKey[1].latitude)*10)-1200)%45).then(res=>datos=res.json()).catch(error => data=[]);
@@ -39,7 +39,7 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
     //let data=
     //let isLoading=false;
 
-    const todasLasRutas=getAllRutas();
+    const todasLasRutas=todasLasRutasData;
     
     if(!isLoading){
         // console.log("Ya cargo la mierda");
@@ -55,6 +55,7 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
         // //data=[];        
         // console.log("El valor de la data es: ");
         // console.log(data);
+        // console.log(url);
     }
 
     const obtenerRutas=(keyy)=>{
@@ -68,6 +69,7 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
     
             // console.log(data[0]);
             // console.log("Justo aqui "+isLoading);
+            console.log("Si entraste e hiciste la solicitud");
             const resultados=[];
             const tiempos=[];
             const transportes=[];
@@ -87,11 +89,12 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
                     //tiempoAcumulado=tiempoAcumulado+Math.abs(data[k].tiempoDeLlegada);
                     
                     transportes.push({color:data[k].color, direccionParadaInicial:data[k].direccionParadaInicial, 
-                                     id_Ruta:data[k].id_Ruta, nombre:todasLasRutas.filter(elemento => elemento.id_Ruta==data[k].id_Ruta)[0].nombre, 
+                                     id_Ruta:data[k].id_Ruta, nombre:(todasLasRutas.length>0)?(todasLasRutas.filter(elemento => elemento.id_Ruta==data[k].id_Ruta)[0].nombre):"---", 
                                      latitudParadaUsuarioComun:data[k].latitudParadaUsuarioComun,longitudParadaUsuarioComun:data[k].longitudParadaUsuarioComun,
                                      id_ParadaUsuarioComun:data[k].id_ParadaUsuarioComun,id_ParadaFinal:data[k].id_ParadaFinal,id_Usuario:data[k].id_Usuario,
                                      latitudParadaFinal:data[k].latitudParadaFinal,longitudParadaFinal:data[k].longitudParadaFinal,
-                                     longitudUsuarioComun:data[k].longitudUsuarioComun,latitudUsuarioComun:data[k].latitudUsuarioComun});
+                                     longitudUsuarioComun:data[k].longitudUsuarioComun,latitudUsuarioComun:data[k].latitudUsuarioComun,
+                                     latitudParadaInicial:data[k].latitudParadaInicial,longitudParadaInicial:data[k].longitudParadaInicial});
                     
                     idUsuarios.push({id_Usuario:data[k].id_Usuario,id_Ruta:data[k].id_Ruta});
                     arregloDatosDeLosUsuarios.push({
@@ -115,13 +118,28 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
                       posicionUltimoRegistro=k;
                 }
             }
-            if(transportes.length>=1){
+            console.log("Llegaste hasta aqui");
+
+            if(transportes.length>=1 && verRutasTiempoReal==true){
+                console.log("Entraste aqui");
                 refMapView.current?.animateCamera({
-                    center:{latitude:transportes[0].longitudUsuarioComun,longitude:transportes[0].latitudUsuarioComun}
+                    center:{latitude:transportes[0].longitudUsuarioComun,longitude:transportes[0].latitudUsuarioComun},
+                    zoom: 15
                 })
+            }else if(transportes.length>=1 && verRutasTiempoReal==false){                
+                console.log("POR UN CARAJO DE MIERDA, PORQUE NO ENTRA "+transportes[0].longitudParadaInicial+ " "+transportes[0].latitudParadaInicial);
+                console.log("POR UN CARAJO DE MIERDA, PORQUE NO ENTRA "+transportes[0].longitudParadaUsuarioComun+ " "+transportes[0].latitudParadaUsuarioComun);
+                refMapView.current?.animateCamera({
+                    center:{
+                        latitude:transportes[0].longitudParadaUsuarioComun,
+                        longitude:transportes[0].latitudParadaUsuarioComun
+                    },
+                    zoom: 15
+                });
+                //transportes=[];
             }
 
-
+            console.log(arregloDatosDeLosUsuarios);
             arregloDatosDeLosUsuarios[arregloDatosDeLosUsuarios.length-1].tiempo=Math.abs(arregloDatosDeLosUsuarios[arregloDatosDeLosUsuarios.length-1].tiempo-
                ((Math.ceil((Math.sqrt(Math.pow((data[posicionUltimoRegistro].longitudParadaFinal-coordenadasDestino.latitude),2)+Math.pow((data[posicionUltimoRegistro].latitudParadaFinal-coordenadasDestino.longitude),2))/0.000009)/1.1))));
 
@@ -137,8 +155,9 @@ const useTrayectoria=(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,s
     
     
             //console.log(keyy);
-        }catch{
+        }catch(e) {
             console.log("Ahora si, ocurrio un error");
+            console.log(e.message);
         }
     }
 

@@ -5,7 +5,6 @@ import React, { useEffect } from "react";
 import { useQuery,queryKey } from "react-query";
 import { Marker, Polyline } from "react-native-maps";
 import {View,Text, Image} from 'react-native'
-import getAllRutas from '../data/rutasManagua.js'
 import urlDeLasImagenesEstaticas from "../data/urlDeLasImagenesDeLasRutas.js";
 import obtenerTodasLasParadas from "../data/obtenerTodasLasParadas.js";
 import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
@@ -13,7 +12,7 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
     
 
 
-const CompetenciaTransportistas=({tipoDeUsuario,idUsuarioIniciado,setCargando,rutasSeleccionadasCompetencia,emailState, tokenState, modoOscuro})=>{
+const CompetenciaTransportistas=({tipoDeUsuario,idUsuarioIniciado,setCargando,rutasSeleccionadasCompetencia,emailState, tokenState, modoOscuro,todasLasRutasData})=>{
 
 try{        
     const {data,error,isLoading,isSuccess}=useQuery(['obtenerUsuariosCompetencia',emailState,tokenState],async({queryKey})=>{
@@ -30,7 +29,7 @@ try{
     let todasLasParadas=obtenerTodasLasParadas(emailState,tokenState)
     let todasLasRutasParada=todasLasRutasParadas(emailState,tokenState);
 
-    let rutasDeManagua=getAllRutas();
+    let rutasDeManagua=todasLasRutasData;
     
     if(isLoading){
         //console.log("Se estan cargando los usuarios");

@@ -9,7 +9,7 @@ const Fab=({onPres, style,imagen})=>{
             style={style}
             onPress={onPres}
             >
-                <Image source={imagen} style={{width:28,height:28, borderRadius:15,borderRadius:15, borderColor:'white', borderWidth:2}}/>
+                <Image source={imagen} style={{width:28,height:28, borderRadius:14,borderRadius:14, borderColor:'white', borderWidth:2}}/>
             </TouchableOpacity>
         </View>
     )
@@ -26,6 +26,8 @@ const styles=StyleSheet.create({
         alignSelf:'center',
         borderColor:'black', 
         borderWidth:2,
-        borderRadius:16
+        borderRadius:16,
+        flexDirection:'row',
+        justifyContent:'center'
     }
 })

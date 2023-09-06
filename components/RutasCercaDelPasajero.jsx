@@ -2,14 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useQuery,queryKey } from "react-query";
 import { Marker, Polyline } from "react-native-maps";
 import {Image,View,Text} from 'react-native'
-import getAllRutas from "../data/rutasManagua.js";
 import urlDeLasImagenesEstaticas from "../data/urlDeLasImagenesDeLasRutas.js";
 import obtenerParadasPorParadasCompletas from '../data/obtenerParadasPorParadasCompletas.js';
 import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
     
 
 
-    const RutasCercaDelPasajero=({modoOscuro,userLocation,rutasSeleccionadasCompetencia,emailState, tokenState,refMapView,tiempoDeEspera})=>{
+    const RutasCercaDelPasajero=({todasLasRutasData,modoOscuro,userLocation,rutasSeleccionadasCompetencia,emailState, tokenState,refMapView,tiempoDeEspera})=>{
 
     try{
         const {data,error,isLoading}=useQuery(['obtenerUsuariosCompetencia',emailState,tokenState],async({queryKey})=>{
@@ -26,7 +25,7 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
             }
         })
     
-        let todasLasRutas=getAllRutas();
+        let todasLasRutas=todasLasRutasData;
         let todasLasUrls=urlDeLasImagenesEstaticas();
         
         if(isLoading){
@@ -81,8 +80,8 @@ import todasLasRutasParadas from "../data/todasLasRutasParadas.js";
                                         latitudeDelta:0.02,
                                         longitudeDelta:0.05}}>
                                             
-                                            {item.direccion=='D' && <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{"⇛"+todasLasRutas[item.id_Ruta-1].nombre}</Text>}
-                                            {item.direccion=='I' && <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{"⇚"+todasLasRutas[item.id_Ruta-1].nombre}</Text>}
+                                            {item.direccion=='D' && <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{"⇛"+(todasLasRutas.length>0)?todasLasRutas[item.id_Ruta-1].nombre:"---"}</Text>}
+                                            {item.direccion=='I' && <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{"⇚"+(todasLasRutas.length>0)?todasLasRutas[item.id_Ruta-1].nombre:"---"}</Text>}
                                             <Image style={{width:25,height:25}} source={todasLasUrls[item.id_Ruta-1]} ></Image>
                         
                                     </Marker>
