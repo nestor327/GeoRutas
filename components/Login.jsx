@@ -7,6 +7,7 @@ import { LogBox } from 'react-native';
 LogBox.ignoreLogs(['new NativeEventEmitter']);
 import {GoogleSignin,statusCodes} from '@react-native-google-signin/google-signin';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import auth from '@react-native-firebase/auth';
 
 //keytool -exportcert -alias my-key-alias -keystore 
 //"C:\Users\Nestor Gonzalez\Desktop\GeoRutas\android\app\my-upload-key.keystore" |
@@ -52,18 +53,6 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
     react.useEffect(()=>{
         //getContraseña(setContrasenia);
         obtenerContrasenia();
-        GoogleSignin.configure({
-            scopes: ['https://www.googleapis.com/auth/drive.readonly'], // what API you want to access on behalf of the user, default is email and profile
-            webClientId: '<FROM DEVELOPER CONSOLE>', // client ID of type WEB for your server (needed to verify user ID and offline access)
-            offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
-            hostedDomain: '', // specifies a hosted domain restriction
-            forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
-            accountName: '', // [Android] specifies an account name on the device that should be used
-            iosClientId: '<FROM DEVELOPER CONSOLE>', // [iOS] if you want to specify the client ID of type iOS (otherwise, it is taken from GoogleService-Info.plist)
-            googleServicePlistPath: '', // [iOS] if you renamed your GoogleService-Info file, new name here, e.g. GoogleService-Info-Staging
-            openIdRealm: '', // [iOS] The OpenID2 realm of the home web server. This allows Google to include the user's OpenID Identifier in the OpenID Connect ID token.
-            profileImageSize: 120, // [iOS] The desired height (and width) of the profile image. Defaults to 120px
-          });
     },[])
     
     react.useEffect(()=>{
@@ -494,6 +483,63 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
         await Linking.openURL('https://georutasn.blogspot.com/p/politicas-de-privacidad-de-la.html');
     }
 
+    const SingInWithGoogle = async () =>  {
+        try{
+
+            GoogleSignin.configure({
+                offlineAccess:false,
+                webClientId: '782293643903-o4tvcr4j6t6b29heukogqmcbvu5o46ef.apps.googleusercontent.com'
+                //iosClientId: 'ADD_YOUR_iOS_CLIENT_ID_HERE'
+            });
+
+            // Check if your device supports Google Play
+            await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+            // Get the users ID token
+            const { idToken } = await GoogleSignin.signIn();
+
+            // Create a Google credential with the token
+            const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+
+            // Sign-in the user with the credential
+            return auth().signInWithCredential(googleCredential);
+
+        }catch(e){
+            console.log("ERROR IS: " + JSON.stringify(e));
+            if(e.message=="NETWORK_ERROR"){
+                setMensajeAlerta("Revise su conexión a internet");
+                setMostrarAlerte(true);
+            }else if(e.message=="DEVELOPER_ERROR"){
+                setMensajeAlerta("El inicio de sesión con Google no está disponible"+JSON.stringify(e));
+                setMostrarAlerte(true);
+            }else{
+                setMensajeAlerta("El inicio de sesión con Google no está disponible,"+JSON.stringify(e));
+                setMostrarAlerte(true);
+            }
+            return null;
+        }
+        
+
+        // GoogleSignin.hasPlayServices().then((hasPlayService) => {
+        //     if (hasPlayService) {
+        //             GoogleSignin.signIn().then((userInfo) => {
+        //             console.log(JSON.stringify(userInfo))
+        //             registrarseConGoogle(userInfo.user);                                    
+
+        //         }).catch((e) => {
+        //             console.log("ERROR IS: " + JSON.stringify(e));
+        //             if(e.message=="NETWORK_ERROR"){
+        //                 setMensajeAlerta("Revise su conexión a internet");
+        //                 setMostrarAlerte(true);
+        //             }else if(e.message=="DEVELOPER_ERROR"){
+        //                 setMensajeAlerta("El inicio de sesión con Google no está disponible.");
+        //                 setMostrarAlerte(true);
+        //             }
+        //         })
+        //     }
+        // }).catch((e) => {
+        //     console.log("ERROR IS: " + JSON.stringify(e));
+        // })
+    }
 
     return(
 
@@ -583,33 +629,13 @@ const Login=({setLoguearse,setRegistrarse,setSecionIniciada,setLosguearTransport
 
 
                 <View style={{color:'white',marginLeft:'auto', marginRight:'auto',marginTop:10,width:'60%'}}>
-                    <TouchableOpacity onPress={() =>  {
-                        GoogleSignin.configure({
-                            androidClientId: '782293643903-ibtlt9akvbpt8v3pbjeet0qt18aa0mmc.apps.googleusercontent.com',
-                            //iosClientId: 'ADD_YOUR_iOS_CLIENT_ID_HERE'
-                        });
-
-                        GoogleSignin.hasPlayServices().then((hasPlayService) => {
-                            if (hasPlayService) {
-                                    GoogleSignin.signIn().then((userInfo) => {
-                                    console.log(JSON.stringify(userInfo))
-                                    registrarseConGoogle(userInfo.user);                                    
-
-                                }).catch((e) => {
-                                    console.log("ERROR IS: " + JSON.stringify(e));
-                                    if(e.message=="NETWORK_ERROR"){
-                                        setMensajeAlerta("Revise su conexión a internet");
-                                        setMostrarAlerte(true);
-                                    }else if(e.message=="DEVELOPER_ERROR"){
-                                        setMensajeAlerta("El inicio de sesión con Google no está disponible.");
-                                        setMostrarAlerte(true);
-                                    }
-                                })
-                            }
-                        }).catch((e) => {
-                            console.log("ERROR IS: " + JSON.stringify(e));
-                        })
-                    }} 
+                    <TouchableOpacity onPress={ ()=> SingInWithGoogle().then((userInfo)=>{
+                        console.log("Los datos del usuario son: ");
+                        console.log(userInfo.user);
+                        registrarseConGoogle(userInfo.user);
+                    }).catch((error)=>{
+                        console.log(error);
+                    })} 
                     style={{backgroundColor:'#BD0101',flexDirection:'row',width:'100%',height:32,alignItems:'center',justifyContent:'center',borderRadius:4}}
                     >
                         <Image source={require('../assets/googleIcon.png')} style={{height:17,width:17,marginRight:7,borderRadius:15}}></Image>

@@ -1,15 +1,14 @@
 import { useEffect } from "react";
 import { Marker } from "react-native-maps"
-import getAllRutas from "../../data/rutasManagua";
 import { Image, Text } from "react-native";
 import urlDeLasImagenesEstaticas from "../../data/urlDeLasImagenesDeLasRutas";
 
 
-const RutaDelUsuarioQueComparte=({emailState, tokenState,idDeLaRutaALaQueComparteElPasajero,id_usuarioTransportistaQueComparte,enviarUbicacionComoUnPasajero
+const RutaDelUsuarioQueComparte=({todasLasRutasData,emailState, tokenState,idDeLaRutaALaQueComparteElPasajero,id_usuarioTransportistaQueComparte,enviarUbicacionComoUnPasajero
                                 ,userLocation,modoOscuro,compartiendoUbicacionComoPasajero})=>{
 
 
-    let todasLasRutas=getAllRutas();
+    let todasLasRutas=todasLasRutasData;
     let todasLasUrls=urlDeLasImagenesEstaticas();
 
     //Este useefect esta malo aqui, hay que sacarlo para que todo pueda funcionar correctamente.
@@ -48,7 +47,7 @@ const RutaDelUsuarioQueComparte=({emailState, tokenState,idDeLaRutaALaQueCompart
             style={{alignItems:'center'}}
             line
             >
-                <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{"Tú "+todasLasRutas.filter(elem => elem.id_Ruta==idDeLaRutaALaQueComparteElPasajero)[0].nombre}</Text>
+                <Text style={{color:(!modoOscuro)?'black':'#c3c3c3'}}>{"Tú "+(todasLasRutas.length>0)?(todasLasRutas.filter(elem => elem.id_Ruta==idDeLaRutaALaQueComparteElPasajero)[0].nombre):"---"}</Text>
                 <Image 
                     style={{height:35,width:35}}
                     source={todasLasUrls[idDeLaRutaALaQueComparteElPasajero-1]}

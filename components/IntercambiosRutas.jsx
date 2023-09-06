@@ -1,17 +1,16 @@
 import React, { useEffect,useRef,useState } from "react";
 import { View,Image,TextInput,Text, ScrollView, TouchableOpacity, ActivityIndicator, Animated, Alert } from "react-native";
 import RutasBarItem from "./RutasBarItem.jsx";
-import getAllRutas from '../data/rutasManagua.js'
 
 
-const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRutasTrayecto,obtenerRutas
+const IntercambiosRutas=({todasLasRutasData,rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRutasTrayecto,obtenerRutas
     ,setVerTrayectoria,setVerRutasCercanas,identificadorKey,refCambiarLupa
     ,setVerCompetencia,setOcultarTrayecto,setCargando,setFechaDeClicCambio,setMostrarCompañerosCercanos
     ,setIniciarRecorridoDeLaTrayectoria,setMostrarLaLineaDeLaRutaQueComparte,verRutasTiempoReal, setVerRutasTiempoReal})=>{
 
     let cantidadDeTrayectos =[0];
     let datosDeLasRutas=[];
-    let todasLasRutas=getAllRutas();
+    let todasLasRutas=todasLasRutasData;
 
     if(rutasEnElMapa==undefined){
         return(
@@ -38,8 +37,8 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
         let coloresEnLasRutas=[];
         let nombreDeLasRutas=[];
         for(let h=0;h<rutasTrayectoria.length;h++){
-            coloresEnLasRutas.push(todasLasRutas[rutasTrayectoria[h].id_Ruta-1].color);
-            nombreDeLasRutas.push(todasLasRutas[rutasTrayectoria[h].id_Ruta-1].nombre);
+            coloresEnLasRutas.push((todasLasRutas.length>0)?todasLasRutas[rutasTrayectoria[h].id_Ruta-1].color:"#102769");
+            nombreDeLasRutas.push((todasLasRutas.length>0)?todasLasRutas[rutasTrayectoria[h].id_Ruta-1].nombre:"---");
         }
          
         return(
@@ -77,7 +76,7 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
                     {
                         cantidadDeTrayectos.map((item, i)=>{
                             return(
-                                <View key={i} style={{alignItems:'center', marginTop:'17%'}} 
+                                <View key={i} style={{alignItems:'center', marginBottom:'17%'}} 
                                 onTouchEnd={()=>{  
                                     
                                     if(identificadorKey.current!=(i+1)){
@@ -131,7 +130,7 @@ const IntercambiosRutas=({rutasEnElMapa,rutasTrayectoria,visualizarRutas,verRuta
                                             }).start();
                                         }}
                                     >
-                                        <Image source={(verRutasTiempoReal)?require("../assets/rutasChulada5SoloTrayecto.png"):require("../assets/rutasChulada5.png")} style={{height:50,width:50, borderRadius:25}}/>                                                             
+                                        <Image source={(!verRutasTiempoReal)?require("../assets/rutasChulada5SoloTrayecto.png"):require("../assets/rutasChulada5.png")} style={{height:50,width:50, borderRadius:25}}/>                                                             
                                      </Animated.View>
                                      
                                      <Text style={{color:'white'}} >Ruta: {i+1}</Text>

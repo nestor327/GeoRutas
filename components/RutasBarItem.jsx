@@ -8,7 +8,7 @@ const RutasBarItem=({numeroDeRuta,tiempoDeLlegada,color, mostrarTiempo})=>{
     const fadeAnim=react.useRef(new Animated.Value(1));
 
     return(
-        <Animated.View style={[styles.conteiner,{marginTop:'7.5%',opacity:fadeAnim.current}]}    
+        <Animated.View style={[styles.conteiner,{marginBottom:'7.5%',opacity:fadeAnim.current}]}    
         onTouchEnd={()=>{
             //fadeIn();
             Animated.timing(fadeAnim.current, {

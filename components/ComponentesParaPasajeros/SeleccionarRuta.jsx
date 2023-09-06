@@ -1,6 +1,5 @@
 import {View,ScrollView, StatusBar, Text, TouchableOpacity, Image,FlatList } from 'react-native'
 import RutasBarItem from '../RutasBarItem';
-import getAllRutas from '../../data/rutasManagua';
 import imagen from '../../assets/x_icon_imagen.png';
 import {useEffect,useState} from 'react';
 import { PERMISSIONS, check, openSettings, request } from 'react-native-permissions';
@@ -8,11 +7,11 @@ import obtenerTodasLasCoordenadas from '../../data/obtenerTodasLasCoordenadas.js
 import { getIdUsuarioTransportistaQueComparten, setCompartiendoUbicacionParaElTransportista, setIdRutaDelUsuarioQueComparten } from '../../data/asyncStorageData';
 
 
-const SeleccionarRuta=({height,width,setMostrarRutaASeleccionar,setCompartiendoUbicacionComoPasajero,setMostrarComprasPasajeros,setIdDeLaRutaALaQueComparteElPasajero
+const SeleccionarRuta=({todasLasRutasData,height,width,setMostrarRutaASeleccionar,setCompartiendoUbicacionComoPasajero,setMostrarComprasPasajeros,setIdDeLaRutaALaQueComparteElPasajero
         ,setMostrarLaLineaDeLaRutaQueComparte,bacgroundPermisos, askLocationBacgroundPermission,mostrarAlerta,setMostrarAlerte,setMensajeAlerta,setBacgroundPermisos
         ,userLocation,setId_usuarioTransportistaQueComparte})=>{
 
-    const rutas=getAllRutas();
+    const rutas=todasLasRutasData;
 
     const rutasFiltradas=[];
     const idRutas=[];
@@ -21,7 +20,7 @@ const SeleccionarRuta=({height,width,setMostrarRutaASeleccionar,setCompartiendoU
 
     for(let k=0;k<obtenerCoordenadasCercanas.length;k++){
         if(idRutas.indexOf(obtenerCoordenadasCercanas[k].id_Ruta)<0){
-            let elemento=rutas.filter(elem => elem.id_Ruta==obtenerCoordenadasCercanas[k].id_Ruta)[0];
+            let elemento=(rutas.length>0)?rutas.filter(elem => elem.id_Ruta==obtenerCoordenadasCercanas[k].id_Ruta)[0]:undefined;
             if(elemento!=undefined){
                 rutasFiltradas.push(elemento);
                 idRutas.push(obtenerCoordenadasCercanas[k].id_Ruta);

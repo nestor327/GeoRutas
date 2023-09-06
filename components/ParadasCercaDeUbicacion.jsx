@@ -5,9 +5,8 @@
     import { Marker, Polyline } from "react-native-maps";
     import {Image,View,Text} from 'react-native'
     import RutasBarItem from '../components/RutasBarItem.jsx';
-    import getAllRutas from "../data/rutasManagua.js";
 
-    const ParadasCercaDelOrigen=({lalitude,longitude,setVerParadasCercanas,emailState, tokenState,setFechaDeClicCambio
+    const ParadasCercaDelOrigen=({todasLasRutasData,lalitude,longitude,setVerParadasCercanas,emailState, tokenState,setFechaDeClicCambio
         ,setMostrarCompañerosCercanos,refMapView,setVerRutasCercanas,setVerCompetencia,tipoDeSubscripcion,tipoDeUsuario})=>{
         try{
             const {data,error,isLoading}=useQuery(['obtenerParadasEnElOrigen',lalitude,longitude],async({queryKey})=>{                
@@ -20,7 +19,7 @@
             })
         
         
-            let todasLasRutas=getAllRutas();
+            let todasLasRutas=todasLasRutasData;
         
             if(isLoading==false){ 
 
@@ -29,8 +28,8 @@
                 
         
                 for(let s=0;s<data.length;s++){
-                    nombresEnElArregloFinal.push(todasLasRutas.filter(elemento => elemento.id_Ruta==data[s].id_Ruta)[0].nombre);
-                    coloresRuta.push(todasLasRutas.filter(elemento => elemento.id_Ruta==data[s].id_Ruta)[0].color);
+                    nombresEnElArregloFinal.push((todasLasRutas.length>0)?todasLasRutas.filter(elemento => elemento.id_Ruta==data[s].id_Ruta)[0].nombre:"---");
+                    coloresRuta.push((todasLasRutas.length>0)?todasLasRutas.filter(elemento => elemento.id_Ruta==data[s].id_Ruta)[0].color:"#102769");
                 }
                 return(
                     data.map((item, i)=>{

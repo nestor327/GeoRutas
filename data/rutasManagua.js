@@ -3,36 +3,27 @@ import { useQuery,queryKey } from "react-query";
 
 const getAllRutas=()=>{
 
-    // const {data,error,isLoading}=useQuery(['obtenerRutas'],async({queryKey})=>{
-    //     return await fetch('https://georutas.somee.com/api/rutas').then(res=>datos=res.json()).catch(error => datos=[]);
-    // },{
-    //     staleTime:Infinity
-    // })
-
-//     const {data,error,isLoading}=useQuery(['obtenerRutas'],async({queryKey})=>{
-//         return await fetch('https://georutas.somee.com/api/Rutas').then(res=>datos=res.json()).catch(error => datos=[]);
-//     },{
-//         staleTime:Infinity
-//     })
-
-// if(isLoading){
-//     //console.log("Se estan cargando las paradas");        
-// }
-
-// if(isLoading==false){    
-//     return(data)
-// }
-
-// if(error){
-//     return([]);
-// }
+    const {data,error,isLoading}=useQuery(['obtenerRutas'],async({queryKey})=>{
+        return await fetch('https://georutas.somee.com/api/rutas').then(res=>datos=res.json()).catch(error => datos=[]);
+    },{
+        staleTime:86400000
+    })
 
 
-return([{id_Ruta:1,nombre:"6",color:"green",cantidad:33,capacidad:60},
-        {id_Ruta:2,nombre:"101",color:"blue",cantidad:33,capacidad:60},
-        {id_Ruta:3,nombre:"102",color:"red",cantidad:33,capacidad:60},
-        {id_Ruta:4,nombre:"103",color:"#42E014",cantidad:33,capacidad:60},
-        {id_Ruta:5,nombre:"104",color:"#C21230",cantidad:33,capacidad:60},
+if(isLoading || error){
+    return [];
+}else if(!isLoading){
+    //console.log("La puta data es: ");
+    //console.log(data);
+   return(data);
+}
+else{
+    return []
+// return([{id_Ruta:1,nombre:"6",color:"green",cantidad:33,capacidad:60},
+//         {id_Ruta:2,nombre:"101",color:"blue",cantidad:33,capacidad:60},
+//         {id_Ruta:3,nombre:"102",color:"red",cantidad:33,capacidad:60},
+//         {id_Ruta:4,nombre:"103",color:"#42E014",cantidad:33,capacidad:60},
+//         {id_Ruta:5,nombre:"104",color:"#C21230",cantidad:33,capacidad:60},
         // {id_Ruta:6,nombre:"105",color:"#183EAD",cantidad:33,capacidad:60},
         // {id_Ruta:7,nombre:"106",color:"#C25106",cantidad:33,capacidad:60},
         // {id_Ruta:8,nombre:"107",color:"#15B320",cantidad:33,capacidad:60},
@@ -73,7 +64,7 @@ return([{id_Ruta:1,nombre:"6",color:"green",cantidad:33,capacidad:60},
         // {id_Ruta:43,nombre:"VAN",color:"#D65D27",cantidad:33,capacidad:60},
         // {id_Ruta:44,nombre:"ESQ",color:"#27A5D6",cantidad:33,capacidad:60},
         // {id_Ruta:45,nombre:"SIS",color:"#6AB019",cantidad:33,capacidad:60}
-        ]);
-
+        // ]);
+    }
 }
 export default getAllRutas

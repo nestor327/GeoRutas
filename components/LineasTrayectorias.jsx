@@ -31,7 +31,7 @@ import { Polyline } from "react-native-maps";
 
         
                 return(
-                    <Polyline strokeColor={color} strokeWidth={2.5} coordinates={coordenadas}></Polyline>
+                    <Polyline strokeColor={color} strokeWidth={3} coordinates={coordenadas}></Polyline>
                 )
             }
         

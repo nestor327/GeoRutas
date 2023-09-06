@@ -1,13 +1,13 @@
 import react, { useEffect, useState } from "react"
 import { ScrollView, StatusBar, Text, View,Image, TouchableOpacity, ActivityIndicator } from "react-native"
 import { getNombre } from "../data/asyncStorageData"
-import getAllRutas from "../data/rutasManagua"
+//import getAllRutas from "../data/rutasManagua"
 import imagen from '../assets/x_icon_imagen.png';
 import PerfilesDeUsuarios from "./ComponentesParaAdmins/PerfilesDeUsuarios";
 
 const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrarUsuarios,nombre,setEditarInfoDelChofer,setEmailDelChoferEditar,setChoferAEditar
     ,refrescar,setRefrescar,setMostrarAlerte, setMensajeAlerta,setSecionIniciada,setTipoDeUsuario,setLoguearse,comprarProducto,purchase,setPurchase,idFacturaOApellidos
-    ,tiempoDesdeLaUltimaSuscripcion})=>{
+    ,tiempoDesdeLaUltimaSuscripcion,todasLasRutasData})=>{
     
 
     const [data,setData]=useState([]);
@@ -18,7 +18,7 @@ const AdministrarUsuarios=({height,width,emailState,tokenState,setVerAdministrar
 
     const obtenerLosDatos=async()=>{
 
-        let todasLasRutas=getAllRutas();
+        let todasLasRutas=todasLasRutasData;        
 
         let idRuta=1;
 

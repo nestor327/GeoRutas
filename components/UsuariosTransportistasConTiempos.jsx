@@ -4,11 +4,10 @@
 import React, { useEffect } from "react";
 import { useQuery,queryKey } from "react-query";
 import { Marker, Polyline } from "react-native-maps";
-import {Image,View,Text, LogBox} from 'react-native'
-import getAllRutas from '../data/rutasManagua.js'
+import {Image,View,Text, LogBox} from 'react-native';
 import urlDeLasImagenesEstaticas from "../data/urlDeLasImagenesDeLasRutas.js";
     
-    const UsuariosTransportistasConTiempo=({modoSimplificado,tipoDeUsuario,idRuta,idUsuarioIniciado,verTransportistasPorLaDerecha,verTransportistasPorLaIzquierda
+    const UsuariosTransportistasConTiempo=({todasLasRutasData,modoSimplificado,tipoDeUsuario,idRuta,idUsuarioIniciado,verTransportistasPorLaDerecha,verTransportistasPorLaIzquierda
             ,emailState, tokenState,modoOscuro,setTiempoParaUsaurioTransportistaLogueado,setTiempoPromedio})=>{
 
     try{
@@ -43,7 +42,7 @@ import urlDeLasImagenesEstaticas from "../data/urlDeLasImagenesDeLasRutas.js";
             //console.log(data);
         }
     
-        let rutasDeManagua=getAllRutas();
+        let rutasDeManagua=todasLasRutasData;
         const urlDeLasImagenes=urlDeLasImagenesEstaticas();
     
         if(!error && isLoading==false && rutasDeManagua.length>0 && urlDeLasImagenes.length>0 && data!=null && data!=undefined && data.length>1 ){

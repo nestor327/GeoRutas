@@ -11,7 +11,8 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
                         ,setVerParadasCercanas,setMostrarMenusBuenEstado,setmenUno,setmenDos,setmenTres,setmenCinco,setmenCuatro
                         ,setMostrarBarraSecundariaDeUbicacion,menCinco,modoOscuro,setMostrarCompañerosCercanos,fechaDeClicSalida, setFechaDeClicSalida
                         ,refMapView,setIniciarRecorridoDeLaTrayectoria,tipoDeSubscripcion,tipoDeUsuario,setMostrarLaLineaDeLaRutaQueComparte
-                        ,verRutasTiempoReal, setVerRutasTiempoReal
+                        ,verRutasTiempoReal, setVerRutasTiempoReal,setCoordenadasOrigen, coordenadasOrigen,setMostrarInstruccionesTrayectos,
+                        mostrarInstruccionesTrayectos,setMostrarInstruccionesTodas, mostrarInstruccionesTodas, mostrarInstruccionesSiguientes, setMostrarInstruccionesSiguientes
                         })=>{
 
         const [fechaDeClicCambio, setFechaDeClicCambio]=useState(1679456668848);
@@ -47,7 +48,7 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
         },[fechaDeClicCambio,fechaDeClicSalida])
         
     return(
-        <View style={{width:'100%',height:(height>width)?height-width*0.2:height*0.8-StatusBar.currentHeight,position:'absolute',top:0,left:0,zIndex:240}}
+        <View style={{width:'100%',height:(height>width)?height-width*0.2:height*0.8-StatusBar.currentHeight,position:'absolute',top:0,left:0,zIndex:140}}
             onTouchEnd={()=>{
                 //setTipoDeClic(1);
                 let fecha= new Date();
@@ -56,11 +57,22 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
             }}
             >
             <View style={{height:'100%',width:width,padding:0}}>
-                <View style={[menDos, { left:(height<width)?width*0.2+(width*0.2-height*0.2)/2:width*0.2, 
+                <View style={[menDos, { left:(height<width)?width*0.2+(width*0.2-height*0.2)/2:width*0.2, borderTopEndRadius:5,borderTopStartRadius:5,
                 width: (height>width)?width*0.2:height*0.2,zIndex:1000,  position: 'absolute', 
                 top:(height>width)?height-width*0.8:height*0.6-height*0.2-StatusBar.currentHeight*0.8, 
                 backgroundColor: '#102769',height:(height>width)?width*0.6:height*0.4 },modoOscuro && {backgroundColor:'#151553'}]}
+                onTouchEnd={(e)=>{
+                    e.stopPropagation();
+                }}
                 >
+
+                <TouchableOpacity>
+                    <View style={[{height:18,width:'100%',justifyContent:'flex-end',flexDirection:'row',padding:3,marginBottom:7}]} onTouchEnd={()=>{
+                        setMostrarInstruccionesTodas(!mostrarInstruccionesTodas);
+                    }}>
+                        <Image source={require('../assets/question-mark.png')} style={[{height:18,width:18,tintColor:'#ffffff',borderColor:'#f1f1f1',borderWidth:2,borderRadius:16,backgroundColor:'#10279050'}]}></Image>
+                    </View>
+                </TouchableOpacity>
                 <ScrollView
                 >
                 {
@@ -78,12 +90,14 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
                                     // setFechaDeClicSalida(fecha.getTime());
                                     //setTipoDeClic(2);
                                     setMostrarCompañerosCercanos(false);
-                                    setVerRutasCercanas(false);                                    
+                                    setVerRutasCercanas(false);           
+                                    let fecha= new Date();
+                                    setFechaDeClicSalida(fecha.getTime());
                                 }}                            
                                 >
                                 { i>=0 && <RutasBarItem color={item.color} numeroDeRuta={item.nombre}
                                     tiempoDeLlegada={'1231'}>
-                                    </RutasBarItem>            }           
+                                    </RutasBarItem>}           
     
                                 </View>
                             )   
@@ -93,30 +107,43 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
                 </ScrollView>
             </View>
 
-            {ocultarMenu==true && <View style={[menUno, {left:(height<width)?(width*0.2-height*0.2)/2:0, 
+            {ocultarMenu==true && <View style={[menUno, {left:(height<width)?(width*0.2-height*0.2)/2:0, borderTopEndRadius:5, 
             width: (height>width)?width*0.2:height*0.2, height:(height>width)?width*0.6:height*0.4, position: 'absolute', 
             top:(height>width)?height-width*0.8:height*0.6-height*0.2-StatusBar.currentHeight*0.8, backgroundColor: '#102769'},modoOscuro && {backgroundColor:'#151553'}]}
             onTouchEnd={(e)=>{
                 e.stopPropagation();
             }}
             >
+                <TouchableOpacity>
+                    <View style={[{height:18,width:'100%',justifyContent:'flex-end',flexDirection:'row',padding:3}]} onTouchEnd={()=>{
+                        setMostrarInstruccionesTrayectos(!mostrarInstruccionesTrayectos);
+                    }}>
+                        <Image source={require('../assets/question-mark.png')} style={[{height:18,width:18,tintColor:'#ffffff',borderColor:'#f1f1f1',borderWidth:2,borderRadius:16,backgroundColor:'#10279050'}]}></Image>
+                    </View>
+                </TouchableOpacity>
                   <TouchableOpacity
                     style={{width:'100%',borderRadius:10
-                    ,height:40,alignItems:'center',justifyContent:'space-evenly',flexDirection:'row',marginTop:5}}
+                    ,height:40,alignItems:'center',justifyContent:'space-evenly',flexDirection:'row'}}
                     onPressOut={()=>{
                         //
                         setVerRutasTiempoReal(!verRutasTiempoReal);
+                        let latitude=(verRutasTiempoReal)?coordenadasOrigen.latitude+0.0000001:coordenadasOrigen.latitude-0.0000001;
+
+                        setCoordenadasOrigen({latitude:latitude,longitude:coordenadasOrigen.longitude});
+                        obtenerRutas();
+                        setOcultarTrayecto(false);
+                        setIniciarRecorridoDeLaTrayectoria(false);
                     }}
                     >
                     {/* <Text style={{color:'white',fontSize:15}}>{(!verRutasTiempoReal)?"Activar modo oscuro":"Desactivar modo oscuro"}</Text> */}
-                    <View style={[!verRutasTiempoReal && {height:30,width:60,backgroundColor:'#c6c6c6',borderRadius:17,justifyContent:'center'}
-                                ,verRutasTiempoReal && {height:30,width:60,backgroundColor:'#6f6f6f',borderRadius:17,justifyContent:'center'}]}>
-                        <Image source={(!verRutasTiempoReal)?require('../assets/relojActivo.png'):require('../assets/relojInactivo.png')} style={[{height:28,width:28,marginLeft:1,tintColor:'#ffffff',borderColor:'#f1f1f1',borderWidth:2,borderRadius:16,backgroundColor:(verRutasTiempoReal)?'#10279050':'#102790'},verRutasTiempoReal && {marginLeft:32}]}></Image>
+                    <View style={[verRutasTiempoReal && {height:30,width:60,backgroundColor:'#c6c6c6',borderRadius:17,justifyContent:'center'}
+                                ,!verRutasTiempoReal && {height:30,width:60,backgroundColor:'#a1a1a1',borderRadius:17,justifyContent:'center'}]}>
+                        <Image source={(verRutasTiempoReal)?require('../assets/relojActivo.png'):require('../assets/relojInactivo.png')} style={[{height:28,width:28,marginLeft:1,tintColor:'#ffffff',borderColor:'#f1f1f1',borderWidth:2,borderRadius:16,backgroundColor:(!verRutasTiempoReal)?'#2050AA':'#102790'},!verRutasTiempoReal && {marginLeft:32}]}></Image>
                     </View>
                 </TouchableOpacity>
                   <ScrollView>
                       
-                      <IntercambiosRutas setFechaDeClicCambio={setFechaDeClicCambio} rutasEnElMapa={data} rutasTrayectoria={rutasTrayectoria} visualizarRutas={visualizarRutas} 
+                      <IntercambiosRutas todasLasRutasData={todasLasRutasData} setFechaDeClicCambio={setFechaDeClicCambio} rutasEnElMapa={data} rutasTrayectoria={rutasTrayectoria} visualizarRutas={visualizarRutas} 
                       verRutasTrayecto={verRutasTrayecto} obtenerRutas={obtenerRutas}
                       setVerTrayectoria={setVerTrayectoria}
                       setVerRutasCercanas={setVerRutasCercanas} setVerCompetencia={setVerCompetencia} setOcultarTrayecto={setOcultarTrayecto}
@@ -128,13 +155,24 @@ const ItemsTrayectos=({height,width,todasLasRutasData,menDos,setIdRutaAMostrar,o
                   </ScrollView>
             </View>}
 
-            {ocultarTercerMenu==true && <View style={[menTres, { left:(height<width)?3*width*0.2+(width*0.2-height*0.2)/2:3*width*0.2, 
+            {ocultarTercerMenu==true && <View style={[menTres, { left:(height<width)?3*width*0.2+(width*0.2-height*0.2)/2:3*width*0.2, borderTopEndRadius:5,borderTopStartRadius:5,
             width: (height>width)?width*0.2:height*0.2, 
             height: (height>width)?width*0.6:height*0.4, position: 'absolute', 
-            top:(height>width)?height-width*0.8:height*0.6-height*0.2-StatusBar.currentHeight*0.8, backgroundColor: '#102769'},modoOscuro && {backgroundColor:'#151553'}]}>
+            top:(height>width)?height-width*0.8:height*0.6-height*0.2-StatusBar.currentHeight*0.8, backgroundColor: '#102769'},modoOscuro && {backgroundColor:'#151553'}]}
+            onTouchEnd={(e)=>{
+                e.stopPropagation();
+            }}
+            >
+                <TouchableOpacity>
+                    <View style={[{height:18,width:'100%',justifyContent:'flex-end',flexDirection:'row',padding:3,marginBottom:7}]} onTouchEnd={()=>{
+                        setMostrarInstruccionesSiguientes(!mostrarInstruccionesSiguientes);
+                    }}>
+                        <Image source={require('../assets/question-mark.png')} style={[{height:18,width:18,tintColor:'#ffffff',borderColor:'#f1f1f1',borderWidth:2,borderRadius:16,backgroundColor:'#10279050'}]}></Image>
+                    </View>
+                </TouchableOpacity>
                 <ScrollView>
                 {
-                    <ParadasCercaDelOrigen tipoDeUsuario={tipoDeUsuario} tipoDeSubscripcion={tipoDeSubscripcion} refMapView={refMapView} setFechaDeClicCambio={setFechaDeClicCambio} emailState={emailState} tokenState={tokenState} lalitude={latitude} longitude={longitude} 
+                    <ParadasCercaDelOrigen todasLasRutasData={todasLasRutasData} tipoDeUsuario={tipoDeUsuario} tipoDeSubscripcion={tipoDeSubscripcion} refMapView={refMapView} setFechaDeClicCambio={setFechaDeClicCambio} emailState={emailState} tokenState={tokenState} lalitude={latitude} longitude={longitude} 
                     setVerParadasCercanas={setVerParadasCercanas} setMostrarCompañerosCercanos={setMostrarCompañerosCercanos} setVerRutasCercanas={setVerRutasCercanas} setVerCompetencia={setVerCompetencia}></ParadasCercaDelOrigen>
                 }
                 </ScrollView>

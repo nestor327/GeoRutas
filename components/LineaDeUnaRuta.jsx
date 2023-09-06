@@ -1,12 +1,10 @@
     
-    
     import React from "react";
     import { useQuery,queryKey } from "react-query";
     import { Polyline } from "react-native-maps";
-    import getAllRutas from '../data/rutasManagua.js';
     import { View } from "react-native";
 
-    const LineaDeUnaRuta=({idRuta,setMostrarSniperCargando,setCargando,emailState, tokenState})=>{
+    const LineaDeUnaRuta=({todasLasRutasData,idRuta,setMostrarSniperCargando,setCargando,emailState, tokenState})=>{
 
         try{
             let color="red";
@@ -19,7 +17,7 @@
         //     color="black";
         // }
 
-        let todasLasRutas=getAllRutas();
+        let todasLasRutas=todasLasRutasData;
         if(todasLasRutas.filter(elemento => elemento.id_Ruta==idRuta).length>0){
             color=todasLasRutas.filter(elemento => elemento.id_Ruta==idRuta)[0].color;
         }else{
@@ -27,8 +25,6 @@
         }
 
 
-        
-        //console.log(getAllRutas().filter(elemento => elemento.id_Ruta=idRuta)[0]);
     
     const {data,error,isLoading}=useQuery(['obtenerIndividual',idRuta,emailState,tokenState],async({queryKey})=>{
         //return await fetch('https://georutas.somee.com/api/Coordenadas/'+queryKey[1]).then(res=>datos=res.json())
@@ -82,7 +78,7 @@
         
         console.log(coordenadas[0]);
         return(
-            <Polyline strokeColor={color} strokeWidth={2} coordinates={coordenadas}></Polyline>
+            <Polyline strokeColor={color} strokeWidth={2.5} coordinates={coordenadas}></Polyline>
         )
     }
 

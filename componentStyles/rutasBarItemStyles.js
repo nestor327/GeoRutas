@@ -12,7 +12,6 @@ const styles=StyleSheet.create(
             padding:2,
             flexDirection:'row',
             alignItems:'center',
-            marginTop:5,
             // backgroundColor:'rgb(146, 15, 15)',
             borderRadius:16
         },

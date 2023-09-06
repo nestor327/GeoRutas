@@ -5,7 +5,6 @@ import Login from './components/Login.jsx';
 import MenuBar from './components/MenuBar.jsx';
 import Register from './components/Register.jsx';
 import getAllRutas from './data/rutasManagua.js';
-import { NativeModules } from 'react-native';
 import useTrayectoria from './src/hooks/useTrayectoria.jsx';
 
 import RutasBarItem from './components/RutasBarItem.jsx';
@@ -37,6 +36,9 @@ import SeleccionarRuta from './components/ComponentesParaPasajeros/SeleccionarRu
 import useLocation from './src/hooks/useLocation.jsx';
 import { getIdUsuarioTransportistaQueComparten } from './data/asyncStorageData.js';
 import BackgroundService from 'react-native-background-actions';
+import ITrayectos from './components/Instrucciones/ITrayectos.jsx';
+import ITodas from './components/Instrucciones/ITodas.jsx';
+import ISiguientes from './components/Instrucciones/ISiguientes.jsx';
 
 const App=(
     // emailState, setEmailState, mensajeAlerta, purchase, setPurchase, setMensajeAlerta,
@@ -199,9 +201,12 @@ const App=(
       const [noSeEncontraronTrayectorias, setNoseEncontraronTrayectorias]=useState(false);
 
       const refMapView=useRef();
+      const [verRutasTiempoReal,setVerRutasTiempoReal]=useState(false);
 
-      const {data,obtenerRutas,datosDeLosUsuarios,verificarSiHayDatos} = useTrayectoria(coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,setVisualizarRutas,
-      setTiemposRutasTrayectorias,setIconosTransportes,setIdUsuariosDeTrayectoria,verRutasTrayecto,identificadorKey,emailState,tokenState,setNoseEncontraronTrayectorias,refMapView);
+      let todasLasRutasData=getAllRutas();
+      const {data,obtenerRutas,datosDeLosUsuarios,verificarSiHayDatos} = useTrayectoria(todasLasRutasData,coordenadasOrigen,coordenadasDestino,setRutasTrayectoria,setVisualizarRutas,
+      setTiemposRutasTrayectorias,setIconosTransportes,setIdUsuariosDeTrayectoria,verRutasTrayecto,identificadorKey,emailState,tokenState,setNoseEncontraronTrayectorias
+      ,refMapView,verRutasTiempoReal);
 
       const [menUno, setmenUno] = useState([{ display: 'none',color:'#102769' }]);
       const [menDos, setmenDos] = useState([{ display: 'none',color:'#102769' }]);
@@ -217,7 +222,7 @@ const App=(
 
       const [cargando, setCargando]=useState(false);
 
-      let todasLasRutasData=getAllRutas();
+      
       const [todasLasRutasCompetencia, setTodasLasRutasCompetencia]=useState(getAllRutas());
       const [rutasSeleccionadasCompetencia, setRutasSeleccionadasCompetencia]=useState([]);
 
@@ -650,8 +655,9 @@ const App=(
             }
         },[emailState,tokenState,tipoDeUsuario,compartiendoUbicacionComoPasajero])
 
-        const [verRutasTiempoReal,setVerRutasTiempoReal]=useState(false);
-        
+        const [mostrarInstruccionesTrayectos, setMostrarInstruccionesTrayectos]=useState(false);
+        const [mostrarInstruccionesTodas, setMostrarInstruccionesTodas]=useState(false);
+        const [mostrarInstruccionesSiguientes, setMostrarInstruccionesSiguientes]=useState(false);
 
   return (
      <View style={{height:height, width:width}}>
@@ -693,12 +699,12 @@ const App=(
         askLocationBacgroundPermission={askLocationBacgroundPermission} checkLocationPermission={checkLocationPermission} checkBacgroundLocationPermission={checkBacgroundLocationPermission} bacgroundPermisos={bacgroundPermisos}
         setBacgroundPermisos={setBacgroundPermisos} actualizarTiemposDeLasParadas={actualizarTiemposDeLasParadas} enviarUbicacionComoUnPasajero={enviarUbicacionComoUnPasajero} id_usuarioTransportistaQueComparte={id_usuarioTransportistaQueComparte}
         setUsaurioPasajeroCompartiendoSuUbicacion={setUsaurioPasajeroCompartiendoSuUbicacion} setIdDeLaRutaALaQueComparteElPasajero={setIdDeLaRutaALaQueComparteElPasajero} setId_usuarioTransportistaQueComparte={setId_usuarioTransportistaQueComparte}
-        setMostrarLaLineaDeLaRutaQueComparte={setMostrarLaLineaDeLaRutaQueComparte}
+        setMostrarLaLineaDeLaRutaQueComparte={setMostrarLaLineaDeLaRutaQueComparte} verRutasTiempoReal={verRutasTiempoReal} todasLasRutasData={todasLasRutasData}
         ></Inicio>
 
         {mostrarMenusBuenEstado==true && <ItemsTrayectos verRutasTiempoReal={verRutasTiempoReal} setVerRutasTiempoReal={setVerRutasTiempoReal} 
         setOcultarLasMierdasDelPrimerMenu={setOcultarLasMierdasDelPrimerMenu} ocultarMenu={ocultarMenu} setIdRutaAMostrar={setIdRutaAMostrar} 
-        height={height} width={width} todasLasRutasData={todasLasRutasData} 
+        height={height} width={width} todasLasRutasData={todasLasRutasData}
         menDos={menDos}
         menUno={menUno}
         menTres={menTres}
@@ -715,6 +721,9 @@ const App=(
         menCinco={menCinco} modoOscuro={modoOscuro} setMostrarCompañerosCercanos={setMostrarCompañerosCercanos} fechaDeClicSalida={fechaDeClicSalida} setFechaDeClicSalida={setFechaDeClicSalida}        
         refMapView={refMapView} setIniciarRecorridoDeLaTrayectoria={setIniciarRecorridoDeLaTrayectoria}
         tipoDeSubscripcion={tipoDeSubscripcion} tipoDeUsuario={tipoDeUsuario} setMostrarLaLineaDeLaRutaQueComparte={setMostrarLaLineaDeLaRutaQueComparte}
+        setCoordenadasOrigen={setCoordenadasOrigen} coordenadasOrigen={coordenadasOrigen} setMostrarInstruccionesTrayectos={setMostrarInstruccionesTrayectos}
+        mostrarInstruccionesTrayectos={mostrarInstruccionesTrayectos} setMostrarInstruccionesTodas={setMostrarInstruccionesTodas} mostrarInstruccionesTodas={mostrarInstruccionesTodas}
+        mostrarInstruccionesSiguientes={mostrarInstruccionesSiguientes} setMostrarInstruccionesSiguientes={setMostrarInstruccionesSiguientes}
         >
 
         </ItemsTrayectos>}
@@ -743,13 +752,16 @@ const App=(
         {cambiarPassword==true && <CambiarPassword setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} height={height} width={width} setCambiarPassword={setCambiarPassword}></CambiarPassword>}
         
 
-        {verAdministrarUsuarios==true && <AdministrarUsuarios purchase={purchase} setPurchase={setPurchase} comprarProducto={comprarProducto} setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setLoguearse={setLoguearse} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} refrescar={refrescar}setRefrescar={setRefrescar} setChoferAEditar={setChoferAEditar} setEmailDelChoferEditar={setEmailDelChoferEditar} setEditarInfoDelChofer={setEditarInfoDelChofer} 
+        {verAdministrarUsuarios==true && <AdministrarUsuarios todasLasRutasData={todasLasRutasData} purchase={purchase} setPurchase={setPurchase} comprarProducto={comprarProducto} setSecionIniciada={setSecionIniciada} setTipoDeUsuario={setTipoDeUsuario} setLoguearse={setLoguearse} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} refrescar={refrescar}setRefrescar={setRefrescar} setChoferAEditar={setChoferAEditar} setEmailDelChoferEditar={setEmailDelChoferEditar} setEditarInfoDelChofer={setEditarInfoDelChofer} 
         nombre={nombreAdmin} setVerAdministrarUsuarios={setVerAdministrarUsuarios} tiempoDesdeLaUltimaSuscripcion={tiempoDesdeLaUltimaSuscripcion}
         height={height} width={width} emailState={emailState} tokenState={tokenState} idFacturaOApellidos={idFacturaOApellidos}></AdministrarUsuarios>}
         {editarInfoDelChofer==true && <EditarUsuario setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} refrescar={refrescar}setRefrescar={setRefrescar} emailState={emailState} tokenState={tokenState} choferAEditar={choferAEditar} emailDelChoferEditar={emailDelChoferEditar} setEditarInfoDelChofer={setEditarInfoDelChofer} height={height} width={width} ></EditarUsuario>}
         {registrarse==true && <Register setConfirmarCodigo={setConfirmarCodigo} setMostrarAlerte={setMostrarAlerte} setMensajeAlerta={setMensajeAlerta} emailState={emailState} tokenState={tokenState} setEditarPerfil={setEditarPerfil} editarPerfil={editarPerfil} setLoguearse={setLoguearse} setRegistrarse={setRegistrarse} 
         height={height} width={width}></Register>}
         {mostrarAlerta==true && <AlertComponet width={width} urlDeLaAplicacion={urlDeLaAplicacion} setTipoDeAlerta={setTipoDeAlerta} tipoDeAlert={tipoDeAlerta} setMostrarAlerte={setMostrarAlerte} AlerMensaje={mensajeAlerta} height={height}></AlertComponet>}
+        {mostrarInstruccionesTrayectos && <ITrayectos width={width} height={height} setMostrarInstruccionesTrayectos={setMostrarInstruccionesTrayectos}></ITrayectos>}
+        {mostrarInstruccionesTodas && <ITodas width={width} height={height} setMostrarInstruccionesTodas={setMostrarInstruccionesTodas}></ITodas>}
+        {mostrarInstruccionesSiguientes && <ISiguientes width={width} height={height} setMostrarInstruccionesSiguientes={setMostrarInstruccionesSiguientes}></ISiguientes>}
 
         {darBienvenida==true && <BVAplicacion setDarBienvenida={setDarBienvenida} height={height} width={width}></BVAplicacion>}
         {secionIniciada==true && justificarUbicacion==true && <JustificarUbicacion setPedirUbicacionSegundoPlano={setPedirUbicacionSegundoPlano} setMensajeAlerta={setMensajeAlerta} setMostrarAlerte={setMostrarAlerte} setPedirUbicacion={setPedirUbicacion} tipoDeUsuario={tipoDeUsuario} setJustificarUbicacion={setJustificarUbicacion} height={height} width={width}></JustificarUbicacion>}
@@ -764,7 +776,7 @@ const App=(
                                             modoOscuro={modoOscuro}></ComprasUsuariosPasajeros>}
         {mostrarInformacion==true && (emailState=='nestordgt27@gmail.com' || emailState=='perlavanessa2008@gmail.com') && <MostrarInformacion setMostrarInformacion={setMostrarInformacion} refrescarHistorial={refrescarHistorial} height={height} width={width} historial={historial} purchase={purchaseTxt}></MostrarInformacion>}
 
-        {mostrarRutaASeleccionar==true && compartiendoUbicacionComoPasajero==false && <SeleccionarRuta setId_usuarioTransportistaQueComparte={setId_usuarioTransportistaQueComparte} userLocation={userLocation} setBacgroundPermisos={setBacgroundPermisos} askLocationBacgroundPermission={askLocationBacgroundPermission} setMostrarAlerte={setMostrarAlerte} mostrarAlerta={mostrarAlerta} setMensajeAlerta={setMensajeAlerta} bacgroundPermisos={bacgroundPermisos} setMostrarLaLineaDeLaRutaQueComparte={setMostrarLaLineaDeLaRutaQueComparte} setIdDeLaRutaALaQueComparteElPasajero={setIdDeLaRutaALaQueComparteElPasajero} 
+        {mostrarRutaASeleccionar==true && compartiendoUbicacionComoPasajero==false && <SeleccionarRuta todasLasRutasData={todasLasRutasData} setId_usuarioTransportistaQueComparte={setId_usuarioTransportistaQueComparte} userLocation={userLocation} setBacgroundPermisos={setBacgroundPermisos} askLocationBacgroundPermission={askLocationBacgroundPermission} setMostrarAlerte={setMostrarAlerte} mostrarAlerta={mostrarAlerta} setMensajeAlerta={setMensajeAlerta} bacgroundPermisos={bacgroundPermisos} setMostrarLaLineaDeLaRutaQueComparte={setMostrarLaLineaDeLaRutaQueComparte} setIdDeLaRutaALaQueComparteElPasajero={setIdDeLaRutaALaQueComparteElPasajero} 
                 setMostrarComprasPasajeros={setMostrarComprasPasajeros} setCompartiendoUbicacionComoPasajero={setCompartiendoUbicacionComoPasajero} setMostrarRutaASeleccionar={setMostrarRutaASeleccionar} height={height} width={width}></SeleccionarRuta> }
 
     </View>
